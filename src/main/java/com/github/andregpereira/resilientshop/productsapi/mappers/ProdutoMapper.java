@@ -1,0 +1,19 @@
+package com.github.andregpereira.resilientshop.productsapi.mappers;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+
+import com.github.andregpereira.resilientshop.productsapi.dtos.ProdutoDto;
+import com.github.andregpereira.resilientshop.productsapi.dtos.ProdutoRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.entities.Produto;
+
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface ProdutoMapper {
+
+	Produto toProduto(ProdutoDto produtoDto);
+
+	Produto toProduto(ProdutoRegistroDto produtoRegistroDto);
+
+	ProdutoDto toProdutoDto(Produto produtoDto);
+
+}
