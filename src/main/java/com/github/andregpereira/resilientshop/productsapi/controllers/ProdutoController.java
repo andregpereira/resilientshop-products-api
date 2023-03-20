@@ -63,7 +63,7 @@ public class ProdutoController {
 
 	// Pesquisar por nome
 	@GetMapping("/nome")
-	public ResponseEntity<Page<ProdutoDto>> consultarPorNome(@RequestParam(required = true) String nome,
+	public ResponseEntity<Page<ProdutoDto>> consultarPorNome(@RequestParam(required = false) String nome,
 			@PageableDefault(sort = "nome", direction = Direction.DESC, page = 0, size = 10) Pageable pageable) {
 		return ResponseEntity.ok(produtoConsultaService.consultarPorNome(nome, pageable));
 	}
