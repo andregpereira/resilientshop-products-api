@@ -1,6 +1,10 @@
 package com.github.andregpereira.resilientshop.productsapi.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,10 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.andregpereira.resilientshop.productsapi.dtos.ProdutoDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.ProdutoRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDto;
+import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.services.ProdutoConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.services.ProdutoManutencaoService;
 
@@ -31,28 +36,35 @@ public class ProdutoController {
 
 	// Registrar usuário
 	@PostMapping
-	public ResponseEntity<ProdutoDto> registrar(@RequestBody @Valid ProdutoRegistroDto usuarioRegistroDto) {
-		ProdutoDto produtoDto = produtoManutencaoService.registrar(usuarioRegistroDto);
+	public ResponseEntity<ProdutoDto> registrar(@RequestBody @Valid ProdutoRegistroDto produtoRegistroDto) {
+		ProdutoDto produtoDto = produtoManutencaoService.registrar(produtoRegistroDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(produtoDto);
 	}
 
 	// Atualizar usuário por id
 	@PutMapping("/{id}")
 	public ResponseEntity<ProdutoDto> atualizar(@PathVariable Long id,
-			@RequestBody @Valid ProdutoRegistroDto usuarioRegistroDto) {
-		return ResponseEntity.ok(produtoManutencaoService.atualizar(id, usuarioRegistroDto));
+			@RequestBody @Valid ProdutoRegistroDto produtoRegistroDto) {
+		return ResponseEntity.ok(produtoManutencaoService.atualizar(id, produtoRegistroDto));
 	}
 
-	// Deletar por id
+	// Remover por id
 	@DeleteMapping("/{id}")
-	private ResponseEntity<String> deletar(@PathVariable Long id) {
-		return ResponseEntity.ok(produtoManutencaoService.deletar(id));
+	private ResponseEntity<String> remover(@PathVariable Long id) {
+		return ResponseEntity.ok(produtoManutencaoService.remover(id));
 	}
 
 	// Pesquisar por id
 	@GetMapping("/{id}")
 	public ResponseEntity<ProdutoDto> consultarPorId(@PathVariable Long id) {
 		return ResponseEntity.ok(produtoConsultaService.consultarPorId(id));
+	}
+
+	// Pesquisar por nome
+	@GetMapping("/nome")
+	public ResponseEntity<Page<ProdutoDto>> consultarPorNome(@RequestParam(required = true) String nome,
+			@PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+		return ResponseEntity.ok(produtoConsultaService.consultarPorNome(nome, pageable));
 	}
 
 }
