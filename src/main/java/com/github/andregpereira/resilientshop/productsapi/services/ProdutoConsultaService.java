@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDto;
 import com.github.andregpereira.resilientshop.productsapi.entities.Produto;
 import com.github.andregpereira.resilientshop.productsapi.mappers.ProdutoMapper;
@@ -25,12 +26,12 @@ public class ProdutoConsultaService {
 	@Autowired
 	private ProdutoMapper produtoMapper;
 
-	public ProdutoDto consultarPorId(Long id) {
+	public ProdutoDetalhesDto consultarPorId(Long id) {
 		Optional<Produto> optionalProduto = produtoRepository.findById(id);
 		if (!optionalProduto.isPresent()) {
 			throw new EntityNotFoundException("produto_nao_encontrado");
 		}
-		return produtoMapper.toProdutoDto(optionalProduto.get());
+		return produtoMapper.toProdutoDetalhesDto(optionalProduto.get());
 	}
 
 	public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
