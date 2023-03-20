@@ -1,7 +1,5 @@
 package com.github.andregpereira.resilientshop.productsapi.services;
 
-import java.security.InvalidParameterException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -33,17 +31,20 @@ public class ProdutoConsultaService {
 	}
 
 	public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
-		if (nome.isBlank()) {
-//			throw new InvalidParameterException("produto_consulta_nome_em_branco");
-			return ProdutoDto.criarLista(produtoRepository.findByNome(nome, pageable));
-		} else if (nome.length() < 2) {
-			throw new InvalidParameterException("produto_consulta_nome_tamanho_invalido");
-		}
+		nome = nome != null ? nome : "";
 		Page<Produto> produtos = produtoRepository.findByNome(nome, pageable);
 		if (produtos.isEmpty()) {
 			throw new EmptyResultDataAccessException(1);
+//			throw new InvalidParameterException("produto_consulta_nome_em_branco");
 		}
 		return ProdutoDto.criarLista(produtos);
+//		else if (nome.length() < 2) {
+//			throw new InvalidParameterException("produto_consulta_nome_tamanho_invalido");
+//		}
+//		if (produtos.getTotalElements()==0) {
+//			throw new EmptyResultDataAccessException(1);
+//		}
+//		return ProdutoDto.criarLista(produtos);
 	}
 
 }
