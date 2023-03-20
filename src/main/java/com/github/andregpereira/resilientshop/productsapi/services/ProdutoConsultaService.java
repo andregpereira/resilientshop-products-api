@@ -1,7 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.services;
 
 import java.security.InvalidParameterException;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -27,24 +26,24 @@ public class ProdutoConsultaService {
 	private ProdutoMapper produtoMapper;
 
 	public ProdutoDetalhesDto consultarPorId(Long id) {
-		Optional<Produto> optionalProduto = produtoRepository.findById(id);
-		if (!optionalProduto.isPresent()) {
+		if (!produtoRepository.existsById(id)) {
 			throw new EntityNotFoundException("produto_nao_encontrado");
 		}
-		return produtoMapper.toProdutoDetalhesDto(optionalProduto.get());
+		return produtoMapper.toProdutoDetalhesDto(produtoRepository.getReferenceById(id));
 	}
 
 	public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
 		if (nome.isBlank()) {
-			throw new InvalidParameterException("produto_consulta_nome_em_branco");
+//			throw new InvalidParameterException("produto_consulta_nome_em_branco");
+			return ProdutoDto.criarLista(produtoRepository.findByNome(nome, pageable));
 		} else if (nome.length() < 2) {
 			throw new InvalidParameterException("produto_consulta_nome_tamanho_invalido");
 		}
-		Page<Produto> pageProdutos = produtoRepository.findByNome(nome, pageable);
-		if (pageProdutos.isEmpty()) {
+		Page<Produto> produtos = produtoRepository.findByNome(nome, pageable);
+		if (produtos.isEmpty()) {
 			throw new EmptyResultDataAccessException(1);
 		}
-		return ProdutoDto.criarLista(pageProdutos);
+		return ProdutoDto.criarLista(produtos);
 	}
 
 }
