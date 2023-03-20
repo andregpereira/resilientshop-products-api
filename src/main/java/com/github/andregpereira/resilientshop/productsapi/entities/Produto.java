@@ -5,9 +5,12 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -16,13 +19,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@SequenceGenerator(name = "produto", sequenceName = "sq_produto", allocationSize = 1)
 @Table(name = "tb_produtos", uniqueConstraints = { @UniqueConstraint(name = "uc_sku", columnNames = "sku") })
+@SequenceGenerator(name = "produto", sequenceName = "sq_produtos", allocationSize = 1)
 public class Produto {
 
 	@Id
@@ -46,6 +49,10 @@ public class Produto {
 	private BigDecimal valorUnitario;
 
 	@Column(nullable = false)
-	private Integer estoque;
+	private int estoque;
+
+	@ManyToOne
+	@JoinColumn(name = "id_categoria", foreignKey = @ForeignKey(name = "fk_id_categoria"))
+	private Categoria categoria;
 
 }
