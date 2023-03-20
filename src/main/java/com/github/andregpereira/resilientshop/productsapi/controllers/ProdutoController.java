@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDto;
 import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.services.ProdutoConsultaService;
@@ -34,14 +35,14 @@ public class ProdutoController {
 	@Autowired
 	private ProdutoConsultaService produtoConsultaService;
 
-	// Registrar usuário
+	// Registrar produto
 	@PostMapping
 	public ResponseEntity<ProdutoDto> registrar(@RequestBody @Valid ProdutoRegistroDto produtoRegistroDto) {
 		ProdutoDto produtoDto = produtoManutencaoService.registrar(produtoRegistroDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(produtoDto);
 	}
 
-	// Atualizar usuário por id
+	// Atualizar produto por id
 	@PutMapping("/{id}")
 	public ResponseEntity<ProdutoDto> atualizar(@PathVariable Long id,
 			@RequestBody @Valid ProdutoRegistroDto produtoRegistroDto) {
@@ -56,14 +57,14 @@ public class ProdutoController {
 
 	// Pesquisar por id
 	@GetMapping("/{id}")
-	public ResponseEntity<ProdutoDto> consultarPorId(@PathVariable Long id) {
+	public ResponseEntity<ProdutoDetalhesDto> consultarPorId(@PathVariable Long id) {
 		return ResponseEntity.ok(produtoConsultaService.consultarPorId(id));
 	}
 
 	// Pesquisar por nome
 	@GetMapping("/nome")
 	public ResponseEntity<Page<ProdutoDto>> consultarPorNome(@RequestParam(required = true) String nome,
-			@PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+			@PageableDefault(sort = "nome", direction = Direction.DESC, page = 0, size = 10) Pageable pageable) {
 		return ResponseEntity.ok(produtoConsultaService.consultarPorNome(nome, pageable));
 	}
 
