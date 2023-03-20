@@ -7,19 +7,18 @@ import org.springframework.data.domain.Page;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.entities.Produto;
 
 import lombok.Builder;
 
 @Builder
 public record ProdutoDto(Long id, Long sku, String nome, String descricao,
-		@JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy - HH:mm:ss") LocalDateTime dataCriacao, BigDecimal valorUnitario,
-		int estoque, CategoriaDto categoria) {
+		@JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy - HH:mm:ss") LocalDateTime dataCriacao,
+		BigDecimal valorUnitario, int estoque) {
 
 	public ProdutoDto(Produto produto) {
 		this(produto.getId(), produto.getSku(), produto.getNome(), produto.getDescricao(), produto.getDataCriacao(),
-				produto.getValorUnitario(), produto.getEstoque(), new CategoriaDto(produto.getCategoria()));
+				produto.getValorUnitario(), produto.getEstoque());
 	}
 
 	public static Page<ProdutoDto> criarLista(Page<Produto> pageProdutos) {
