@@ -33,10 +33,10 @@ public class ProdutoServiceExceptionHandler {
 
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	public ResponseEntity<String> erro400(MissingServletRequestParameterException e) {
-		if (e.getMessage().contains("nome")) {
-			return ResponseEntity.badRequest()
-					.body("Não foi possível realizar a busca por nome. Digite um nome e tente novamente.");
-		}
+//		if (e.getMessage().contains("nome")) {
+//			return ResponseEntity.badRequest()
+//					.body("Não foi possível realizar a busca por nome. Digite um nome e tente novamente.");
+//		}
 		return ResponseEntity.badRequest().body(
 				"Não foi possível realizar a busca por produto. Por favor, preencha os campos obrigatórios e tente novamente.");
 	}
@@ -71,7 +71,7 @@ public class ProdutoServiceExceptionHandler {
 	@ExceptionHandler(EmptyResultDataAccessException.class)
 	public ResponseEntity<String> erro404(EmptyResultDataAccessException e) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-				.body("Nenhum prdouto foi encontrado. Verifique e tente novamente.");
+				.body("Nenhum produto foi encontrado. Verifique e tente novamente.");
 	}
 
 	@ExceptionHandler(DataIntegrityViolationException.class)
