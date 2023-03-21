@@ -1,4 +1,4 @@
-package com.github.andregpereira.resilientshop.productsapi.services;
+package com.github.andregpereira.resilientshop.productsapi.services.produto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;

@@ -1,4 +1,4 @@
-package com.github.andregpereira.resilientshop.productsapi.services;
+package com.github.andregpereira.resilientshop.productsapi.services.produto;
 
 import java.security.InvalidParameterException;
 import java.util.stream.Stream;

@@ -19,37 +19,37 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoRegistroDto;
-import com.github.andregpereira.resilientshop.productsapi.services.produto.ProdutoConsultaService;
-import com.github.andregpereira.resilientshop.productsapi.services.produto.ProdutoManutencaoService;
+import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaDetalhesDto;
+import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.services.categoria.CategoriaConsultaService;
+import com.github.andregpereira.resilientshop.productsapi.services.categoria.CategoriaManutencaoService;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/produtos")
-public class ProdutoController {
+@RequestMapping("/categorias")
+public class CategoriaController {
 
 	@Autowired
-	private ProdutoManutencaoService manutencaoService;
+	private CategoriaManutencaoService manutencaoService;
 
 	@Autowired
-	private ProdutoConsultaService consultaService;
+	private CategoriaConsultaService consultaService;
 
-	// Registrar produto
+	// Registrar categoria
 	@PostMapping
-	public ResponseEntity<ProdutoDetalhesDto> registrar(@RequestBody @Valid ProdutoRegistroDto dto,
+	public ResponseEntity<CategoriaDetalhesDto> registrar(@RequestBody @Valid CategoriaRegistroDto dto,
 			UriComponentsBuilder uriBuilder) {
-		ProdutoDetalhesDto produto = manutencaoService.registrar(dto);
-		URI uri = uriBuilder.path("/produtos/{id}").buildAndExpand(produto.id()).toUri();
-		return ResponseEntity.created(uri).body(produto);
+		CategoriaDetalhesDto categoria = manutencaoService.registrar(dto);
+		URI uri = uriBuilder.path("/produtos/{id}").buildAndExpand(categoria.id()).toUri();
+		return ResponseEntity.created(uri).body(categoria);
 	}
 
-	// Atualizar produto por id
+	// Atualizar categoria por id
 	@PutMapping("/{id}")
-	public ResponseEntity<ProdutoDetalhesDto> atualizar(@PathVariable Long id,
-			@RequestBody @Valid ProdutoRegistroDto dto) {
+	public ResponseEntity<CategoriaDetalhesDto> atualizar(@PathVariable Long id,
+			@RequestBody @Valid CategoriaRegistroDto dto) {
 		return ResponseEntity.ok(manutencaoService.atualizar(id, dto));
 	}
 
@@ -61,13 +61,13 @@ public class ProdutoController {
 
 	// Pesquisar por id
 	@GetMapping("/{id}")
-	public ResponseEntity<ProdutoDetalhesDto> consultarPorId(@PathVariable Long id) {
+	public ResponseEntity<CategoriaDetalhesDto> consultarPorId(@PathVariable Long id) {
 		return ResponseEntity.ok(consultaService.consultarPorId(id));
 	}
 
 	// Pesquisar por nome
 	@GetMapping("/nome")
-	public ResponseEntity<Page<ProdutoDto>> consultarPorNome(@RequestParam(required = false) String nome,
+	public ResponseEntity<Page<CategoriaDto>> consultarPorNome(@RequestParam(required = false) String nome,
 			@PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
 		return ResponseEntity.ok(consultaService.consultarPorNome(nome, pageable));
 	}

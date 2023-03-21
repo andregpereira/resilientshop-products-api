@@ -5,9 +5,9 @@ import com.github.andregpereira.resilientshop.productsapi.entities.Categoria;
 import lombok.Builder;
 
 @Builder
-public record CategoriaDto(Long id, String nome) {
+public record CategoriaDetalhesDto(Long id, String nome) {
 
-	public CategoriaDto(Categoria categoria) {
+	public CategoriaDetalhesDto(Categoria categoria) {
 		this(categoria.getId(), categoria.getNome());
 	}
 
