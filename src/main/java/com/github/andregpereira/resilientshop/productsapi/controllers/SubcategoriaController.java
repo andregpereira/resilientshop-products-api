@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.andregpereira.resilientshop.productsapi.dtos.subcategoria.SubcategoriaDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.dtos.subcategoria.SubcategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.dtos.subcategoria.SubcategoriaRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.services.subcategoria.SubcategoriaConsultaService;
@@ -35,13 +36,13 @@ public class SubcategoriaController {
 
 	// Registrar subcategoria
 	@PostMapping
-	public ResponseEntity<SubcategoriaDto> registrar(@RequestBody @Valid SubcategoriaRegistroDto dto) {
+	public ResponseEntity<SubcategoriaDetalhesDto> registrar(@RequestBody @Valid SubcategoriaRegistroDto dto) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(manutencaoService.registrar(dto));
 	}
 
 	// Atualizar subcategoria por id
 	@PutMapping("/{id}")
-	public ResponseEntity<SubcategoriaDto> atualizar(@PathVariable Long id,
+	public ResponseEntity<SubcategoriaDetalhesDto> atualizar(@PathVariable Long id,
 			@RequestBody @Valid SubcategoriaRegistroDto dto) {
 		return ResponseEntity.ok(manutencaoService.atualizar(id, dto));
 	}
@@ -61,7 +62,7 @@ public class SubcategoriaController {
 
 	// Pesquisar por id
 	@GetMapping("/{id}")
-	public ResponseEntity<SubcategoriaDto> consultarPorId(@PathVariable Long id) {
+	public ResponseEntity<SubcategoriaDetalhesDto> consultarPorId(@PathVariable Long id) {
 		return ResponseEntity.ok(consultaService.consultarPorId(id));
 	}
 
