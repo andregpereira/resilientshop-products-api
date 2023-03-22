@@ -8,4 +8,6 @@ import com.github.andregpereira.resilientshop.productsapi.entities.Categoria;
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
 
+	boolean existsByNome(String nome);
+
 }

@@ -1,12 +1,13 @@
 package com.github.andregpereira.resilientshop.productsapi.entities;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -28,11 +29,10 @@ public class Categoria {
 	@Column(name = "id_categoria")
 	private Long id;
 
-	@Column(nullable = false, length = 45)
+	@Column(length = 45, nullable = false)
 	private String nome;
 
-	@OneToMany
-	@PrimaryKeyJoinColumn(nome = "id_subcategoria")
-	private Subcategoria subcategoria;
+	@OneToMany(mappedBy = "categoria")
+	private List<Subcategoria> subcategoria;
 
 }
