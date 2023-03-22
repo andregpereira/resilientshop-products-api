@@ -33,6 +33,6 @@ public class Categoria {
 	private String nome;
 
 	@OneToMany(mappedBy = "categoria")
-	private List<Subcategoria> subcategoria;
+	private List<Subcategoria> subcategorias;
 
 }

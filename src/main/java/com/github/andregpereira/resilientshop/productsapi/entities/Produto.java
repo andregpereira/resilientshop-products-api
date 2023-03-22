@@ -52,7 +52,7 @@ public class Produto {
 	private int estoque;
 
 	@ManyToOne
-	@JoinColumn(name = "id_categoria", foreignKey = @ForeignKey(name = "fk_id_categoria"))
-	private Categoria categoria;
+	@JoinColumn(name = "id_categoria", foreignKey = @ForeignKey(name = "fk_id_subcategoria"))
+	private Subcategoria subcategoria;
 
 }

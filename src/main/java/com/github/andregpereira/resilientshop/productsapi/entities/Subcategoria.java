@@ -1,5 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.entities;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
@@ -8,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -36,7 +39,10 @@ public class Subcategoria {
 	private String descricao;
 
 	@ManyToOne
-	@JoinColumn(name = "id_categoria", nullable = false, foreignKey = @ForeignKey(name = "fk_id_subcategoria"))
+	@JoinColumn(name = "id_categoria", nullable = false, foreignKey = @ForeignKey(name = "fk_id_categoria"))
 	private Categoria categoria;
+
+	@OneToMany(mappedBy = "subcategoria")
+	private List<Produto> produtos;
 
 }
