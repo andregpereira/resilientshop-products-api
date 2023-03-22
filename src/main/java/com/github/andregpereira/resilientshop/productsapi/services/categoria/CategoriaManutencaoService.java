@@ -37,7 +37,7 @@ public class CategoriaManutencaoService {
 		if (!repository.existsById(id)) {
 			throw new EntityNotFoundException(
 					"Desculpe, não foi possível encontrar uma categoria com este id. Verifique e tente novamente");
-		} else if (!repository.existsByNome(dto.nome())) {
+		} else if (repository.existsByNome(dto.nome())) {
 			throw new EntityExistsException("Opa! Já existe uma categoria com esse nome");
 		}
 		Categoria categoriaAtualizada = mapper.toCategoria(dto);
