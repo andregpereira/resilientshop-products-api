@@ -1,7 +1,5 @@
 package com.github.andregpereira.resilientshop.productsapi.services.categoria;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,8 +44,7 @@ public class CategoriaManutencaoService {
 	}
 
 	public String remover(Long id) {
-		Optional<Categoria> optionalCategoria = repository.findById(id);
-		optionalCategoria.ifPresentOrElse(c -> repository.deleteById(c.getId()), () -> {
+		repository.findById(id).ifPresentOrElse(c -> repository.deleteById(c.getId()), () -> {
 			throw new EntityNotFoundException(
 					"Desculpe, não foi possível encontrar uma categoria com este id. Verifique e tente novamente");
 		});

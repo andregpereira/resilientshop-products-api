@@ -29,7 +29,9 @@ public class ProdutoManutencaoService {
 
 	public ProdutoDetalhesDto registrar(ProdutoRegistroDto dto) {
 		if (repository.existsBySku(dto.sku())) {
-			throw new EntityExistsException("Já existe um produto com esse SKU registrado");
+			throw new EntityExistsException("Opa! Já existe um produto com esse SKU registrado");
+		} else if (repository.existsByNome(dto.nome())) {
+			throw new EntityExistsException("Opa! Já existe um produto com esse nome registrado");
 		}
 		Produto produto = mapper.toProduto(dto);
 		produto.setDataCriacao(LocalDateTime.now());
@@ -41,6 +43,8 @@ public class ProdutoManutencaoService {
 		if (!optionalProduto.isPresent()) {
 			throw new EntityNotFoundException(
 					"Desculpe, não foi possível encontrar um produto com este id. Verifique e tente novamente");
+		} else if (repository.existsByNome(dto.nome())) {
+			throw new EntityExistsException("Opa! Já existe um produto com esse nome registrado");
 		}
 		Produto produtoAntigo = optionalProduto.get();
 		Produto produtoAtualizado = mapper.toProduto(dto);
@@ -51,8 +55,7 @@ public class ProdutoManutencaoService {
 	}
 
 	public String remover(Long id) {
-		Optional<Produto> optionalProduto = repository.findById(id);
-		optionalProduto.ifPresentOrElse(p -> repository.deleteById(id), () -> {
+		repository.findById(id).ifPresentOrElse(p -> repository.deleteById(id), () -> {
 			throw new EntityNotFoundException(
 					"Desculpe, não foi possível encontrar um produto com este id. Verifique e tente novamente");
 		});
