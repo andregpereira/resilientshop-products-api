@@ -32,11 +32,11 @@ public class Subcategoria {
 	@Column(nullable = false, length = 45)
 	private String nome;
 
-	@Column(nullable = false, length = 45)
+	@Column(nullable = false, length = 255)
 	private String descricao;
 
 	@ManyToOne
-	@JoinColumn(name = "id_subcategoria", foreignKey = @ForeignKey(name = "fk_id_subcategoria"))
+	@JoinColumn(name = "id_categoria", nullable = false, foreignKey = @ForeignKey(name = "fk_id_subcategoria"))
 	private Categoria categoria;
 
 }

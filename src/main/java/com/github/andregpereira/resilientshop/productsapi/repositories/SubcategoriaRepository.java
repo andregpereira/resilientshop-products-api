@@ -7,5 +7,4 @@ import com.github.andregpereira.resilientshop.productsapi.entities.Subcategoria;
 
 @Repository
 public interface SubcategoriaRepository extends JpaRepository<Subcategoria, Long> {
-
 }
