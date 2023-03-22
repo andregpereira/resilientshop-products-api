@@ -1,11 +1,13 @@
 package com.github.andregpereira.resilientshop.productsapi.services.categoria;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.entities.Categoria;
 import com.github.andregpereira.resilientshop.productsapi.mappers.CategoriaMapper;
 import com.github.andregpereira.resilientshop.productsapi.repositories.CategoriaRepository;
 
@@ -30,6 +32,16 @@ public class CategoriaConsultaService {
 					"Desculpe, não foi possível encontrar uma categoria com este id. Verifique e tente novamente");
 		}
 		return mapper.toCategoriaDto(repository.getReferenceById(id));
+	}
+
+	public Page<CategoriaDto> consultarPorNome(String nome, Pageable pageable) {
+		nome = nome.trim();
+		Page<Categoria> categorias = repository.findByNome(nome, pageable);
+		if (categorias.isEmpty() || nome.isBlank()) {
+			throw new EmptyResultDataAccessException(
+					"Desculpe, não foi possível encontrar uma categoria com este nome. Verifique e tente novamente", 1);
+		}
+		return CategoriaDto.criarPage(categorias);
 	}
 
 }
