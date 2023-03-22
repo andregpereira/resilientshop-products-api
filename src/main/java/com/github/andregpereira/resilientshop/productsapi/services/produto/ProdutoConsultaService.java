@@ -18,33 +18,31 @@ import jakarta.persistence.EntityNotFoundException;
 public class ProdutoConsultaService {
 
 	@Autowired
-	private ProdutoRepository produtoRepository;
+	private ProdutoRepository repository;
 
 	@Autowired
-	private ProdutoMapper produtoMapper;
+	private ProdutoMapper mapper;
+
+	public Page<ProdutoDto> listar(Pageable pageable) {
+		return ProdutoDto.criarPage(repository.findAll(pageable));
+	}
 
 	public ProdutoDetalhesDto consultarPorId(Long id) {
-		if (!produtoRepository.existsById(id)) {
-			throw new EntityNotFoundException("produto_nao_encontrado");
+		if (!repository.existsById(id)) {
+			throw new EntityNotFoundException(
+					"Desculpe, não foi possível encontrar um produto com este id. Verifique e tente novamente");
 		}
-		return produtoMapper.toProdutoDetalhesDto(produtoRepository.getReferenceById(id));
+		return mapper.toProdutoDetalhesDto(repository.getReferenceById(id));
 	}
 
 	public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
-		nome = nome != null ? nome : "";
-		Page<Produto> produtos = produtoRepository.findByNome(nome, pageable);
-		if (produtos.isEmpty()) {
-			throw new EmptyResultDataAccessException(1);
-//			throw new InvalidParameterException("produto_consulta_nome_em_branco");
+		nome = nome.trim();
+		Page<Produto> produtos = repository.findByNome(nome, pageable);
+		if (produtos.isEmpty() || nome.isBlank()) {
+			throw new EmptyResultDataAccessException(
+					"Desculpe, não foi possível encontrar um produto com este nome. Verifique e tente novamente", 1);
 		}
-		return ProdutoDto.criarLista(produtos);
-//		else if (nome.length() < 2) {
-//			throw new InvalidParameterException("produto_consulta_nome_tamanho_invalido");
-//		}
-//		if (produtos.getTotalElements()==0) {
-//			throw new EmptyResultDataAccessException(1);
-//		}
-//		return ProdutoDto.criarLista(produtos);
+		return ProdutoDto.criarPage(produtos);
 	}
 
 }

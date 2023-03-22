@@ -1,12 +1,11 @@
 package com.github.andregpereira.resilientshop.productsapi.controllers;
 
-import java.net.URI;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
+import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoAtualizacaoDto;
 import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDto;
 import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoRegistroDto;
@@ -39,17 +38,14 @@ public class ProdutoController {
 
 	// Registrar produto
 	@PostMapping
-	public ResponseEntity<ProdutoDetalhesDto> registrar(@RequestBody @Valid ProdutoRegistroDto dto,
-			UriComponentsBuilder uriBuilder) {
-		ProdutoDetalhesDto produto = manutencaoService.registrar(dto);
-		URI uri = uriBuilder.path("/produtos/{id}").buildAndExpand(produto.id()).toUri();
-		return ResponseEntity.created(uri).body(produto);
+	public ResponseEntity<ProdutoDetalhesDto> registrar(@RequestBody @Valid ProdutoRegistroDto dto) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(manutencaoService.registrar(dto));
 	}
 
 	// Atualizar produto por id
 	@PutMapping("/{id}")
 	public ResponseEntity<ProdutoDetalhesDto> atualizar(@PathVariable Long id,
-			@RequestBody @Valid ProdutoRegistroDto dto) {
+			@RequestBody @Valid ProdutoAtualizacaoDto dto) {
 		return ResponseEntity.ok(manutencaoService.atualizar(id, dto));
 	}
 
@@ -57,6 +53,13 @@ public class ProdutoController {
 	@DeleteMapping("/{id}")
 	private ResponseEntity<String> remover(@PathVariable Long id) {
 		return ResponseEntity.ok(manutencaoService.remover(id));
+	}
+
+	// Listar todos os produtos
+	@GetMapping
+	public ResponseEntity<Page<ProdutoDto>> listar(
+			@PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+		return ResponseEntity.ok(consultaService.listar(pageable));
 	}
 
 	// Pesquisar por id
@@ -67,7 +70,7 @@ public class ProdutoController {
 
 	// Pesquisar por nome
 	@GetMapping("/nome")
-	public ResponseEntity<Page<ProdutoDto>> consultarPorNome(@RequestParam(required = false) String nome,
+	public ResponseEntity<Page<ProdutoDto>> consultarPorNome(@RequestParam String nome,
 			@PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
 		return ResponseEntity.ok(consultaService.consultarPorNome(nome, pageable));
 	}
