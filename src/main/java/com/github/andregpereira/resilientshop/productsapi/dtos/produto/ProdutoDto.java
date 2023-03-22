@@ -14,11 +14,11 @@ import lombok.Builder;
 @Builder
 public record ProdutoDto(Long id, String nome, String descricao,
 		@JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy - HH:mm:ss") LocalDateTime dataCriacao,
-		BigDecimal valorUnitario) {
+		BigDecimal valorUnitario, int estoque) {
 
 	public ProdutoDto(Produto produto) {
 		this(produto.getId(), produto.getNome(), produto.getDescricao(), produto.getDataCriacao(),
-				produto.getValorUnitario());
+				produto.getValorUnitario(), produto.getEstoque());
 	}
 
 	public static Page<ProdutoDto> criarPage(Page<Produto> produtos) {
