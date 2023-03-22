@@ -51,17 +51,17 @@ public class CategoriaController {
 		return ResponseEntity.ok(manutencaoService.remover(id));
 	}
 
+	// Listar todas as categorias
+	@GetMapping
+	public ResponseEntity<Page<CategoriaDto>> listar(
+			@PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+		return ResponseEntity.ok(consultaService.listar(pageable));
+	}
+
 	// Pesquisar por id
 	@GetMapping("/{id}")
 	public ResponseEntity<CategoriaDto> consultarPorId(@PathVariable Long id) {
 		return ResponseEntity.ok(consultaService.consultarPorId(id));
-	}
-
-	// Listar categorias
-	@GetMapping
-	public ResponseEntity<Page<CategoriaDto>> listar(
-			@PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
-		return ResponseEntity.ok(consultaService.listar(pageable));
 	}
 
 }

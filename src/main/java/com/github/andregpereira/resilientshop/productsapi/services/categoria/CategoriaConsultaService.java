@@ -20,16 +20,16 @@ public class CategoriaConsultaService {
 	@Autowired
 	private CategoriaMapper mapper;
 
+	public Page<CategoriaDto> listar(Pageable pageable) {
+		return CategoriaDto.criarPage(repository.findAll(pageable));
+	}
+
 	public CategoriaDto consultarPorId(Long id) {
 		if (!repository.existsById(id)) {
 			throw new EntityNotFoundException(
 					"Desculpe, não foi possível encontrar uma categoria com este id. Verifique e tente novamente");
 		}
 		return mapper.toCategoriaDto(repository.getReferenceById(id));
-	}
-
-	public Page<CategoriaDto> listar(Pageable pageable) {
-		return CategoriaDto.criarPage(repository.findAll(pageable));
 	}
 
 }

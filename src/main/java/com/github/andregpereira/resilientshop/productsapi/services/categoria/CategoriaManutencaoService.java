@@ -40,9 +40,9 @@ public class CategoriaManutencaoService {
 		} else if (!repository.existsByNome(dto.nome())) {
 			throw new EntityExistsException("Opa! Já existe uma categoria com esse nome");
 		}
-		Categoria categoria = mapper.toCategoria(dto);
-		categoria.setId(id);
-		return mapper.toCategoriaDto(repository.save(categoria));
+		Categoria categoriaAtualizada = mapper.toCategoria(dto);
+		categoriaAtualizada.setId(id);
+		return mapper.toCategoriaDto(repository.save(categoriaAtualizada));
 	}
 
 	public String remover(Long id) {
