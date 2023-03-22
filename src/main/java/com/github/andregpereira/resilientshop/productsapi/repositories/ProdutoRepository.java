@@ -19,5 +19,8 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 	@Query(value = "select * from tb_produtos p where p.nome ilike %:nome%", nativeQuery = true)
 	Page<Produto> findByNome(@Param("nome") String nome, Pageable pageable);
 
+	Page<Produto> findAllBySubcategoriaId(Long id, Pageable pageable);
+
+	Page<Produto> findAllBySubcategoriaCategoriaId(Long id, Pageable pageable);
 
 }

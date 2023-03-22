@@ -75,4 +75,18 @@ public class ProdutoController {
 		return ResponseEntity.ok(consultaService.consultarPorNome(nome, pageable));
 	}
 
+	// Pesquisar por subcategoria
+	@GetMapping("/subcategoria/{id}")
+	public ResponseEntity<Page<ProdutoDto>> consultarPorSubcategoria(@PathVariable Long id,
+			@PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+		return ResponseEntity.ok(consultaService.consultarPorSubcategoria(id, pageable));
+	}
+
+	// Pesquisar por categoria
+	@GetMapping("/categoria/{id}")
+	public ResponseEntity<Page<ProdutoDto>> consultarPorCategoria(@PathVariable Long id,
+			@PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+		return ResponseEntity.ok(consultaService.consultarPorCategoria(id, pageable));
+	}
+
 }
