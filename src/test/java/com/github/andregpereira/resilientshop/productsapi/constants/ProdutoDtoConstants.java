@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.LOCAL_DATE_TIME;
 import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaDtoConstants.SUBCATEGORIA_DTO;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaDtoConstants.SUBCATEGORIA_DTO_ATUALIZADO;
+import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaDtoConstants.SUBCATEGORIA_DTO_ATUALIZADA;
 
 public class ProdutoDtoConstants {
 
@@ -24,7 +24,7 @@ public class ProdutoDtoConstants {
 
     public static final ProdutoDetalhesDto PRODUTO_DETALHES_DTO_ATUALIZADO = new ProdutoDetalhesDto(null, 123456789L,
             "nome2", "Teste da classe ProdutoAtualizacaoDto", LOCAL_DATE_TIME, BigDecimal.valueOf(29.99), 8,
-            SUBCATEGORIA_DTO_ATUALIZADO);
+            SUBCATEGORIA_DTO_ATUALIZADA);
 
     public static final ProdutoRegistroDto PRODUTO_REGISTRO_DTO = new ProdutoRegistroDto(123456789L, "nome",
             "Teste da classe ProdutoRegistroDto", BigDecimal.valueOf(10.59), 10, 1L);

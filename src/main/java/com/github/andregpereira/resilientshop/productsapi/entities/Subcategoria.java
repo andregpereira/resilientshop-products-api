@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -32,7 +32,20 @@ public class Subcategoria {
     @JoinColumn(name = "id_categoria", nullable = false, foreignKey = @ForeignKey(name = "fk_id_categoria"))
     private Categoria categoria;
 
-//    @OneToMany(mappedBy = "subcategoria")
-//    private List<Produto> produtos;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Subcategoria that = (Subcategoria) o;
+        return Objects.equals(id, that.id) && Objects.equals(nome, that.nome) && Objects.equals(descricao,
+                that.descricao) && Objects.equals(categoria, that.categoria);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nome, descricao, categoria);
+    }
 
 }

@@ -54,7 +54,7 @@ class CategoriaControllerTest {
     @Test
     void criarCategoriaComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
         mockMvc.perform(post("/categorias").content(
-                objectMapper.writeValueAsString(CATEGORIA_REGISTRO_DTO_INVALIDO)).contentType(
+                objectMapper.writeValueAsString(CATEGORIA_REGISTRO_DTO_INVALIDA)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isUnprocessableEntity());
     }
 
@@ -68,26 +68,26 @@ class CategoriaControllerTest {
 
     @Test
     void atualizarCategoriaComDadosValidosRetornaOk() throws Exception {
-        given(manutencaoService.atualizar(1L, CATEGORIA_REGISTRO_DTO_ATUALIZADO)).willReturn(CATEGORIA_DTO_ATUALIZADO);
+        given(manutencaoService.atualizar(1L, CATEGORIA_REGISTRO_DTO_ATUALIZADA)).willReturn(CATEGORIA_DTO_ATUALIZADA);
         mockMvc.perform(put("/categorias/1").content(
-                objectMapper.writeValueAsString(CATEGORIA_REGISTRO_DTO_ATUALIZADO)).contentType(
+                objectMapper.writeValueAsString(CATEGORIA_REGISTRO_DTO_ATUALIZADA)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpectAll(
-                jsonPath("$.nome").value(CATEGORIA_DTO_ATUALIZADO.nome()));
+                jsonPath("$.nome").value(CATEGORIA_DTO_ATUALIZADA.nome()));
     }
 
     @Test
     void atualizarCategoriaComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
         mockMvc.perform(put("/categorias/1").content(
-                objectMapper.writeValueAsString(CATEGORIA_REGISTRO_DTO_INVALIDO)).contentType(
+                objectMapper.writeValueAsString(CATEGORIA_REGISTRO_DTO_INVALIDA)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     void atualizarCategoriaInexistenteRetornaNotFound() throws Exception {
-        given(manutencaoService.atualizar(1L, CATEGORIA_REGISTRO_DTO_ATUALIZADO)).willThrow(
+        given(manutencaoService.atualizar(1L, CATEGORIA_REGISTRO_DTO_ATUALIZADA)).willThrow(
                 CategoriaNotFoundException.class);
         mockMvc.perform(put("/categorias/1").content(
-                objectMapper.writeValueAsString(CATEGORIA_REGISTRO_DTO_ATUALIZADO)).contentType(
+                objectMapper.writeValueAsString(CATEGORIA_REGISTRO_DTO_ATUALIZADA)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
     }
 
@@ -109,7 +109,7 @@ class CategoriaControllerTest {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         List<CategoriaDto> listaCategorias = new ArrayList<>();
         listaCategorias.add(CATEGORIA_DTO);
-        listaCategorias.add(CATEGORIA_DTO_ATUALIZADO);
+        listaCategorias.add(CATEGORIA_DTO_ATUALIZADA);
         Page<CategoriaDto> pageCategorias = new PageImpl<>(listaCategorias, pageable, 10);
         given(consultaService.listar(pageable)).willReturn(pageCategorias);
         mockMvc.perform(get("/categorias")).andExpect(status().isOk()).andExpectAll(jsonPath("$.empty").value(false),

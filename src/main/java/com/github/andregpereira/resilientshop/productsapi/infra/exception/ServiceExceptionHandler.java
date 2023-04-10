@@ -66,13 +66,6 @@ public class ServiceExceptionHandler {
     public ResponseEntity<String> erro409(CategoriaAlreadyExistsException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
-    //    @ExceptionHandler(DataIntegrityViolationException.class)
-//    private ResponseEntity<String> erro409(DataIntegrityViolationException e) {
-//        if (e.getMessage().contains("uc_sku")) {
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body("Produto com esse SKU já existe.");
-//        }
-//        return ResponseEntity.status(HttpStatus.CONFLICT).body("Dado inválido. Verifique e tente novamente");
-//    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Stream<DadoInvalido>> erro422(MethodArgumentNotValidException e) {
@@ -80,7 +73,8 @@ public class ServiceExceptionHandler {
         return ResponseEntity.unprocessableEntity().body(erros.map(DadoInvalido::new));
     }
 
-    private record DadoInvalido(String campo, String mensagem) {
+    private record DadoInvalido(String campo,
+            String mensagem) {
 
         public DadoInvalido(FieldError erro) {
             this(erro.getField(), erro.getDefaultMessage());

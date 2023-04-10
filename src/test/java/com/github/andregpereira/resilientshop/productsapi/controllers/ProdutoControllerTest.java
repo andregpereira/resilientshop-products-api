@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoDtoConstants.*;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaDtoConstants.SUBCATEGORIA_DTO_ATUALIZADO;
+import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaDtoConstants.SUBCATEGORIA_DTO_ATUALIZADA;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -101,8 +101,8 @@ class ProdutoControllerTest {
                         DateTimeFormatter.ofPattern("dd/MM/uuuu HH:mm"))),
                 jsonPath("$.valorUnitario").value(PRODUTO_DETALHES_DTO_ATUALIZADO.valorUnitario()),
                 jsonPath("$.estoque").value(PRODUTO_DETALHES_DTO_ATUALIZADO.estoque()),
-                jsonPath("$.subcategoria.nome").value(SUBCATEGORIA_DTO_ATUALIZADO.nome()),
-                jsonPath("$.subcategoria.descricao").value(SUBCATEGORIA_DTO_ATUALIZADO.descricao()));
+                jsonPath("$.subcategoria.nome").value(SUBCATEGORIA_DTO_ATUALIZADA.nome()),
+                jsonPath("$.subcategoria.descricao").value(SUBCATEGORIA_DTO_ATUALIZADA.descricao()));
     }
 
     @Test

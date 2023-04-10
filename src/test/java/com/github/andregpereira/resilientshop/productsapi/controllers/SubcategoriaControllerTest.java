@@ -56,7 +56,7 @@ class SubcategoriaControllerTest {
     @Test
     void criarSubcategoriaComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
         mockMvc.perform(post("/subcategorias").content(
-                objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_INVALIDO)).contentType(
+                objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_INVALIDA)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isUnprocessableEntity());
     }
 
@@ -79,29 +79,29 @@ class SubcategoriaControllerTest {
 
     @Test
     void atualizarSubcategoriaComDadosValidosRetornaOk() throws Exception {
-        given(manutencaoService.atualizar(1L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADO)).willReturn(
-                SUBCATEGORIA_DETALHES_DTO_ATUALIZADO);
+        given(manutencaoService.atualizar(1L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).willReturn(
+                SUBCATEGORIA_DETALHES_DTO_ATUALIZADA);
         mockMvc.perform(put("/subcategorias/1").content(
-                objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADO)).contentType(
+                objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpectAll(jsonPath("$").exists(),
-                jsonPath("$.nome").value(SUBCATEGORIA_DETALHES_DTO_ATUALIZADO.nome()),
-                jsonPath("$.descricao").value(SUBCATEGORIA_DETALHES_DTO_ATUALIZADO.descricao()),
-                jsonPath("$.categoria.nome").value(SUBCATEGORIA_DETALHES_DTO_ATUALIZADO.categoria().nome()));
+                jsonPath("$.nome").value(SUBCATEGORIA_DETALHES_DTO_ATUALIZADA.nome()),
+                jsonPath("$.descricao").value(SUBCATEGORIA_DETALHES_DTO_ATUALIZADA.descricao()),
+                jsonPath("$.categoria.nome").value(SUBCATEGORIA_DETALHES_DTO_ATUALIZADA.categoria().nome()));
     }
 
     @Test
     void atualizarSubcategoriaComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
         mockMvc.perform(put("/subcategorias/1").content(
-                objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADO_INVALIDO)).contentType(
+                objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADO_INVALIDA)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isUnprocessableEntity());
     }
 
     @Test
     void atualizarSubcategoriaInexistenteRetornaNotFound() throws Exception {
-        given(manutencaoService.atualizar(1L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADO)).willThrow(
+        given(manutencaoService.atualizar(1L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).willThrow(
                 SubcategoriaNotFoundException.class);
         mockMvc.perform(put("/subcategorias/1").content(
-                objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADO)).contentType(
+                objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
     }
 

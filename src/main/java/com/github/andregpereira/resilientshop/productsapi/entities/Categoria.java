@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -25,7 +25,19 @@ public class Categoria {
     @Column(length = 45, nullable = false)
     private String nome;
 
-//    @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
-//    private List<Subcategoria> subcategorias;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Categoria categoria = (Categoria) o;
+        return Objects.equals(id, categoria.id) && Objects.equals(nome, categoria.nome);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nome);
+    }
 
 }
