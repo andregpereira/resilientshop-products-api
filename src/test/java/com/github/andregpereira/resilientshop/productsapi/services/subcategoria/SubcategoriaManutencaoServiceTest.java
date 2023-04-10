@@ -54,8 +54,6 @@ class SubcategoriaManutencaoServiceTest {
 
     @Test
     void criarSubcategoriaComDadosInvalidosThrowsException() {
-//        given(subcategoriaRepository.existsByNome(CATEGORIA_INVALIDA.getNome())).willReturn(false);
-//        given(subcategoriaRepository.save(SUBCATEGORIA_INVALIDA)).willThrow(RuntimeException.class);
         assertThatThrownBy(() -> manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO_INVALIDA)).isInstanceOf(
                 RuntimeException.class);
         then(subcategoriaRepository).should(never()).save(SUBCATEGORIA);

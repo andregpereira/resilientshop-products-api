@@ -5,7 +5,6 @@ import com.github.andregpereira.resilientshop.productsapi.entities.Categoria;
 import com.github.andregpereira.resilientshop.productsapi.infra.exception.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.mappers.CategoriaMapper;
 import com.github.andregpereira.resilientshop.productsapi.repositories.CategoriaRepository;
-import com.github.andregpereira.resilientshop.productsapi.services.categoria.CategoriaConsultaServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
