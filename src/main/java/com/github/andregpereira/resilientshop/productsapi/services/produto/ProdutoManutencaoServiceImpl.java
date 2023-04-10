@@ -11,6 +11,7 @@ import com.github.andregpereira.resilientshop.productsapi.mappers.ProdutoMapper;
 import com.github.andregpereira.resilientshop.productsapi.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.repositories.SubcategoriaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 @Transactional
 public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
@@ -30,27 +32,35 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
 
     public ProdutoDetalhesDto registrar(ProdutoRegistroDto dto) {
         if (produtoRepository.existsBySku(dto.sku())) {
+            log.info("Produto já cadastrado com o SKU {}", dto.sku());
             throw new ProdutoAlreadyExistsException("Opa! Já existe um produto com esse SKU registrado");
         } else if (produtoRepository.existsByNome(dto.nome())) {
+            log.info("Produto já cadastrado com o nome {}", dto.nome());
             throw new ProdutoAlreadyExistsException("Opa! Já existe um produto com esse nome registrado");
         } else if (!subcategoriaRepository.existsById(dto.idSubcategoria())) {
+            log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
             throw new SubcategoriaNotFoundException(
                     "Desculpe, não foi possível encontrar uma subcategoria com o id " + dto.idSubcategoria() + ". Verifique e tente novamente");
         }
         Produto produto = mapper.toProduto(dto);
         produto.setDataCriacao(LocalDateTime.now());
         produto.setSubcategoria(subcategoriaRepository.getReferenceById(dto.idSubcategoria()));
-        return mapper.toProdutoDetalhesDto(produtoRepository.save(produto));
+        produto = produtoRepository.save(produto);
+        log.info("Produto criado");
+        return mapper.toProdutoDetalhesDto(produto);
     }
 
     public ProdutoDetalhesDto atualizar(Long id, ProdutoAtualizacaoDto dto) {
         Optional<Produto> optionalProduto = produtoRepository.findById(id);
         if (optionalProduto.isEmpty()) {
+            log.info("Produto não encontrado com id {}", id);
             throw new ProdutoNotFoundException(
                     "Desculpe, não foi possível encontrar um produto com o id " + id + ". Verifique e tente novamente");
         } else if (produtoRepository.existsByNome(dto.nome())) {
+            log.info("Produto já cadastrado com o nome {}", dto.nome());
             throw new ProdutoAlreadyExistsException("Opa! Já existe um produto com esse nome registrado");
         } else if (!subcategoriaRepository.existsById(dto.idSubcategoria())) {
+            log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
             throw new SubcategoriaNotFoundException(
                     "Desculpe, não foi possível encontrar uma subcategoria com o id " + dto.idSubcategoria() + ". Verifique e tente novamente");
         }
@@ -60,14 +70,18 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
         produtoAtualizado.setSku(produtoAntigo.getSku());
         produtoAtualizado.setDataCriacao(produtoAntigo.getDataCriacao());
         produtoAtualizado.setSubcategoria(subcategoriaRepository.getReferenceById(dto.idSubcategoria()));
-        return mapper.toProdutoDetalhesDto(produtoRepository.save(produtoAtualizado));
+        Produto produto = produtoRepository.save(produtoAtualizado);
+        log.info("Produto com id {} atualizado", id);
+        return mapper.toProdutoDetalhesDto(produto);
     }
 
     public String remover(Long id) {
         produtoRepository.findById(id).ifPresentOrElse(p -> produtoRepository.deleteById(id), () -> {
+            log.info("Produto não encontrado com id {}", id);
             throw new ProdutoNotFoundException(
                     "Desculpe, não foi possível encontrar um produto com o id " + id + ". Verifique e tente novamente");
         });
+        log.info("Produto com id {} removido", id);
         return "Produto removido.";
     }
 

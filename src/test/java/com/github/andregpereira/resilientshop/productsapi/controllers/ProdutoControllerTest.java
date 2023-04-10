@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.security.InvalidParameterException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ProdutoController.class)
-public class ProdutoControllerTest {
+class ProdutoControllerTest {
 
     @MockBean
     private ProdutoManutencaoService manutencaoService;
@@ -45,14 +46,14 @@ public class ProdutoControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void criarProdutoComDadosValidosRetornaCreated() throws Exception {
+    void criarProdutoComDadosValidosRetornaCreated() throws Exception {
         given(manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).willReturn(PRODUTO_DETALHES_DTO);
         mockMvc.perform(post("/produtos").content(objectMapper.writeValueAsString(PRODUTO_REGISTRO_DTO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isCreated()).andExpectAll(jsonPath("$").exists(),
                 jsonPath("$.sku").value(PRODUTO_DETALHES_DTO.sku()),
                 jsonPath("$.nome").value(PRODUTO_DETALHES_DTO.nome()),
-                jsonPath("$.descricao").value(PRODUTO_DETALHES_DTO.descricao()),
-//                jsonPath("$.dataCriacao").value(PRODUTO_DETALHES_DTO.dataCriacao()),
+                jsonPath("$.descricao").value(PRODUTO_DETALHES_DTO.descricao()), jsonPath("$.dataCriacao").value(
+                        PRODUTO_DETALHES_DTO.dataCriacao().format(DateTimeFormatter.ofPattern("dd/MM/uuuu HH:mm"))),
                 jsonPath("$.valorUnitario").value(PRODUTO_DETALHES_DTO.valorUnitario()),
                 jsonPath("$.estoque").value(PRODUTO_DETALHES_DTO.estoque()),
                 jsonPath("$.subcategoria.nome").value(PRODUTO_DETALHES_DTO.subcategoria().nome()),
@@ -60,35 +61,35 @@ public class ProdutoControllerTest {
     }
 
     @Test
-    public void criarProdutoComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
+    void criarProdutoComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
         mockMvc.perform(post("/produtos").content(
                 objectMapper.writeValueAsString(PRODUTO_REGISTRO_DTO_INVALIDO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    public void criarProdutoComSubcategoriaInexistenteRetornaNotFound() throws Exception {
+    void criarProdutoComSubcategoriaInexistenteRetornaNotFound() throws Exception {
         given(manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).willThrow(SubcategoriaNotFoundException.class);
         mockMvc.perform(post("/produtos").content(objectMapper.writeValueAsString(PRODUTO_REGISTRO_DTO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
     }
 
     @Test
-    public void criarProdutoComSkuOuNomeExistentesRetornaConflict() throws Exception {
+    void criarProdutoComSkuOuNomeExistentesRetornaConflict() throws Exception {
         given(manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).willThrow(ProdutoAlreadyExistsException.class);
         mockMvc.perform(post("/produtos").content(objectMapper.writeValueAsString(PRODUTO_REGISTRO_DTO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isConflict());
     }
 
     //    @Test
-//    public void criarProdutoComNomeExistenteRetornaConflict() throws Exception {
+//     void criarProdutoComNomeExistenteRetornaConflict() throws Exception {
 //        given(manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).willThrow(ProdutoAlreadyExistsException.class);
 //        mockMvc.perform(post("/produtos").content(
 //                objectMapper.writeValueAsString(PRODUTO_REGISTRO_DTO)).contentType(
 //                MediaType.APPLICATION_JSON)).andExpect(status().isConflict());
 //    }
     @Test
-    public void atualizarProdutoComDadosValidosRetornaOkEProdutoDetalhesDto() throws Exception {
+    void atualizarProdutoComDadosValidosRetornaOkEProdutoDetalhesDto() throws Exception {
         given(manutencaoService.atualizar(1L, PRODUTO_ATUALIZACAO_DTO)).willReturn(PRODUTO_DETALHES_DTO_ATUALIZADO);
         mockMvc.perform(put("/produtos/1").content(
                 objectMapper.writeValueAsString(PRODUTO_ATUALIZACAO_DTO)).contentType(
@@ -96,7 +97,8 @@ public class ProdutoControllerTest {
                 jsonPath("$.sku").value(PRODUTO_DETALHES_DTO_ATUALIZADO.sku()),
                 jsonPath("$.nome").value(PRODUTO_DETALHES_DTO_ATUALIZADO.nome()),
                 jsonPath("$.descricao").value(PRODUTO_DETALHES_DTO_ATUALIZADO.descricao()),
-//                jsonPath("$.dataCriacao").value(PRODUTO_DETALHES_DTO.dataCriacao()),
+                jsonPath("$.dataCriacao").value(PRODUTO_DETALHES_DTO_ATUALIZADO.dataCriacao().format(
+                        DateTimeFormatter.ofPattern("dd/MM/uuuu HH:mm"))),
                 jsonPath("$.valorUnitario").value(PRODUTO_DETALHES_DTO_ATUALIZADO.valorUnitario()),
                 jsonPath("$.estoque").value(PRODUTO_DETALHES_DTO_ATUALIZADO.estoque()),
                 jsonPath("$.subcategoria.nome").value(SUBCATEGORIA_DTO_ATUALIZADO.nome()),
@@ -104,14 +106,14 @@ public class ProdutoControllerTest {
     }
 
     @Test
-    public void atualizarProdutoComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
+    void atualizarProdutoComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
         mockMvc.perform(put("/produtos/1").content(
                 objectMapper.writeValueAsString(PRODUTO_ATUALIZACAO_DTO_INVALIDO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    public void atualizarProdutoInexistenteRetornaNotFound() throws Exception {
+    void atualizarProdutoInexistenteRetornaNotFound() throws Exception {
         given(manutencaoService.atualizar(1L, PRODUTO_ATUALIZACAO_DTO)).willThrow(ProdutoNotFoundException.class);
         mockMvc.perform(put("/produtos/1").content(
                 objectMapper.writeValueAsString(PRODUTO_ATUALIZACAO_DTO)).contentType(
@@ -119,31 +121,32 @@ public class ProdutoControllerTest {
     }
 
     @Test
-    public void removerProdutoPorIdExistenteRetornaOk() throws Exception {
+    void removerProdutoPorIdExistenteRetornaOk() throws Exception {
         given(manutencaoService.remover(10L)).willReturn("Produto removido");
         mockMvc.perform(delete("/produtos/10")).andExpect(status().isOk()).andExpectAll(
                 jsonPath("$").value("Produto removido"));
     }
 
     @Test
-    public void removerProdutoPorIdInexistenteRetornaNotFound() throws Exception {
+    void removerProdutoPorIdInexistenteRetornaNotFound() throws Exception {
         given(manutencaoService.remover(10L)).willThrow(ProdutoNotFoundException.class);
         mockMvc.perform(delete("/produtos/10")).andExpectAll(status().isNotFound());
     }
 
     @Test
-    public void listarProdutosExistentesRetornaOk() throws Exception {
+    void listarProdutosExistentesRetornaOk() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         List<ProdutoDto> listaProdutos = new ArrayList<>();
         listaProdutos.add(PRODUTO_DTO);
+        listaProdutos.add(PRODUTO_DTO_ATUALIZADO);
         Page<ProdutoDto> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
         given(consultaService.listar(pageable)).willReturn(pageProdutos);
-        mockMvc.perform(get("/produtos")).andExpect(status().isOk()).andExpectAll(jsonPath("$").exists(),
-                jsonPath("$.empty").value(false), jsonPath("$.numberOfElements").value(1));
+        mockMvc.perform(get("/produtos")).andExpect(status().isOk()).andExpectAll(jsonPath("$.empty").value(false),
+                jsonPath("$.numberOfElements").value(2));
     }
 
     @Test
-    public void listarProdutosInexistentesRetornaNotFound() throws Exception {
+    void listarProdutosInexistentesRetornaNotFound() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
 //        List<ProdutoDto> listaProdutos = new ArrayList<>();
 //        Page<ProdutoDto> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
@@ -155,25 +158,26 @@ public class ProdutoControllerTest {
     }
 
     @Test
-    public void consultarProdutoPorIdExistenteRetornaProdutoDetalhesDto() throws Exception {
+    void consultarProdutoPorIdExistenteRetornaProdutoDetalhesDto() throws Exception {
         given(consultaService.consultarPorId(1L)).willReturn(PRODUTO_DETALHES_DTO);
-        mockMvc.perform(get("/produtos/1")).andExpect(status().isOk()).andExpectAll(jsonPath("$").exists(),
+        mockMvc.perform(get("/produtos/1")).andExpect(status().isOk()).andExpectAll(
                 jsonPath("$.nome").value(PRODUTO_DETALHES_DTO.nome()));
     }
 
     @Test
-    public void consultarProdutoPorIdInexistenteRetornaNotFound() throws Exception {
+    void consultarProdutoPorIdInexistenteRetornaNotFound() throws Exception {
         given(consultaService.consultarPorId(10L)).willThrow(ProdutoNotFoundException.class);
         mockMvc.perform(get("/produtos/10")).andExpect(status().isNotFound());
     }
 
     @Test
-    public void consultarProdutoPorIdInvalidoRetornaBadRequest() throws Exception {
-        mockMvc.perform(get("/produtos/a")).andExpect(status().isBadRequest());
+    void consultarProdutoPorIdInvalidoRetornaBadRequest() throws Exception {
+        mockMvc.perform(get("/produtos/a")).andExpect(status().isBadRequest()).andExpectAll(
+                jsonPath("$").value("Parâmetro inválido. Verifique e tente novamente"));
     }
 
     @Test
-    public void consultarProdutoPorNomeExistenteRetornaProdutoDto() throws Exception {
+    void consultarProdutoPorNomeExistenteRetornaProdutoDto() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
         List<ProdutoDto> listaProdutos = new ArrayList<>();
         listaProdutos.add(PRODUTO_DTO);
@@ -184,14 +188,14 @@ public class ProdutoControllerTest {
     }
 
     @Test
-    public void consultarProdutoPorNomeInexistenteRetornaNotFound() throws Exception {
+    void consultarProdutoPorNomeInexistenteRetornaNotFound() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
         given(consultaService.consultarPorNome("nomeProduto", pageable)).willThrow(ProdutoNotFoundException.class);
         mockMvc.perform(get("/produtos/nome").param("nome", "nomeProduto")).andExpect(status().isNotFound());
     }
 
     @Test
-    public void consultarProdutoPorSubcategoriaExistenteRetornaProdutoDto() throws Exception {
+    void consultarProdutoPorSubcategoriaExistenteRetornaProdutoDto() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
         List<ProdutoDto> listaProdutos = new ArrayList<>();
         listaProdutos.add(PRODUTO_DTO);
@@ -202,14 +206,14 @@ public class ProdutoControllerTest {
     }
 
     @Test
-    public void consultarProdutoPorSubcategoriaInexistenteRetornaNotFound() throws Exception {
+    void consultarProdutoPorSubcategoriaInexistenteRetornaNotFound() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
         given(consultaService.consultarPorSubcategoria(20L, pageable)).willThrow(ProdutoNotFoundException.class);
         mockMvc.perform(get("/produtos/subcategoria/20")).andExpect(status().isNotFound());
     }
 
     @Test
-    public void consultarProdutoPorCategoriaExistenteRetornaProdutoDto() throws Exception {
+    void consultarProdutoPorCategoriaExistenteRetornaProdutoDto() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
         List<ProdutoDto> listaProdutos = new ArrayList<>();
         listaProdutos.add(PRODUTO_DTO);
@@ -220,28 +224,28 @@ public class ProdutoControllerTest {
     }
 
     @Test
-    public void consultarProdutoPorCategoriaInexistenteRetornaNotFound() throws Exception {
+    void consultarProdutoPorCategoriaInexistenteRetornaNotFound() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
         given(consultaService.consultarPorCategoria(25L, pageable)).willThrow(ProdutoNotFoundException.class);
         mockMvc.perform(get("/produtos/categoria/25")).andExpect(status().isNotFound());
     }
 
     @Test
-    public void criarProdutoComRequestBodyNuloRetornaBadRequest() throws Exception {
+    void criarProdutoComRequestBodyNuloRetornaBadRequest() throws Exception {
         mockMvc.perform(post("/produtos").content(objectMapper.writeValueAsString(null)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andExpectAll(
                 jsonPath("$").value("Informação inválida. Verifique os dados e tente novamente"));
     }
 
     @Test
-    public void inserirParametroNomeInvalidoThrowsException() throws Exception {
+    void inserirParametroNomeVazioThrowsException() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
         given(consultaService.consultarPorNome("", pageable)).willThrow(InvalidParameterException.class);
         mockMvc.perform(get("/produtos/nome").param("nome", "")).andExpect(status().isBadRequest());
     }
 
     @Test
-    public void inserirParametroNomeNuloThrowsException() throws Exception {
+    void inserirParametroNomeNuloThrowsException() throws Exception {
         mockMvc.perform(get("/produtos/nome")).andExpect(status().isBadRequest()).andExpectAll(
                 jsonPath("$.campo").value("nome"), jsonPath("$.mensagem").value("O campo nome é obrigatório"));
     }

@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SubcategoriaController.class)
-public class SubcategoriaControllerTest {
+class SubcategoriaControllerTest {
 
     @MockBean
     private SubcategoriaManutencaoService manutencaoService;
@@ -43,7 +43,7 @@ public class SubcategoriaControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    public void criarSubcategoriaComDadosValidosRetornaCreated() throws Exception {
+    void criarSubcategoriaComDadosValidosRetornaCreated() throws Exception {
         given(manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).willReturn(SUBCATEGORIA_DETALHES_DTO);
         mockMvc.perform(post("/subcategorias").content(
                 objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO)).contentType(
@@ -54,14 +54,14 @@ public class SubcategoriaControllerTest {
     }
 
     @Test
-    public void criarSubcategoriaComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
+    void criarSubcategoriaComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
         mockMvc.perform(post("/subcategorias").content(
                 objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_INVALIDO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isUnprocessableEntity());
     }
 
     @Test
-    public void criarSubcategoriaComCategoriaInexistenteRetornaNotFound() throws Exception {
+    void criarSubcategoriaComCategoriaInexistenteRetornaNotFound() throws Exception {
         given(manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).willThrow(CategoriaNotFoundException.class);
         mockMvc.perform(post("/subcategorias").content(
                 objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO)).contentType(
@@ -69,7 +69,7 @@ public class SubcategoriaControllerTest {
     }
 
     @Test
-    public void criarSubcategoriaComNomeExistenteRetornaConflict() throws Exception {
+    void criarSubcategoriaComNomeExistenteRetornaConflict() throws Exception {
         given(manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).willThrow(
                 SubcategoriaAlreadyExistsException.class);
         mockMvc.perform(post("/subcategorias").content(
@@ -78,7 +78,7 @@ public class SubcategoriaControllerTest {
     }
 
     @Test
-    public void atualizarSubcategoriaComDadosValidosRetornaOk() throws Exception {
+    void atualizarSubcategoriaComDadosValidosRetornaOk() throws Exception {
         given(manutencaoService.atualizar(1L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADO)).willReturn(
                 SUBCATEGORIA_DETALHES_DTO_ATUALIZADO);
         mockMvc.perform(put("/subcategorias/1").content(
@@ -90,7 +90,14 @@ public class SubcategoriaControllerTest {
     }
 
     @Test
-    public void atualizarSubcategoriaInexistenteRetornaNotFound() throws Exception {
+    void atualizarSubcategoriaComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
+        mockMvc.perform(put("/subcategorias/1").content(
+                objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADO_INVALIDO)).contentType(
+                MediaType.APPLICATION_JSON)).andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void atualizarSubcategoriaInexistenteRetornaNotFound() throws Exception {
         given(manutencaoService.atualizar(1L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADO)).willThrow(
                 SubcategoriaNotFoundException.class);
         mockMvc.perform(put("/subcategorias/1").content(
@@ -99,14 +106,7 @@ public class SubcategoriaControllerTest {
     }
 
     @Test
-    public void atualizarSubcategoriaComDadosInvalidosRetornaUnprocessableEntity() throws Exception {
-        mockMvc.perform(put("/subcategorias/1").content(
-                objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADO_INVALIDO)).contentType(
-                MediaType.APPLICATION_JSON)).andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
-    public void atualizarSubcategoriaComCategoriaInexistenteRetornaNotFound() throws Exception {
+    void atualizarSubcategoriaComCategoriaInexistenteRetornaNotFound() throws Exception {
         given(manutencaoService.atualizar(1L, SUBCATEGORIA_REGISTRO_DTO)).willThrow(CategoriaNotFoundException.class);
         mockMvc.perform(put("/subcategorias/1").content(
                 objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO)).contentType(
@@ -114,20 +114,20 @@ public class SubcategoriaControllerTest {
     }
 
     @Test
-    public void removerSubcategoriaPorIdExistenteRetornaOk() throws Exception {
+    void removerSubcategoriaPorIdExistenteRetornaOk() throws Exception {
         given(manutencaoService.remover(10L)).willReturn("Subcategoria removida");
         mockMvc.perform(delete("/subcategorias/10")).andExpect(status().isOk()).andExpectAll(
                 jsonPath("$").value("Subcategoria removida"));
     }
 
     @Test
-    public void removerSubcategoriaPorIdInexistenteRetornaNotFound() throws Exception {
+    void removerSubcategoriaPorIdInexistenteRetornaNotFound() throws Exception {
         given(manutencaoService.remover(10L)).willThrow(SubcategoriaNotFoundException.class);
         mockMvc.perform(delete("/subcategorias/10")).andExpectAll(status().isNotFound());
     }
 
     @Test
-    public void listarSubcategoriasExistentesRetornaOk() throws Exception {
+    void listarSubcategoriasExistentesRetornaOk() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         List<SubcategoriaDto> listaSubcategorias = new ArrayList<>();
         listaSubcategorias.add(SUBCATEGORIA_DTO);
@@ -138,14 +138,14 @@ public class SubcategoriaControllerTest {
     }
 
     @Test
-    public void listarSubcategoriasInexistentesRetornaNotFound() throws Exception {
+    void listarSubcategoriasInexistentesRetornaNotFound() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         given(consultaService.listar(pageable)).willThrow(SubcategoriaNotFoundException.class);
         mockMvc.perform(get("/subcategorias")).andExpect(status().isNotFound());
     }
 
     @Test
-    public void consultarSubcategoriaPorIdExistenteRetornaOk() throws Exception {
+    void consultarSubcategoriaPorIdExistenteRetornaOk() throws Exception {
         given(consultaService.consultarPorId(1L)).willReturn(SUBCATEGORIA_DETALHES_DTO);
         mockMvc.perform(get("/subcategorias/1")).andExpect(status().isOk()).andExpectAll(jsonPath("$").exists(),
                 jsonPath("$.nome").value(SUBCATEGORIA_DETALHES_DTO.nome()),
@@ -154,18 +154,19 @@ public class SubcategoriaControllerTest {
     }
 
     @Test
-    public void consultarSubcategoriaPorIdInexistenteRetornaNotFound() throws Exception {
+    void consultarSubcategoriaPorIdInexistenteRetornaNotFound() throws Exception {
         given(consultaService.consultarPorId(10L)).willThrow(SubcategoriaNotFoundException.class);
         mockMvc.perform(get("/subcategorias/10")).andExpect(status().isNotFound());
     }
 
     @Test
-    public void consultarSubcategoriaPorIdInvalidoRetornaBadRequest() throws Exception {
-        mockMvc.perform(get("/subcategorias/a")).andExpect(status().isBadRequest());
+    void consultarSubcategoriaPorIdInvalidoRetornaBadRequest() throws Exception {
+        mockMvc.perform(get("/subcategorias/a")).andExpect(status().isBadRequest()).andExpectAll(
+                jsonPath("$").value("Parâmetro inválido. Verifique e tente novamente"));
     }
 
     @Test
-    public void criarSubcategoriaComRequestBodyNuloRetornaBadRequest() throws Exception {
+    void criarSubcategoriaComRequestBodyNuloRetornaBadRequest() throws Exception {
         mockMvc.perform(post("/subcategorias").content(objectMapper.writeValueAsString(null)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andExpectAll(
                 jsonPath("$").value("Informação inválida. Verifique os dados e tente novamente"));
