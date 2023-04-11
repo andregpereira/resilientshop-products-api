@@ -14,4 +14,6 @@ public class SubcategoriaConstants {
 
     public static final Subcategoria SUBCATEGORIA_INVALIDA = new Subcategoria(null, "", "", CATEGORIA_INVALIDA);
 
+    public static final Subcategoria SUBCATEGORIA_VAZIA = new Subcategoria();
+
 }

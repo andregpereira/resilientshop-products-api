@@ -12,8 +12,6 @@ public interface CategoriaMapper {
 
     Categoria toCategoria(CategoriaRegistroDto dto);
 
-    CategoriaDto toCategoria(Categoria categoria);
-
     CategoriaDto toCategoriaDto(Categoria categoria);
 
 }

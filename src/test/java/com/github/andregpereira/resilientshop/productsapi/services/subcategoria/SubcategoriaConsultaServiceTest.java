@@ -41,6 +41,26 @@ class SubcategoriaConsultaServiceTest {
     private SubcategoriaRepository repository;
 
     @Test
+    void listarSubcategoriasExistentesRetornaPageSubcategoriaDto() {
+        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
+        List<Subcategoria> listaSubcategorias = new ArrayList<>();
+        listaSubcategorias.add(SUBCATEGORIA);
+        Page<Subcategoria> pageSubcategorias = new PageImpl<>(listaSubcategorias, pageable, 10);
+        given(repository.findAll(pageable)).willReturn(pageSubcategorias);
+        Page<SubcategoriaDto> sut = consultaService.listar(pageable);
+        assertThat(sut).isNotEmpty().hasSize(1);
+        assertThat(sut.getContent().get(0)).isEqualTo(SUBCATEGORIA_DTO);
+    }
+
+    @Test
+    void listarSubcategoriasInexistentesThrowsException() {
+        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
+        given(repository.findAll(pageable)).willReturn(Page.empty());
+        assertThatThrownBy(() -> consultaService.listar(pageable)).isInstanceOf(
+                SubcategoriaNotFoundException.class).hasMessage("Ops! Ainda não há subcategorias cadastradas");
+    }
+
+    @Test
     void consultarSubcategoriaPorIdExistenteRetornaSubcategoriaDetalhesDto() {
         given(repository.existsById(1L)).willReturn(true);
         given(repository.getReferenceById(1L)).willReturn(SUBCATEGORIA);
@@ -54,26 +74,6 @@ class SubcategoriaConsultaServiceTest {
         assertThatThrownBy(() -> consultaService.consultarPorId(10L)).isInstanceOf(
                 SubcategoriaNotFoundException.class).hasMessage(
                 "Desculpe, não foi possível encontrar uma subcategoria com o id 10. Verifique e tente novamente");
-    }
-
-    @Test
-    void listarSubcategoriasExistentesRetornaPageSubcategoriaDto() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        List<Subcategoria> listaSubcategorias = new ArrayList<>();
-        listaSubcategorias.add(SUBCATEGORIA);
-        Page<Subcategoria> pageSubcategorias = new PageImpl<>(listaSubcategorias, pageable, 10);
-        given(repository.findAll(pageable)).willReturn(pageSubcategorias);
-        Page<SubcategoriaDto> sut = consultaService.listar(pageable);
-        assertThat(sut).isNotEmpty().hasSize(1);
-        assertThat(sut.getContent().get(0)).isEqualTo(SUBCATEGORIA_DTO);
-    }
-
-    @Test
-    void listarSubcategoriasInexistentesThrwosException() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(repository.findAll(pageable)).willReturn(Page.empty());
-        assertThatThrownBy(() -> consultaService.listar(pageable)).isInstanceOf(
-                SubcategoriaNotFoundException.class).hasMessage("Ops! Ainda não há subcategorias cadastradas");
     }
 
 }

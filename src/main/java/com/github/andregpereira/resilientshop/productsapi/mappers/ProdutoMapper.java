@@ -15,6 +15,7 @@ public interface ProdutoMapper {
     Produto toProduto(ProdutoRegistroDto dto);
 
     Produto toProduto(ProdutoAtualizacaoDto dto);
+
     ProdutoDto toProdutoDto(Produto produto);
 
     ProdutoDetalhesDto toProdutoDetalhesDto(Produto produto);

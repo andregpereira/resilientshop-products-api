@@ -82,7 +82,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
                     "Desculpe, não foi possível encontrar um produto com o id " + id + ". Verifique e tente novamente");
         });
         log.info("Produto com id {} removido", id);
-        return "Produto removido.";
+        return "Produto removido";
     }
 
 }

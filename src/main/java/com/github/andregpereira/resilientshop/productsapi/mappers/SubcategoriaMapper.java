@@ -12,6 +12,7 @@ import org.mapstruct.ReportingPolicy;
 public interface SubcategoriaMapper {
 
     Subcategoria toSubcategoria(SubcategoriaRegistroDto dto);
+
     SubcategoriaDto toSubcategoriaDto(Subcategoria subcategoria);
 
     SubcategoriaDetalhesDto toSubcategoriaDetalhesDto(Subcategoria subcategoria);

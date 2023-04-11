@@ -67,7 +67,7 @@ class CategoriaConsultaServiceTest {
     }
 
     @Test
-    void listarCategoriasInexistentesThrwosException() {
+    void listarCategoriasInexistentesThrowsException() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         given(repository.findAll(pageable)).willReturn(Page.empty());
         assertThatThrownBy(() -> consultaService.listar(pageable)).isInstanceOf(

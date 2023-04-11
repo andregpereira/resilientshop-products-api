@@ -52,7 +52,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
         nome = nome.trim();
         Page<Produto> produtos = produtoRepository.findByNome(nome, pageable);
-        if (produtos.isEmpty() || nome.isBlank()) {
+        if (produtos.isEmpty()) {
             log.info("Nenhum produto foi encontrado com o nome {}", nome);
             throw new ProdutoNotFoundException(
                     "Desculpe, não foi possível encontrar um produto com esse nome. Verifique e tente novamente");
