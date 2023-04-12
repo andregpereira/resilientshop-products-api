@@ -15,8 +15,6 @@ public record ProdutoAtualizacaoDto(@NotBlank(message = "O nome é obrigatório"
         @NotNull(message = "A quantidade em estoque é obrigatória") @PositiveOrZero(
                 message = "Ops! Quantidade inválida, digite um número que não seja negativo.") int estoque,
         @NotNull(message = "A subcategoria é obrigatória") @Positive(
-                message = "O valor mínimo para esse campo é 1") Long idSubcategoria,
-        @NotNull(message = "A categoria é obrigatória") @Positive(
-                message = "O valor mínimo para esse campo é 1") Long idCategoria) {
+                message = "O valor mínimo para esse campo é 1") Long idSubcategoria) {
 
 }

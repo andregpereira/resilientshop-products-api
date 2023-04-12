@@ -56,7 +56,6 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
         assertThat(sut.getValorUnitario()).isEqualTo(PRODUTO.getValorUnitario());
         assertThat(sut.getSubcategoria()).isEqualTo(PRODUTO.getSubcategoria());
         assertThat(sut.getSubcategoria().getCategoria()).isEqualTo(PRODUTO.getSubcategoria().getCategoria());
-        assertThat(sut.getCategoria()).isEqualTo(PRODUTO.getCategoria());
     }
 
     @Test
@@ -89,7 +88,6 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
         produtoAtualizado.getSubcategoria().setId(PRODUTO_ATUALIZADO.getSubcategoria().getId());
         produtoAtualizado.getSubcategoria().getCategoria().setId(
                 PRODUTO_ATUALIZADO.getSubcategoria().getCategoria().getId());
-        produtoAtualizado.getCategoria().setId(PRODUTO_ATUALIZADO.getCategoria().getId());
         em.persist(CATEGORIA_ATUALIZADA);
         em.persist(SUBCATEGORIA_ATUALIZADA);
         Produto sut = produtoRepository.save(produtoAtualizado);
@@ -102,7 +100,6 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
         assertThat(sut.getValorUnitario()).isEqualTo(PRODUTO_ATUALIZADO.getValorUnitario());
         assertThat(sut.getSubcategoria()).isEqualTo(PRODUTO_ATUALIZADO.getSubcategoria());
         assertThat(sut.getSubcategoria().getCategoria()).isEqualTo(PRODUTO_ATUALIZADO.getSubcategoria().getCategoria());
-        assertThat(sut.getCategoria()).isEqualTo(PRODUTO_ATUALIZADO.getCategoria());
     }
 
     @Test
