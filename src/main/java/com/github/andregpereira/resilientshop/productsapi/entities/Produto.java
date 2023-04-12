@@ -46,6 +46,10 @@ public class Produto {
     @JoinColumn(name = "id_subcategoria", nullable = false, foreignKey = @ForeignKey(name = "fk_id_subcategoria"))
     private Subcategoria subcategoria;
 
+    @ManyToOne
+    @JoinColumn(name = "id_categoria", nullable = false, foreignKey = @ForeignKey(name = "fk_id_categoria"))
+    private Categoria categoria;
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -56,12 +60,13 @@ public class Produto {
         return estoque == produto.estoque && Objects.equals(id, produto.id) && Objects.equals(sku,
                 produto.sku) && Objects.equals(nome, produto.nome) && Objects.equals(descricao,
                 produto.descricao) && Objects.equals(dataCriacao, produto.dataCriacao) && Objects.equals(valorUnitario,
-                produto.valorUnitario) && Objects.equals(subcategoria, produto.subcategoria);
+                produto.valorUnitario) && Objects.equals(subcategoria, produto.subcategoria) && Objects.equals(
+                categoria, produto.categoria);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, sku, nome, descricao, dataCriacao, valorUnitario, estoque, subcategoria);
+        return Objects.hash(id, sku, nome, descricao, dataCriacao, valorUnitario, estoque, subcategoria, categoria);
     }
 
 }

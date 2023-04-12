@@ -1,9 +1,11 @@
 package com.github.andregpereira.resilientshop.productsapi.services.produto;
 
+import com.github.andregpereira.resilientshop.productsapi.infra.exception.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.infra.exception.ProdutoAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.infra.exception.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.infra.exception.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.mappers.ProdutoMapper;
+import com.github.andregpereira.resilientshop.productsapi.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.repositories.SubcategoriaRepository;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA;
+import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA_ATUALIZADA;
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.*;
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoDtoConstants.*;
 import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaConstants.SUBCATEGORIA;
@@ -41,12 +45,17 @@ class ProdutoManutencaoServiceTest {
     @Mock
     private SubcategoriaRepository subcategoriaRepository;
 
+    @Mock
+    private CategoriaRepository categoriaRepository;
+
     @Test
     void criarProdutoComDadosValidosRetornaProdutoDetalhesDto() {
         given(produtoRepository.existsBySku(PRODUTO_LOCAL_DATE_TIME_FIXADO.getSku())).willReturn(false);
         given(produtoRepository.existsByNome(PRODUTO_LOCAL_DATE_TIME_FIXADO.getNome())).willReturn(false);
         given(subcategoriaRepository.existsById(1L)).willReturn(true);
         given(subcategoriaRepository.getReferenceById(1L)).willReturn(SUBCATEGORIA);
+        given(categoriaRepository.existsById(1L)).willReturn(true);
+        given(categoriaRepository.getReferenceById(1L)).willReturn(CATEGORIA);
         try (MockedStatic<LocalDateTime> mockedStatic = mockStatic(LocalDateTime.class)) {
             mockedStatic.when(LocalDateTime::now).thenReturn(LOCAL_DATE_TIME_FIXADO);
             when(produtoRepository.save(PRODUTO_LOCAL_DATE_TIME_FIXADO)).thenReturn(PRODUTO_LOCAL_DATE_TIME_FIXADO);
@@ -87,7 +96,18 @@ class ProdutoManutencaoServiceTest {
         given(subcategoriaRepository.existsById(1L)).willReturn(false);
         assertThatThrownBy(() -> manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
                 SubcategoriaNotFoundException.class).hasMessage(
-                "Desculpe, não foi possível encontrar uma subcategoria com o id 1. Verifique e tente novamente");
+                "Ops! Não foi possível encontrar uma subcategoria com o id 1");
+        then(produtoRepository).should(never()).save(PRODUTO);
+    }
+
+    @Test
+    void criarProdutoComIdCategoriaInexistenteThrowsException() {
+        given(produtoRepository.existsBySku(PRODUTO.getSku())).willReturn(false);
+        given(produtoRepository.existsByNome(PRODUTO.getNome())).willReturn(false);
+        given(subcategoriaRepository.existsById(1L)).willReturn(true);
+        given(categoriaRepository.existsById(1L)).willReturn(false);
+        assertThatThrownBy(() -> manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
+                CategoriaNotFoundException.class).hasMessage("Poxa! Nenhuma categoria foi encontrada com o id 1");
         then(produtoRepository).should(never()).save(PRODUTO);
     }
 
@@ -97,6 +117,8 @@ class ProdutoManutencaoServiceTest {
         given(produtoRepository.existsByNome(PRODUTO_ATUALIZADO.getNome())).willReturn(false);
         given(subcategoriaRepository.existsById(2L)).willReturn(true);
         given(subcategoriaRepository.getReferenceById(2L)).willReturn(SUBCATEGORIA_ATUALIZADA);
+        given(categoriaRepository.existsById(2L)).willReturn(true);
+        given(categoriaRepository.getReferenceById(2L)).willReturn(CATEGORIA_ATUALIZADA);
         when(produtoRepository.save(PRODUTO_ATUALIZADO)).thenReturn(PRODUTO_ATUALIZADO);
         assertThat(manutencaoService.atualizar(PRODUTO.getId(), PRODUTO_ATUALIZACAO_DTO)).isEqualTo(
                 PRODUTO_DETALHES_DTO_ATUALIZADO);
@@ -114,8 +136,7 @@ class ProdutoManutencaoServiceTest {
     void atualizarProdutoComIdInexistenteThrowsException() {
         given(produtoRepository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> manutencaoService.atualizar(10L, PRODUTO_ATUALIZACAO_DTO)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage(
-                "Desculpe, não foi possível encontrar um produto com o id 10. Verifique e tente novamente");
+                ProdutoNotFoundException.class).hasMessage("Ops! Não foi possível encontrar um produto com o id 10");
         then(produtoRepository).should(never()).save(PRODUTO_ATUALIZADO);
     }
 
@@ -129,13 +150,24 @@ class ProdutoManutencaoServiceTest {
     }
 
     @Test
-    void atualizarProdutoComIdISubcategoriaInexistenteThrowsException() {
+    void atualizarProdutoComIdSubcategoriaInexistenteThrowsException() {
         given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
         given(produtoRepository.existsByNome(PRODUTO_ATUALIZADO.getNome())).willReturn(false);
         given(subcategoriaRepository.existsById(2L)).willReturn(false);
         assertThatThrownBy(() -> manutencaoService.atualizar(1L, PRODUTO_ATUALIZACAO_DTO)).isInstanceOf(
                 SubcategoriaNotFoundException.class).hasMessage(
-                "Desculpe, não foi possível encontrar uma subcategoria com o id 2. Verifique e tente novamente");
+                "Ops! Não foi possível encontrar uma subcategoria com o id 2");
+        then(produtoRepository).should(never()).save(PRODUTO_ATUALIZADO);
+    }
+
+    @Test
+    void atualizarProdutoComIdCategoriaInexistenteThrowsException() {
+        given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
+        given(produtoRepository.existsByNome(PRODUTO_ATUALIZADO.getNome())).willReturn(false);
+        given(subcategoriaRepository.existsById(2L)).willReturn(true);
+        given(categoriaRepository.existsById(2L)).willReturn(false);
+        assertThatThrownBy(() -> manutencaoService.atualizar(1L, PRODUTO_ATUALIZACAO_DTO)).isInstanceOf(
+                CategoriaNotFoundException.class).hasMessage("Poxa! Nenhuma categoria foi encontrada com o id 2");
         then(produtoRepository).should(never()).save(PRODUTO_ATUALIZADO);
     }
 

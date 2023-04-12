@@ -6,7 +6,7 @@ import com.github.andregpereira.resilientshop.productsapi.dtos.subcategoria.Subc
 import com.github.andregpereira.resilientshop.productsapi.services.subcategoria.SubcategoriaConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.services.subcategoria.SubcategoriaManutencaoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -15,15 +15,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/subcategorias")
 public class SubcategoriaController {
 
-    @Autowired
-    private SubcategoriaManutencaoService manutencaoService;
+    private final SubcategoriaManutencaoService manutencaoService;
 
-    @Autowired
-    private SubcategoriaConsultaService consultaService;
+    private final SubcategoriaConsultaService consultaService;
 
     // Registrar subcategoria
     @PostMapping

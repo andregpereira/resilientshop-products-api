@@ -7,7 +7,7 @@ import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoRe
 import com.github.andregpereira.resilientshop.productsapi.services.produto.ProdutoConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.services.produto.ProdutoManutencaoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -16,15 +16,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
 
-    @Autowired
-    private ProdutoManutencaoService manutencaoService;
+    private final ProdutoManutencaoService manutencaoService;
 
-    @Autowired
-    private ProdutoConsultaService consultaService;
+    private final ProdutoConsultaService consultaService;
 
     // Registrar produto
     @PostMapping

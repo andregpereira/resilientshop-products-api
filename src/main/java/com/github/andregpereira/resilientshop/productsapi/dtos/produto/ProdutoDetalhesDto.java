@@ -2,6 +2,7 @@ package com.github.andregpereira.resilientshop.productsapi.dtos.produto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.dtos.subcategoria.SubcategoriaDto;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ public record ProdutoDetalhesDto(Long id,
         @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/uuuu HH:mm") LocalDateTime dataCriacao,
         BigDecimal valorUnitario,
         int estoque,
-        SubcategoriaDto subcategoria) {
+        SubcategoriaDto subcategoria,
+        CategoriaDto categoria) {
 
 }

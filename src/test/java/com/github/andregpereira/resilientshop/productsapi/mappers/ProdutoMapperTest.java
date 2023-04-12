@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA;
+import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaDtoConstants.CATEGORIA_DTO;
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.PRODUTO;
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoDtoConstants.*;
 import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaConstants.SUBCATEGORIA;
@@ -68,8 +70,18 @@ class ProdutoMapperTest {
     }
 
     @Test
-    void subcategoriaNuloRetornaNull() {
+    void subcategoriaNulaRetornaNull() {
         assertThat(mapper.subcategoriaToSubcategoriaDto(null)).isNotEqualTo(SUBCATEGORIA_DTO);
+    }
+
+    @Test
+    void categoriaRetornaSubcategoriaDto() {
+        assertThat(mapper.categoriaToCategoriaDto(CATEGORIA)).isEqualTo(CATEGORIA_DTO);
+    }
+
+    @Test
+    void categoriaNulaRetornaNull() {
+        assertThat(mapper.categoriaToCategoriaDto(null)).isNotEqualTo(CATEGORIA_DTO);
     }
 
 }

@@ -5,7 +5,7 @@ import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.Categor
 import com.github.andregpereira.resilientshop.productsapi.services.categoria.CategoriaConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.services.categoria.CategoriaManutencaoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -14,15 +14,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/categorias")
 public class CategoriaController {
 
-    @Autowired
-    private CategoriaManutencaoService manutencaoService;
+    private final CategoriaManutencaoService manutencaoService;
 
-    @Autowired
-    private CategoriaConsultaService consultaService;
+    private final CategoriaConsultaService consultaService;
 
     // Registrar categoria
     @PostMapping
@@ -38,7 +37,7 @@ public class CategoriaController {
 
     // Remover por id
     @DeleteMapping("/{id}")
-    private ResponseEntity<String> remover(@PathVariable Long id) {
+    public ResponseEntity<String> remover(@PathVariable Long id) {
         return ResponseEntity.ok(manutencaoService.remover(id));
     }
 

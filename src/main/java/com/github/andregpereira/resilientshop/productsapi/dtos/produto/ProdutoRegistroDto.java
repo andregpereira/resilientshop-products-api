@@ -19,6 +19,8 @@ public record ProdutoRegistroDto(@NotNull(message = "O SKU é obrigatório") Lon
         @NotNull(message = "A quantidade em estoque é obrigatória") @Positive(
                 message = "Ops! Quantidade inválida, digite um número que não seja negativo") int estoque,
         @NotNull(message = "A subcategoria é obrigatória") @Positive(
-                message = "O valor mínimo para esse campo é 1") Long idSubcategoria) {
+                message = "O valor mínimo para esse campo é 1") Long idSubcategoria,
+        @NotNull(message = "A categoria é obrigatória") @Positive(
+                message = "O valor mínimo para esse campo é 1") Long idCategoria) {
 
 }
