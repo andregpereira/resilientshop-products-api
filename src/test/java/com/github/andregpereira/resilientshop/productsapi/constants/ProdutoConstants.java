@@ -27,8 +27,8 @@ public class ProdutoConstants {
     public static final Produto PRODUTO_ATUALIZADO = new Produto(null, 123456789L, "nome2", "Teste da classe Produto2",
             LOCAL_DATE_TIME, BigDecimal.valueOf(29.99), 87, SUBCATEGORIA_ATUALIZADA, CATEGORIA_ATUALIZADA);
 
-    public static final Produto PRODUTO_INVALIDO = new Produto(null, null, "", "", null, null, 0,
-            SUBCATEGORIA_INVALIDA, CATEGORIA_INVALIDA);
+    public static final Produto PRODUTO_INVALIDO = new Produto(null, null, "", "", null, null, 0, SUBCATEGORIA_INVALIDA,
+            CATEGORIA_INVALIDA);
 
     public static final Produto PRODUTO_VAZIO = new Produto();
 

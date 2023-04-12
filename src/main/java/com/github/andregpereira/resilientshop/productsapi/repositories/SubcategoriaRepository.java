@@ -1,13 +1,12 @@
 package com.github.andregpereira.resilientshop.productsapi.repositories;
 
+import com.github.andregpereira.resilientshop.productsapi.entities.Subcategoria;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import com.github.andregpereira.resilientshop.productsapi.entities.Subcategoria;
 
 @Repository
 public interface SubcategoriaRepository extends JpaRepository<Subcategoria, Long> {
 
-	boolean existsByNome(String nome);
+    boolean existsByNome(String nome);
 
 }

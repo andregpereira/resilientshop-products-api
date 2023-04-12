@@ -14,7 +14,7 @@ import java.security.InvalidParameterException;
 import java.util.stream.Stream;
 
 @RestControllerAdvice
-public class ServiceExceptionHandler {
+public class TratadorDeErros {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> erro400(HttpMessageNotReadableException e) {
