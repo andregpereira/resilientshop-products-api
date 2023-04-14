@@ -1,7 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.repositories;
 
 import com.github.andregpereira.resilientshop.productsapi.config.PostgreSQLContainerConfig;
-import com.github.andregpereira.resilientshop.productsapi.entities.Subcategoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

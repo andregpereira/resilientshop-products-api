@@ -1,6 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.constants;
 
-import com.github.andregpereira.resilientshop.productsapi.entities.Subcategoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
 
 import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.*;
 

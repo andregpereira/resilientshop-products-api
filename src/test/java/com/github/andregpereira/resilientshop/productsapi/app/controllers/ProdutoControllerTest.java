@@ -1,11 +1,10 @@
-package com.github.andregpereira.resilientshop.productsapi.controllers;
+package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.andregpereira.resilientshop.productsapi.app.controllers.ProdutoController;
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDto;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.ProdutoAlreadyExistsException;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.ProdutoNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.SubcategoriaNotFoundException;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoAlreadyExistsException;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoManutencaoService;
 import org.junit.jupiter.api.Test;

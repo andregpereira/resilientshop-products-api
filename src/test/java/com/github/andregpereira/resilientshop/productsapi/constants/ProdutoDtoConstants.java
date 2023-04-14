@@ -1,9 +1,9 @@
 package com.github.andregpereira.resilientshop.productsapi.constants;
 
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoAtualizacaoDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoAtualizacaoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDetalhesDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoRegistroDto;
 
 import java.math.BigDecimal;
 

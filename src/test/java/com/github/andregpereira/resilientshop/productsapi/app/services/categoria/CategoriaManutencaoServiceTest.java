@@ -1,9 +1,8 @@
-package com.github.andregpereira.resilientshop.productsapi.services.categoria;
+package com.github.andregpereira.resilientshop.productsapi.app.services.categoria;
 
-import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaManutencaoServiceImpl;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.CategoriaAlreadyExistsException;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.CategoriaNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.mappers.CategoriaMapper;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaAlreadyExistsException;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
+import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapper;
 import com.github.andregpereira.resilientshop.productsapi.repositories.CategoriaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

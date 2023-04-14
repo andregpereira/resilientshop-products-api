@@ -1,4 +1,4 @@
-package com.github.andregpereira.resilientshop.productsapi.mappers;
+package com.github.andregpereira.resilientshop.productsapi.cross.mappers;
 
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapperImpl;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
