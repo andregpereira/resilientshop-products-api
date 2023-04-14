@@ -1,7 +1,7 @@
-package com.github.andregpereira.resilientshop.productsapi.services.produto;
+package com.github.andregpereira.resilientshop.productsapi.app.services.produto;
 
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDetalhesDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

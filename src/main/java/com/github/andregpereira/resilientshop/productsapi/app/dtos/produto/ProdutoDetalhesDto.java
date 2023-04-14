@@ -1,8 +1,8 @@
-package com.github.andregpereira.resilientshop.productsapi.dtos.produto;
+package com.github.andregpereira.resilientshop.productsapi.app.dtos.produto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import com.github.andregpereira.resilientshop.productsapi.dtos.subcategoria.SubcategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria.SubcategoriaDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package com.github.andregpereira.resilientshop.productsapi.infra.exceptions;
+package com.github.andregpereira.resilientshop.productsapi.cross.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

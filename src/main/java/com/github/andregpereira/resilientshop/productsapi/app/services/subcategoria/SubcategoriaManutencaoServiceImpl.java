@@ -1,12 +1,12 @@
-package com.github.andregpereira.resilientshop.productsapi.services.subcategoria;
+package com.github.andregpereira.resilientshop.productsapi.app.services.subcategoria;
 
-import com.github.andregpereira.resilientshop.productsapi.dtos.subcategoria.SubcategoriaDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.subcategoria.SubcategoriaRegistroDto;
-import com.github.andregpereira.resilientshop.productsapi.entities.Subcategoria;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.CategoriaNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.SubcategoriaAlreadyExistsException;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.SubcategoriaNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.mappers.SubcategoriaMapper;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria.SubcategoriaDetalhesDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria.SubcategoriaRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaAlreadyExistsException;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
+import com.github.andregpereira.resilientshop.productsapi.cross.mappers.SubcategoriaMapper;
 import com.github.andregpereira.resilientshop.productsapi.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.repositories.SubcategoriaRepository;
 import lombok.RequiredArgsConstructor;

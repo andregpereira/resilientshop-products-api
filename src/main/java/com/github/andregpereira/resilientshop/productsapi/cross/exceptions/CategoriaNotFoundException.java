@@ -1,4 +1,4 @@
-package com.github.andregpereira.resilientshop.productsapi.infra.exceptions;
+package com.github.andregpereira.resilientshop.productsapi.cross.exceptions;
 
 public class CategoriaNotFoundException extends RuntimeException {
 

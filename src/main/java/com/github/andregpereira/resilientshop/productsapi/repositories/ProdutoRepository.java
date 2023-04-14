@@ -1,6 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.repositories;
 
-import com.github.andregpereira.resilientshop.productsapi.entities.Produto;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

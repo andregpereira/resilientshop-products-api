@@ -1,4 +1,4 @@
-package com.github.andregpereira.resilientshop.productsapi.dtos.subcategoria;
+package com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria;
 
 public record SubcategoriaDto(Long id,
         String nome,

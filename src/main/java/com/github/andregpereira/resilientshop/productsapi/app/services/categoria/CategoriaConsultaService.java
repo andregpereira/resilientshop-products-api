@@ -1,6 +1,6 @@
-package com.github.andregpereira.resilientshop.productsapi.services.categoria;
+package com.github.andregpereira.resilientshop.productsapi.app.services.categoria;
 
-import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

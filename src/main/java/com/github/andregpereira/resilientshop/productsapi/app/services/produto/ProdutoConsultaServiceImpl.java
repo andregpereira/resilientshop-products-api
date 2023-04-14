@@ -1,12 +1,12 @@
-package com.github.andregpereira.resilientshop.productsapi.services.produto;
+package com.github.andregpereira.resilientshop.productsapi.app.services.produto;
 
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.produto.ProdutoDto;
-import com.github.andregpereira.resilientshop.productsapi.entities.Produto;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.CategoriaNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.ProdutoNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.infra.exceptions.SubcategoriaNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.mappers.ProdutoMapper;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDetalhesDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDto;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
+import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
 import com.github.andregpereira.resilientshop.productsapi.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.repositories.SubcategoriaRepository;

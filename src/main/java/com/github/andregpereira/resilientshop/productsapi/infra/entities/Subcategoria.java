@@ -1,4 +1,4 @@
-package com.github.andregpereira.resilientshop.productsapi.entities;
+package com.github.andregpereira.resilientshop.productsapi.infra.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,9 @@
-package com.github.andregpereira.resilientshop.productsapi.controllers;
+package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
-import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaRegistroDto;
-import com.github.andregpereira.resilientshop.productsapi.services.categoria.CategoriaConsultaService;
-import com.github.andregpereira.resilientshop.productsapi.services.categoria.CategoriaManutencaoService;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaConsultaService;
+import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaManutencaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -1,7 +1,7 @@
-package com.github.andregpereira.resilientshop.productsapi.services.categoria;
+package com.github.andregpereira.resilientshop.productsapi.app.services.categoria;
 
-import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaDto;
-import com.github.andregpereira.resilientshop.productsapi.dtos.categoria.CategoriaRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaRegistroDto;
 
 public interface CategoriaManutencaoService {
 

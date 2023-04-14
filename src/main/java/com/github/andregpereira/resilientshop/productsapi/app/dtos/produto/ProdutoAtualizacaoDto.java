@@ -1,4 +1,4 @@
-package com.github.andregpereira.resilientshop.productsapi.dtos.produto;
+package com.github.andregpereira.resilientshop.productsapi.app.dtos.produto;
 
 import jakarta.validation.constraints.*;
 
