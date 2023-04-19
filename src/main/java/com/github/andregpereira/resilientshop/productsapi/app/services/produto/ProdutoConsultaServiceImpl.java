@@ -7,9 +7,9 @@ import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.Categ
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
-import com.github.andregpereira.resilientshop.productsapi.repositories.CategoriaRepository;
-import com.github.andregpereira.resilientshop.productsapi.repositories.ProdutoRepository;
-import com.github.andregpereira.resilientshop.productsapi.repositories.SubcategoriaRepository;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

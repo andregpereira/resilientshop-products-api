@@ -6,7 +6,7 @@ import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categor
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapper;
-import com.github.andregpereira.resilientshop.productsapi.repositories.CategoriaRepository;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

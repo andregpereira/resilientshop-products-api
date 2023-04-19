@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class CategoriaController {
 
     private final CategoriaManutencaoService manutencaoService;
-
     private final CategoriaConsultaService consultaService;
 
     // Registrar categoria

@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 public class SubcategoriaController {
 
     private final SubcategoriaManutencaoService manutencaoService;
-
     private final SubcategoriaConsultaService consultaService;
 
     // Registrar subcategoria

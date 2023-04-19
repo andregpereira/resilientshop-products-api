@@ -5,7 +5,7 @@ import com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria.
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.SubcategoriaMapper;
-import com.github.andregpereira.resilientshop.productsapi.repositories.SubcategoriaRepository;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

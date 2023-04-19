@@ -4,8 +4,8 @@ import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.Categ
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.SubcategoriaMapper;
-import com.github.andregpereira.resilientshop.productsapi.repositories.CategoriaRepository;
-import com.github.andregpereira.resilientshop.productsapi.repositories.SubcategoriaRepository;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;

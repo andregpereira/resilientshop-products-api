@@ -26,7 +26,6 @@ import java.net.URI;
 public class ProdutoController {
 
     private final ProdutoManutencaoService manutencaoService;
-
     private final ProdutoConsultaService consultaService;
 
     // Registrar produto

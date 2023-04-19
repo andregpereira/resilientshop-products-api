@@ -1,4 +1,4 @@
-package com.github.andregpereira.resilientshop.productsapi.repositories;
+package com.github.andregpereira.resilientshop.productsapi.infra.repositories;
 
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
 import org.springframework.data.domain.Page;

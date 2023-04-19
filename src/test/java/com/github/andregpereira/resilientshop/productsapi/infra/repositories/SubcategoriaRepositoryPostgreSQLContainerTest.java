@@ -1,6 +1,6 @@
-package com.github.andregpereira.resilientshop.productsapi.repositories;
+package com.github.andregpereira.resilientshop.productsapi.infra.repositories;
 
-import com.github.andregpereira.resilientshop.productsapi.config.PostgreSQLContainerConfig;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.config.PostgreSQLContainerConfig;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
