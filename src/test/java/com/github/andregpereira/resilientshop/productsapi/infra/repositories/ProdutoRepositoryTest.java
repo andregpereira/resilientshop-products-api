@@ -1,7 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.infra.repositories;
 
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
-import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +8,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA;
@@ -25,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ProdutoRepositoryTest {
 
     @Autowired
-    private ProdutoRepository produtoRepository;
+    private ProdutoRepository repository;
 
     @Autowired
     private TestEntityManager em;
@@ -44,7 +45,7 @@ class ProdutoRepositoryTest {
     void criarProdutoComDadosValidosRetornaProduto() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto produto = produtoRepository.save(PRODUTO);
+        Produto produto = repository.save(PRODUTO);
         Produto sut = em.find(Produto.class, produto.getId());
         assertThat(sut).isNotNull();
         assertThat(sut.getSku()).isEqualTo(PRODUTO.getSku());
@@ -58,8 +59,8 @@ class ProdutoRepositoryTest {
 
     @Test
     void criarProdutoComDadosInvalidosThrowsRuntimeException() {
-        assertThatThrownBy(() -> produtoRepository.saveAndFlush(PRODUTO_VAZIO)).isInstanceOf(RuntimeException.class);
-        assertThatThrownBy(() -> produtoRepository.save(PRODUTO_INVALIDO)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> repository.saveAndFlush(PRODUTO_VAZIO)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> repository.save(PRODUTO_INVALIDO)).isInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -68,7 +69,7 @@ class ProdutoRepositoryTest {
         em.persist(SUBCATEGORIA);
         Produto sut = em.persistFlushFind(PRODUTO);
         sut.setId(null);
-        assertThatThrownBy(() -> produtoRepository.saveAndFlush(sut)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> repository.saveAndFlush(sut)).isInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -88,7 +89,7 @@ class ProdutoRepositoryTest {
                 PRODUTO_ATUALIZADO.getSubcategoria().getCategoria().getId());
         em.persist(CATEGORIA_ATUALIZADA);
         em.persist(SUBCATEGORIA_ATUALIZADA);
-        Produto sut = produtoRepository.save(produtoAtualizado);
+        Produto sut = repository.save(produtoAtualizado);
         assertThat(sut).isNotNull();
         assertThat(sut.getId()).isEqualTo(produtoAntigo.getId());
         assertThat(sut.getSku()).isEqualTo(PRODUTO_ATUALIZADO.getSku());
@@ -109,8 +110,30 @@ class ProdutoRepositoryTest {
         Produto sutInvalido = PRODUTO_INVALIDO;
         sutVazio.setId(produtoAntigo.getId());
         sutInvalido.setId(produtoAntigo.getId());
-        assertThatThrownBy(() -> produtoRepository.saveAndFlush(sutVazio)).isInstanceOf(RuntimeException.class);
-        assertThatThrownBy(() -> produtoRepository.saveAndFlush(sutInvalido)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> repository.saveAndFlush(sutVazio)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> repository.saveAndFlush(sutInvalido)).isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void listarProdutosExistentesRetornaProdutos() {
+        em.persist(CATEGORIA);
+        em.persist(SUBCATEGORIA);
+        em.persistFlushFind(PRODUTO);
+        em.persist(CATEGORIA);
+        em.persist(SUBCATEGORIA);
+        Produto sut2 = new Produto(null, 1234567890L, "nome2", "Teste da classe Produto", LOCAL_DATE_TIME,
+                BigDecimal.valueOf(10.99), 10, SUBCATEGORIA);
+        em.persist(sut2);
+        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
+        Page<Produto> pageProdutos = repository.findAll(pageable);
+        assertThat(pageProdutos).isNotEmpty().hasSize(2);
+    }
+
+    @Test
+    void listarProdutosInexistentesRetornaEmpty() {
+        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
+        Page<Produto> pageProdutos = repository.findAll(pageable);
+        assertThat(pageProdutos).isEmpty();
     }
 
     @Test
@@ -118,15 +141,15 @@ class ProdutoRepositoryTest {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
         Produto produto = em.persistFlushFind(PRODUTO);
-        Optional<Produto> optionalProduto = produtoRepository.findById(produto.getId());
-        assertThat(produtoRepository.existsById(produto.getId())).isTrue();
+        Optional<Produto> optionalProduto = repository.findById(produto.getId());
+        assertThat(repository.existsById(produto.getId())).isTrue();
         assertThat(optionalProduto).isNotEmpty().get().isEqualTo(produto);
     }
 
     @Test
     void consultarProdutoPorIdInexistenteRetornaFalseEEmpty() {
-        Optional<Produto> optionalProduto = produtoRepository.findById(10L);
-        assertThat(produtoRepository.existsById(10L)).isFalse();
+        Optional<Produto> optionalProduto = repository.findById(10L);
+        assertThat(repository.existsById(10L)).isFalse();
         assertThat(optionalProduto).isEmpty();
     }
 
@@ -136,7 +159,7 @@ class ProdutoRepositoryTest {
         em.persist(SUBCATEGORIA);
         Produto produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = produtoRepository.findByNome(produto.getNome(), pageable);
+        Page<Produto> pageProdutos = repository.findByNome(produto.getNome(), pageable);
         assertThat(pageProdutos).isNotEmpty().hasSize(1);
         assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
     }
@@ -144,7 +167,7 @@ class ProdutoRepositoryTest {
     @Test
     void consultarProdutoPorNomeInexistenteRetornaEmpty() {
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = produtoRepository.findByNome("", pageable);
+        Page<Produto> pageProdutos = repository.findByNome("", pageable);
         assertThat(pageProdutos).isEmpty();
     }
 
@@ -154,8 +177,7 @@ class ProdutoRepositoryTest {
         em.persist(SUBCATEGORIA);
         Produto produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = produtoRepository.findAllBySubcategoriaId(produto.getSubcategoria().getId(),
-                pageable);
+        Page<Produto> pageProdutos = repository.findAllBySubcategoriaId(produto.getSubcategoria().getId(), pageable);
         assertThat(pageProdutos).isNotEmpty().hasSize(1);
         assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
     }
@@ -166,7 +188,7 @@ class ProdutoRepositoryTest {
         em.persist(SUBCATEGORIA);
         Produto produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = produtoRepository.findAllBySubcategoriaId(10L, pageable);
+        Page<Produto> pageProdutos = repository.findAllBySubcategoriaId(10L, pageable);
         assertThat(pageProdutos).isEmpty();
     }
 
@@ -176,7 +198,7 @@ class ProdutoRepositoryTest {
         em.persist(SUBCATEGORIA);
         Produto produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = produtoRepository.findAllBySubcategoriaCategoriaId(
+        Page<Produto> pageProdutos = repository.findAllBySubcategoriaCategoriaId(
                 produto.getSubcategoria().getCategoria().getId(), pageable);
         assertThat(pageProdutos).isNotEmpty().hasSize(1);
         assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
@@ -188,7 +210,7 @@ class ProdutoRepositoryTest {
         em.persist(SUBCATEGORIA);
         Produto produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = produtoRepository.findAllBySubcategoriaCategoriaId(10L, pageable);
+        Page<Produto> pageProdutos = repository.findAllBySubcategoriaCategoriaId(10L, pageable);
         assertThat(pageProdutos).isEmpty();
     }
 
@@ -197,7 +219,7 @@ class ProdutoRepositoryTest {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
         Produto sut = em.persistFlushFind(PRODUTO);
-        produtoRepository.deleteById(sut.getId());
+        repository.deleteById(sut.getId());
         Produto produtoRemovido = em.find(Produto.class, sut.getId());
         assertThat(produtoRemovido).isNull();
     }

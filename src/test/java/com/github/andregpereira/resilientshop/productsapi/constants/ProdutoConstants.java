@@ -12,10 +12,10 @@ import static com.github.andregpereira.resilientshop.productsapi.constants.Subca
 
 public class ProdutoConstants {
 
+    public static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.now();
+
     public static final LocalDateTime LOCAL_DATE_TIME_FIXADO = LocalDateTime.now(
             Clock.fixed(Instant.parse("2014-12-22T10:15:30.00Z"), ZoneId.systemDefault()));
-
-    public static final LocalDateTime LOCAL_DATE_TIME = LocalDateTime.now();
 
     public static final Produto PRODUTO = new Produto(null, 123456789L, "nome", "Teste da classe Produto",
             LOCAL_DATE_TIME, BigDecimal.valueOf(10.59), 10, SUBCATEGORIA);
