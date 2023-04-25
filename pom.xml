@@ -5,14 +5,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.5</version>
+        <version>3.0.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.andregpereira</groupId>
     <artifactId>productsapi</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>productsapi</name>
-    <description>User Api for Resilient Shop Ecommerce Project</description>
+    <description>Produtos Api for Resilient Shop Ecommerce Project</description>
     <properties>
         <java.version>17</java.version>
         <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
