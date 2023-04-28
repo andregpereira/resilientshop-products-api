@@ -39,14 +39,13 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
         return subcategoriaRepository.findById(dto.idSubcategoria()).map(sc -> {
             Produto produto = mapper.toProduto(dto);
             produto.setDataCriacao(LocalDateTime.now());
-            produto.setSubcategoria(subcategoriaRepository.getReferenceById(dto.idSubcategoria()));
+            produto.setSubcategoria(sc);
             produto = produtoRepository.save(produto);
             log.info("Produto criado");
             return mapper.toProdutoDetalhesDto(produto);
         }).orElseThrow(() -> {
             log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
-            return new SubcategoriaNotFoundException(
-                    "Ops! Não foi possível encontrar uma subcategoria com o id " + dto.idSubcategoria());
+            return new SubcategoriaNotFoundException(dto.idSubcategoria());
         });
     }
 
