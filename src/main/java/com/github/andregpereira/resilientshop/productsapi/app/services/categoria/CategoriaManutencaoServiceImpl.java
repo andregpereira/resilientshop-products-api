@@ -2,15 +2,17 @@ package com.github.andregpereira.resilientshop.productsapi.app.services.categori
 
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaRegistroDto;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapper;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.MessageFormat;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -24,7 +26,7 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
     public CategoriaDto registrar(CategoriaRegistroDto dto) {
         if (repository.existsByNome(dto.nome())) {
             log.info("Categoria já cadastrada com o nome {}", dto.nome());
-            throw new CategoriaAlreadyExistsException("Opa! Já existe uma categoria com esse nome");
+            throw new CategoriaAlreadyExistsException(dto.nome());
         }
         Categoria categoria = mapper.toCategoria(dto);
         categoria = repository.save(categoria);
@@ -35,11 +37,10 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
     public CategoriaDto atualizar(Long id, CategoriaRegistroDto dto) {
         if (!repository.existsById(id)) {
             log.info("Categoria não encontrada com id {}", id);
-            throw new CategoriaNotFoundException(
-                    "Desculpe, não foi possível encontrar uma categoria com o id " + id + ". Verifique e tente novamente");
+            throw new CategoriaNotFoundException(id);
         } else if (repository.existsByNome(dto.nome())) {
             log.info("Categoria já cadastrada com o nome {}", dto.nome());
-            throw new CategoriaAlreadyExistsException("Opa! Já existe uma categoria com esse nome");
+            throw new CategoriaAlreadyExistsException(dto.nome());
         }
         Categoria categoriaAtualizada = mapper.toCategoria(dto);
         categoriaAtualizada.setId(id);
@@ -49,13 +50,14 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
     }
 
     public String remover(Long id) {
-        repository.findById(id).ifPresentOrElse(c -> repository.deleteById(id), () -> {
+        return repository.findById(id).map(c -> {
+            repository.deleteById(id);
+            log.info("Categoria com id {} removida", id);
+            return MessageFormat.format("Categoria com id {0} removida com sucesso", id);
+        }).orElseThrow(() -> {
             log.info("Categoria não encontrada com id {}", id);
-            throw new CategoriaNotFoundException(
-                    "Desculpe, não foi possível encontrar uma categoria com o id " + id + ". Verifique e tente novamente");
+            return new CategoriaNotFoundException(id);
         });
-        log.info("Categoria com id {} removida", id);
-        return "Categoria removida";
     }
 
 }

@@ -31,10 +31,10 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
     public ProdutoDetalhesDto registrar(ProdutoRegistroDto dto) {
         if (produtoRepository.existsBySku(dto.sku())) {
             log.info("Produto já cadastrado com o SKU {}", dto.sku());
-            throw new ProdutoAlreadyExistsException("Opa! Já existe um produto com esse SKU registrado");
+            throw new ProdutoAlreadyExistsException(dto.sku());
         } else if (produtoRepository.existsByNome(dto.nome())) {
             log.info("Produto já cadastrado com o nome {}", dto.nome());
-            throw new ProdutoAlreadyExistsException("Opa! Já existe um produto com esse nome registrado");
+            throw new ProdutoAlreadyExistsException(dto.nome());
         }
         return subcategoriaRepository.findById(dto.idSubcategoria()).map(sc -> {
             Produto produto = mapper.toProduto(dto);
@@ -53,7 +53,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
         return produtoRepository.findById(id).map(produtoAntigo -> {
             if (produtoRepository.existsByNome(dto.nome())) {
                 log.info("Produto já cadastrado com o nome {}", dto.nome());
-                throw new ProdutoAlreadyExistsException("Opa! Já existe um produto com esse nome registrado");
+                throw new ProdutoAlreadyExistsException(dto.nome());
             } else if (!subcategoriaRepository.existsById(dto.idSubcategoria())) {
                 log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
                 throw new SubcategoriaNotFoundException(dto.idSubcategoria());

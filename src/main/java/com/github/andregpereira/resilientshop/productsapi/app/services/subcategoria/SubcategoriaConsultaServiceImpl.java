@@ -2,9 +2,9 @@ package com.github.andregpereira.resilientshop.productsapi.app.services.subcateg
 
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria.SubcategoriaDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria.SubcategoriaDto;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.SubcategoriaMapper;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
