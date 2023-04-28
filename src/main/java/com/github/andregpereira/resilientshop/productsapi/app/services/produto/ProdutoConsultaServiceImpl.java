@@ -2,11 +2,11 @@ package com.github.andregpereira.resilientshop.productsapi.app.services.produto;
 
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDto;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
@@ -37,12 +37,13 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     }
 
     public ProdutoDetalhesDto consultarPorId(Long id) {
-        if (!produtoRepository.existsById(id)) {
+        return produtoRepository.findById(id).map(p -> {
+            log.info("Retornando produto com id {}", id);
+            return mapper.toProdutoDetalhesDto(p);
+        }).orElseThrow(() -> {
             log.info("Produto não encontrado com id {}", id);
-            throw new ProdutoNotFoundException("Poxa! Nenhum produto foi encontrado com o id " + id);
-        }
-        log.info("Retornando produto com id {}", id);
-        return mapper.toProdutoDetalhesDto(produtoRepository.getReferenceById(id));
+            return new ProdutoNotFoundException(id);
+        });
     }
 
     public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
