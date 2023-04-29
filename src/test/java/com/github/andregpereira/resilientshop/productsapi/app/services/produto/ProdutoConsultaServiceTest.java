@@ -2,11 +2,11 @@ package com.github.andregpereira.resilientshop.productsapi.app.services.produto;
 
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDto;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
@@ -21,6 +21,7 @@ import org.springframework.data.domain.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.PRODUTO;
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.PRODUTO_ATUALIZADO;
@@ -74,15 +75,14 @@ class ProdutoConsultaServiceTest {
 
     @Test
     void consultarProdutoPorIdExistenteRetornaProdutoDetalhesDto() {
-        given(produtoRepository.existsById(1L)).willReturn(true);
-        when(produtoRepository.getReferenceById(1L)).thenReturn(PRODUTO);
+        given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
         ProdutoDetalhesDto sut = produtoConsultaService.consultarPorId(1L);
         assertThat(sut).isNotNull().isEqualTo(PRODUTO_DETALHES_DTO);
     }
 
     @Test
     void consultarProdutoPorIdInexistenteThrowsException() {
-        given(produtoRepository.existsById(10L)).willReturn(false);
+        given(produtoRepository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> produtoConsultaService.consultarPorId(10L)).isInstanceOf(
                 ProdutoNotFoundException.class).hasMessage("Poxa! Nenhum produto foi encontrado com o id 10");
     }

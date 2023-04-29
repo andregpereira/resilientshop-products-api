@@ -63,7 +63,7 @@ class SubcategoriaManutencaoServiceTest {
     void criarSubcategoriaComIdCategoriaInexistenteThrowsException() {
         given(categoriaRepository.existsById(1L)).willReturn(false);
         assertThatThrownBy(() -> manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).isInstanceOf(
-                CategoriaNotFoundException.class);
+                CategoriaNotFoundException.class).hasMessage("Ops! Não foi encontrada uma categoria com o id 1");
         then(subcategoriaRepository).should(never()).save(SUBCATEGORIA);
     }
 
@@ -127,7 +127,7 @@ class SubcategoriaManutencaoServiceTest {
     @Test
     void removerSubcategoriaComIdExistenteRetornaString() {
         given(subcategoriaRepository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA));
-        assertThat(manutencaoService.remover(1L)).isEqualTo("Subcategoria removida");
+        assertThat(manutencaoService.remover(1L)).isEqualTo("Subcategoria com id 1 removida com sucesso");
         then(subcategoriaRepository).should().deleteById(1L);
     }
 
@@ -136,7 +136,7 @@ class SubcategoriaManutencaoServiceTest {
         given(subcategoriaRepository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> manutencaoService.remover(10L)).isInstanceOf(
                 SubcategoriaNotFoundException.class).hasMessage(
-                "Desculpe, não foi possível encontrar uma subcategoria com o id 10. Verifique e tente novamente");
+                "Ops! Não foi possível encontrar uma subcategoria com o id 10");
         then(subcategoriaRepository).should(never()).deleteById(10L);
     }
 

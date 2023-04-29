@@ -96,7 +96,7 @@ class CategoriaManutencaoServiceTest {
     @Test
     void removerCategoriaComIdExistenteRetornaString() {
         given(repository.findById(1L)).willReturn(Optional.of(CATEGORIA));
-        assertThat(manutencaoService.remover(1L)).isEqualTo("Categoria removida");
+        assertThat(manutencaoService.remover(1L)).isEqualTo("Categoria com id 1 removida com sucesso");
         then(repository).should().deleteById(1L);
     }
 
@@ -104,8 +104,7 @@ class CategoriaManutencaoServiceTest {
     void removerCategoriaComIdInexistenteRetornaString() {
         given(repository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> manutencaoService.remover(10L)).isInstanceOf(
-                CategoriaNotFoundException.class).hasMessage(
-                "Desculpe, não foi possível encontrar uma categoria com o id 10. Verifique e tente novamente");
+                CategoriaNotFoundException.class).hasMessage("Ops! Não foi encontrada uma categoria com o id 10");
         then(repository).should(never()).deleteById(10L);
     }
 
