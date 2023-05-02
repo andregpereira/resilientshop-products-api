@@ -7,6 +7,7 @@ import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.Produ
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoManutencaoService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -21,6 +23,7 @@ import java.net.URI;
 
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
@@ -48,7 +51,7 @@ public class ProdutoController {
 
     // Remover por id
     @DeleteMapping("/{id}")
-    private ResponseEntity<String> remover(@PathVariable Long id) {
+    public ResponseEntity<String> remover(@PathVariable Long id) {
         return ResponseEntity.ok(manutencaoService.remover(id));
     }
 
@@ -67,9 +70,10 @@ public class ProdutoController {
 
     // Pesquisar por nome
     @GetMapping("/nome")
-    public ResponseEntity<Page<ProdutoDto>> consultarPorNome(@RequestParam String nome,
+    public ResponseEntity<Page<ProdutoDto>> consultarPorNome(
+            @RequestParam @Size(message = "O nome deve ter pelo menos 2 caracteres", min = 2) String nome,
             @PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
-        return ResponseEntity.ok(consultaService.consultarPorNome(nome, pageable));
+        return ResponseEntity.ok(consultaService.consultarPorNome(nome.trim(), pageable));
     }
 
     // Pesquisar por subcategoria
