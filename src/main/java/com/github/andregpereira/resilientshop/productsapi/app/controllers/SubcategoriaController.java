@@ -38,7 +38,7 @@ public class SubcategoriaController {
 
     // Remover por id
     @DeleteMapping("/{id}")
-    private ResponseEntity<String> remover(@PathVariable Long id) {
+    public ResponseEntity<String> remover(@PathVariable Long id) {
         return ResponseEntity.ok(manutencaoService.remover(id));
     }
 
