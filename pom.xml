@@ -15,9 +15,10 @@
     <description>Produtos Api for Resilient Shop Ecommerce Project</description>
     <properties>
         <java.version>17</java.version>
-        <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
         <org.projectlombok.version>1.18.26</org.projectlombok.version>
         <org.springdoc.version>2.1.0</org.springdoc.version>
+        <org.testcontainers>1.18.0</org.testcontainers>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <spring-cloud.version>2022.0.2</spring-cloud.version>
     </properties>
@@ -33,7 +34,7 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
-                <version>1.17.6</version>
+                <version>${org.testcontainers}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
