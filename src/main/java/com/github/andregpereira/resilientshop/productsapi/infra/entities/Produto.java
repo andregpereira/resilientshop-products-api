@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 @Getter
 @Setter
@@ -50,9 +51,8 @@ public class Produto {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (o == null || getClass() != o.getClass())
+        if (!(o instanceof Produto produto))
             return false;
-        Produto produto = (Produto) o;
         return estoque == produto.estoque && Objects.equals(id, produto.id) && Objects.equals(sku,
                 produto.sku) && Objects.equals(nome, produto.nome) && Objects.equals(descricao,
                 produto.descricao) && Objects.equals(dataCriacao, produto.dataCriacao) && Objects.equals(valorUnitario,
@@ -62,6 +62,14 @@ public class Produto {
     @Override
     public int hashCode() {
         return Objects.hash(id, sku, nome, descricao, dataCriacao, valorUnitario, estoque, subcategoria);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Produto.class.getSimpleName() + "[", "]").add("id=" + id).add("sku=" + sku).add(
+                "nome='" + nome + "'").add("descricao='" + descricao + "'").add("dataCriacao=" + dataCriacao).add(
+                "valorUnitario=" + valorUnitario).add("estoque=" + estoque).add(
+                "subcategoria=" + subcategoria).toString();
     }
 
 }
