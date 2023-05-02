@@ -9,7 +9,8 @@ import java.text.MessageFormat;
 public class ProdutoAlreadyExistsException extends RuntimeException {
 
     public ProdutoAlreadyExistsException(Long sku) {
-        super(MessageFormat.format("Opa! Já existe um produto cadastrado com o SKU {0}", sku));
+        super(MessageFormat.format("Opa! Já existe um produto cadastrado com o SKU {0}",
+                sku.toString().replace(".", "")));
     }
 
     public ProdutoAlreadyExistsException(String nome) {

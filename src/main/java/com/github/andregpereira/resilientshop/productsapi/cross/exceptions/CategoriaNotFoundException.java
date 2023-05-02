@@ -8,12 +8,12 @@ import java.text.MessageFormat;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class CategoriaNotFoundException extends RuntimeException {
 
-    public CategoriaNotFoundException(String message) {
-        super(message);
+    public CategoriaNotFoundException() {
+        super("Poxa! Ainda não há categorias cadastradas");
     }
 
     public CategoriaNotFoundException(Long id) {
-        super(MessageFormat.format("Ops! Não foi encontrada uma categoria com o id {0}", id));
+        super(MessageFormat.format("Ops! Nenhuma categoria foi encontrada com o id {0}", id));
     }
 
 }
