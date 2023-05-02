@@ -29,24 +29,26 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
             throw new CategoriaAlreadyExistsException(dto.nome());
         }
         Categoria categoria = mapper.toCategoria(dto);
-        categoria = repository.save(categoria);
+        repository.save(categoria);
         log.info("Categoria criada");
         return mapper.toCategoriaDto(categoria);
     }
 
     public CategoriaDto atualizar(Long id, CategoriaRegistroDto dto) {
-        if (!repository.existsById(id)) {
+        return repository.findById(id).map(categoriaAntiga -> {
+            if (repository.existsByNome(dto.nome())) {
+                log.info("Categoria já cadastrada com o nome {}", dto.nome());
+                throw new CategoriaAlreadyExistsException(dto.nome());
+            }
+            Categoria categoriaAtualizada = mapper.toCategoria(dto);
+            categoriaAtualizada.setId(id);
+            repository.save(categoriaAtualizada);
+            log.info("Categoria com id {} atualizada", id);
+            return mapper.toCategoriaDto(categoriaAtualizada);
+        }).orElseThrow(() -> {
             log.info("Categoria não encontrada com id {}", id);
-            throw new CategoriaNotFoundException(id);
-        } else if (repository.existsByNome(dto.nome())) {
-            log.info("Categoria já cadastrada com o nome {}", dto.nome());
-            throw new CategoriaAlreadyExistsException(dto.nome());
-        }
-        Categoria categoriaAtualizada = mapper.toCategoria(dto);
-        categoriaAtualizada.setId(id);
-        Categoria categoria = repository.save(categoriaAtualizada);
-        log.info("Categoria com id {} atualizada", id);
-        return mapper.toCategoriaDto(categoria);
+            return new CategoriaNotFoundException(id);
+        });
     }
 
     public String remover(Long id) {

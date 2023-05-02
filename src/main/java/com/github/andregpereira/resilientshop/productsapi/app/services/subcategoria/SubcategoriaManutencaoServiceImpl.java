@@ -27,37 +27,43 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
     private final CategoriaRepository categoriaRepository;
 
     public SubcategoriaDetalhesDto registrar(SubcategoriaRegistroDto dto) {
-        if (!categoriaRepository.existsById(dto.idCategoria())) {
-            log.info("Categoria não encontrada com id {}", dto.idCategoria());
-            throw new CategoriaNotFoundException(dto.idCategoria());
-        } else if (subcategoriaRepository.existsByNome(dto.nome())) {
+        if (subcategoriaRepository.existsByNome(dto.nome())) {
             log.info("Subcategoria já cadastrada com o nome {}", dto.nome());
             throw new SubcategoriaAlreadyExistsException(dto.nome());
         }
-        Subcategoria subcategoria = mapper.toSubcategoria(dto);
-        subcategoria.setCategoria(categoriaRepository.getReferenceById(dto.idCategoria()));
-        subcategoria = subcategoriaRepository.save(subcategoria);
-        log.info("Subcategoria criada");
-        return mapper.toSubcategoriaDetalhesDto(subcategoria);
+        return categoriaRepository.findById(dto.idCategoria()).map(c -> {
+            Subcategoria subcategoria = mapper.toSubcategoria(dto);
+            subcategoria.setCategoria(c);
+            subcategoriaRepository.save(subcategoria);
+            log.info("Subcategoria criada");
+            return mapper.toSubcategoriaDetalhesDto(subcategoria);
+        }).orElseThrow(() -> {
+            log.info("Categoria não encontrada com id {}", dto.idCategoria());
+            return new CategoriaNotFoundException(dto.idCategoria());
+        });
     }
 
     public SubcategoriaDetalhesDto atualizar(Long id, SubcategoriaRegistroDto dto) {
-        if (!subcategoriaRepository.existsById(id)) {
-            log.info("Subcategoria não ecnontrada com id {}", id);
-            throw new SubcategoriaNotFoundException(id);
-        } else if (!categoriaRepository.existsById(dto.idCategoria())) {
-            log.info("Categoria não encontrada com id {}", dto.idCategoria());
-            throw new CategoriaNotFoundException(dto.idCategoria());
-        } else if (subcategoriaRepository.existsByNome(dto.nome())) {
-            log.info("Subcategoria já cadastrada com o nome {}", dto.nome());
-            throw new SubcategoriaAlreadyExistsException(dto.nome());
-        }
-        Subcategoria subcategoriaAtualizada = mapper.toSubcategoria(dto);
-        subcategoriaAtualizada.setId(id);
-        subcategoriaAtualizada.setCategoria(categoriaRepository.getReferenceById(dto.idCategoria()));
-        Subcategoria subcategoria = subcategoriaRepository.save(subcategoriaAtualizada);
-        log.info("Subcategoria com id {} atualizada", id);
-        return mapper.toSubcategoriaDetalhesDto(subcategoria);
+        return subcategoriaRepository.findById(id).map(subcategoriaAntiga -> {
+            if (subcategoriaRepository.existsByNome(dto.nome())) {
+                log.info("Subcategoria já cadastrada com o nome {}", dto.nome());
+                throw new SubcategoriaAlreadyExistsException(dto.nome());
+            }
+            return categoriaRepository.findById(dto.idCategoria()).map(c -> {
+                Subcategoria subcategoriaAtualizada = mapper.toSubcategoria(dto);
+                subcategoriaAtualizada.setId(id);
+                subcategoriaAtualizada.setCategoria(c);
+                subcategoriaRepository.save(subcategoriaAtualizada);
+                log.info("Subcategoria com id {} atualizada", id);
+                return mapper.toSubcategoriaDetalhesDto(subcategoriaAtualizada);
+            }).orElseThrow(() -> {
+                log.info("Categoria não encontrada com id {}", dto.idCategoria());
+                return new CategoriaNotFoundException(dto.idCategoria());
+            });
+        }).orElseThrow(() -> {
+            log.info("Subcategoria não encontrada com id {}", id);
+            return new SubcategoriaNotFoundException(id);
+        });
     }
 
     public String remover(Long id) {

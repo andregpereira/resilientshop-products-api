@@ -23,20 +23,20 @@ public class CategoriaConsultaServiceImpl implements CategoriaConsultaService {
         Page<Categoria> categorias = repository.findAll(pageable);
         if (categorias.isEmpty()) {
             log.info("Não há categorias cadastradas");
-            throw new CategoriaNotFoundException("Ops! Ainda não há categorias cadastradas");
+            throw new CategoriaNotFoundException();
         }
         log.info("Retornando categorias");
         return categorias.map(mapper::toCategoriaDto);
     }
 
     public CategoriaDto consultarPorId(Long id) {
-        if (!repository.existsById(id)) {
+        return repository.findById(id).map(c -> {
+            log.info("Retornando categoria com id {}", id);
+            return mapper.toCategoriaDto(c);
+        }).orElseThrow(() -> {
             log.info("Categoria não encontrada com id {}", id);
-            throw new CategoriaNotFoundException(
-                    "Desculpe, não foi possível encontrar uma categoria com o id " + id + ". Verifique e tente novamente");
-        }
-        log.info("Retornando categoria com id {}", id);
-        return mapper.toCategoriaDto(repository.getReferenceById(id));
+            return new CategoriaNotFoundException(id);
+        });
     }
 
 }

@@ -30,7 +30,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
         Page<Produto> produtos = produtoRepository.findAll(pageable);
         if (produtos.isEmpty()) {
             log.info("Não há produtos cadastrados");
-            throw new ProdutoNotFoundException("Ops! Ainda não há produtos cadastrados");
+            throw new ProdutoNotFoundException();
         }
         log.info("Retornando produtos");
         return produtos.map(mapper::toProdutoDto);
@@ -47,45 +47,43 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     }
 
     public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
-        nome = nome.trim();
         Page<Produto> produtos = produtoRepository.findByNome(nome, pageable);
         if (produtos.isEmpty()) {
             log.info("Nenhum produto foi encontrado com o nome {}", nome);
-            throw new ProdutoNotFoundException(
-                    "Desculpe, não foi possível encontrar um produto com esse nome. Verifique e tente novamente");
+            throw new ProdutoNotFoundException(nome);
         }
         log.info("Retornando produto com nome {}", nome);
         return produtos.map(mapper::toProdutoDto);
     }
 
     public Page<ProdutoDto> consultarPorSubcategoria(Long id, Pageable pageable) {
-        if (!subcategoriaRepository.existsById(id)) {
+        return subcategoriaRepository.findById(id).map(sc -> {
+            Page<Produto> produtos = produtoRepository.findAllBySubcategoriaId(id, pageable);
+            if (produtos.isEmpty()) {
+                log.info("Nenhum produto foi encontrado com a subcategoria id {}", id);
+                throw new ProdutoNotFoundException("subcategoria", sc.getNome());
+            }
+            log.info("Retornando produtos com subcategoria id {}", id);
+            return produtos.map(mapper::toProdutoDto);
+        }).orElseThrow(() -> {
             log.info("Nenhuma subcategoria foi encontrada com id {}", id);
-            throw new SubcategoriaNotFoundException(
-                    "Desculpe, não foi possível encontrar uma subcategoria com o id " + id + ". Verifique e tente novamente");
-        }
-        Page<Produto> produtos = produtoRepository.findAllBySubcategoriaId(id, pageable);
-        if (produtos.isEmpty()) {
-            log.info("Nenhum produto foi encontrado com a subcategoria id {}", id);
-            throw new ProdutoNotFoundException("Ops! Nenhum produto foi encontrado com essa subcategoria");
-        }
-        log.info("Retornando produtos com subcategoria id {}", id);
-        return produtos.map(mapper::toProdutoDto);
+            return new SubcategoriaNotFoundException(id);
+        });
     }
 
     public Page<ProdutoDto> consultarPorCategoria(Long id, Pageable pageable) {
-        if (!categoriaRepository.existsById(id)) {
+        return categoriaRepository.findById(id).map(c -> {
+            Page<Produto> produtos = produtoRepository.findAllBySubcategoriaCategoriaId(id, pageable);
+            if (produtos.isEmpty()) {
+                log.info("Nenhum produto foi encontrado com a categoria id {}", id);
+                throw new ProdutoNotFoundException("categoria", c.getNome());
+            }
+            log.info("Retornando produtos com categoria id {}", id);
+            return produtos.map(mapper::toProdutoDto);
+        }).orElseThrow(() -> {
             log.info("Nenhuma categoria foi encontrada com id {}", id);
-            throw new CategoriaNotFoundException(
-                    "Desculpe, não foi possível encontrar uma categoria com o id " + id + ". Verifique e tente novamente");
-        }
-        Page<Produto> produtos = produtoRepository.findAllBySubcategoriaCategoriaId(id, pageable);
-        if (produtos.isEmpty()) {
-            log.info("Nenhum produto foi encontrado com a categoria id {}", id);
-            throw new ProdutoNotFoundException("Ops! Nenhum produto foi encontrado com essa categoria");
-        }
-        log.info("Retornando produtos com categoria id {}", id);
-        return produtos.map(mapper::toProdutoDto);
+            return new CategoriaNotFoundException(id);
+        });
     }
 
 }

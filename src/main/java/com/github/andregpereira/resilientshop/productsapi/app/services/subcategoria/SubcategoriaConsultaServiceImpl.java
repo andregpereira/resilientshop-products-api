@@ -24,20 +24,20 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
         Page<Subcategoria> subcategorias = repository.findAll(pageable);
         if (subcategorias.isEmpty()) {
             log.info("Não há subcategorias cadastradas");
-            throw new SubcategoriaNotFoundException("Ops! Ainda não há subcategorias cadastradas");
+            throw new SubcategoriaNotFoundException();
         }
         log.info("Retornando subcategorias");
         return subcategorias.map(mapper::toSubcategoriaDto);
     }
 
     public SubcategoriaDetalhesDto consultarPorId(Long id) {
-        if (!repository.existsById(id)) {
+        return repository.findById(id).map(c -> {
+            log.info("Retornando subcategoria com id {}", id);
+            return mapper.toSubcategoriaDetalhesDto(c);
+        }).orElseThrow(() -> {
             log.info("Subcategoria não encontrada com id {}", id);
-            throw new SubcategoriaNotFoundException(
-                    "Desculpe, não foi possível encontrar uma subcategoria com o id " + id + ". Verifique e tente novamente");
-        }
-        log.info("Retornando subcategoria com id {}", id);
-        return mapper.toSubcategoriaDetalhesDto(repository.getReferenceById(id));
+            return new SubcategoriaNotFoundException(id);
+        });
     }
 
 }

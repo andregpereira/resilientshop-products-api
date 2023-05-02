@@ -40,7 +40,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
             Produto produto = mapper.toProduto(dto);
             produto.setDataCriacao(LocalDateTime.now());
             produto.setSubcategoria(sc);
-            produto = produtoRepository.save(produto);
+            produtoRepository.save(produto);
             log.info("Produto criado");
             return mapper.toProdutoDetalhesDto(produto);
         }).orElseThrow(() -> {
@@ -54,18 +54,20 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
             if (produtoRepository.existsByNome(dto.nome())) {
                 log.info("Produto já cadastrado com o nome {}", dto.nome());
                 throw new ProdutoAlreadyExistsException(dto.nome());
-            } else if (!subcategoriaRepository.existsById(dto.idSubcategoria())) {
-                log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
-                throw new SubcategoriaNotFoundException(dto.idSubcategoria());
             }
-            Produto produtoAtualizado = mapper.toProduto(dto);
-            produtoAtualizado.setId(id);
-            produtoAtualizado.setSku(produtoAntigo.getSku());
-            produtoAtualizado.setDataCriacao(produtoAntigo.getDataCriacao());
-            produtoAtualizado.setSubcategoria(subcategoriaRepository.getReferenceById(dto.idSubcategoria()));
-            produtoRepository.save(produtoAtualizado);
-            log.info("Produto com id {} atualizado", id);
-            return mapper.toProdutoDetalhesDto(produtoAtualizado);
+            return subcategoriaRepository.findById(dto.idSubcategoria()).map(sc -> {
+                Produto produtoAtualizado = mapper.toProduto(dto);
+                produtoAtualizado.setId(id);
+                produtoAtualizado.setSku(produtoAntigo.getSku());
+                produtoAtualizado.setDataCriacao(produtoAntigo.getDataCriacao());
+                produtoAtualizado.setSubcategoria(sc);
+                produtoRepository.save(produtoAtualizado);
+                log.info("Produto com id {} atualizado", id);
+                return mapper.toProdutoDetalhesDto(produtoAtualizado);
+            }).orElseThrow(() -> {
+                log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
+                return new SubcategoriaNotFoundException(dto.idSubcategoria());
+            });
         }).orElseThrow(() -> {
             log.info("Produto não encontrado com id {}", id);
             return new ProdutoNotFoundException(id);
