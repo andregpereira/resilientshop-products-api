@@ -30,7 +30,7 @@ public class Produto {
     @Column(nullable = false, length = 45)
     private String nome;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String descricao;
 
     @Column(nullable = false, updatable = false)
