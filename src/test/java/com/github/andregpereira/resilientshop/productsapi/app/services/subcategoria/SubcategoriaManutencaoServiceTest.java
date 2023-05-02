@@ -8,12 +8,11 @@ import com.github.andregpereira.resilientshop.productsapi.infra.repositories.Cat
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.text.MessageFormat;
 import java.util.Optional;
 
 import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA;
@@ -33,8 +32,8 @@ class SubcategoriaManutencaoServiceTest {
     @InjectMocks
     private SubcategoriaManutencaoServiceImpl manutencaoService;
 
-    @Spy
-    private SubcategoriaMapper mapper = Mappers.getMapper(SubcategoriaMapper.class);
+    @Mock
+    private SubcategoriaMapper mapper;
 
     @Mock
     private SubcategoriaRepository subcategoriaRepository;
@@ -44,10 +43,11 @@ class SubcategoriaManutencaoServiceTest {
 
     @Test
     void criarSubcategoriaComDadosValidosRetornaSubcategoriaDetalhesDto() {
-        given(categoriaRepository.existsById(1L)).willReturn(true);
-        given(categoriaRepository.getReferenceById(1L)).willReturn(CATEGORIA);
-        given(subcategoriaRepository.existsByNome(SUBCATEGORIA.getNome())).willReturn(false);
+        given(subcategoriaRepository.existsByNome(SUBCATEGORIA_REGISTRO_DTO.nome())).willReturn(false);
+        given(categoriaRepository.findById(1L)).willReturn(Optional.of(CATEGORIA));
+        given(mapper.toSubcategoria(SUBCATEGORIA_REGISTRO_DTO)).willReturn(SUBCATEGORIA);
         given(subcategoriaRepository.save(SUBCATEGORIA)).willReturn(SUBCATEGORIA);
+        given(mapper.toSubcategoriaDetalhesDto(SUBCATEGORIA)).willReturn(SUBCATEGORIA_DETALHES_DTO);
         assertThat(manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).isEqualTo(SUBCATEGORIA_DETALHES_DTO);
         then(subcategoriaRepository).should().save(SUBCATEGORIA);
     }
@@ -60,31 +60,35 @@ class SubcategoriaManutencaoServiceTest {
     }
 
     @Test
-    void criarSubcategoriaComIdCategoriaInexistenteThrowsException() {
-        given(categoriaRepository.existsById(1L)).willReturn(false);
+    void criarSubcategoriaComNomeExistenteThrowsException() {
+        given(subcategoriaRepository.existsByNome(SUBCATEGORIA_REGISTRO_DTO.nome())).willReturn(true);
         assertThatThrownBy(() -> manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).isInstanceOf(
-                CategoriaNotFoundException.class).hasMessage("Ops! Não foi encontrada uma categoria com o id 1");
+                SubcategoriaAlreadyExistsException.class).hasMessage(
+                MessageFormat.format("Poxa! Já existe uma subcategoria cadastrada com o nome {0}",
+                        SUBCATEGORIA_REGISTRO_DTO.nome()));
         then(subcategoriaRepository).should(never()).save(SUBCATEGORIA);
     }
 
     @Test
-    void criarSubcategoriaComNomeExistenteThrowsException() {
-        given(categoriaRepository.existsById(1L)).willReturn(true);
-        given(subcategoriaRepository.existsByNome(SUBCATEGORIA.getNome())).willReturn(true);
+    void criarSubcategoriaComIdCategoriaInexistenteThrowsException() {
+        given(subcategoriaRepository.existsByNome(SUBCATEGORIA_REGISTRO_DTO.nome())).willReturn(false);
+        given(categoriaRepository.findById(1L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).isInstanceOf(
-                SubcategoriaAlreadyExistsException.class);
+                CategoriaNotFoundException.class).hasMessage("Ops! Nenhuma categoria foi encontrada com o id 1");
         then(subcategoriaRepository).should(never()).save(SUBCATEGORIA);
     }
 
     @Test
     void atualizarSubcategoriaComDadosValidosRetornaSubcategoriaDetalhesDto() {
-        given(subcategoriaRepository.existsById(SUBCATEGORIA.getId())).willReturn(true);
-        given(categoriaRepository.existsById(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.idCategoria())).willReturn(true);
-        given(subcategoriaRepository.existsByNome(SUBCATEGORIA_ATUALIZADA.getNome())).willReturn(false);
-        given(categoriaRepository.getReferenceById(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.idCategoria())).willReturn(
-                CATEGORIA_ATUALIZADA);
+        given(subcategoriaRepository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA));
+        given(subcategoriaRepository.existsByNome(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.nome())).willReturn(false);
+        given(categoriaRepository.findById(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.idCategoria())).willReturn(
+                Optional.of(CATEGORIA_ATUALIZADA));
+        given(mapper.toSubcategoria(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).willReturn(SUBCATEGORIA_ATUALIZADA);
         given(subcategoriaRepository.save(SUBCATEGORIA_ATUALIZADA)).willReturn(SUBCATEGORIA_ATUALIZADA);
-        assertThat(manutencaoService.atualizar(SUBCATEGORIA.getId(), SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).isEqualTo(
+        given(mapper.toSubcategoriaDetalhesDto(SUBCATEGORIA_ATUALIZADA)).willReturn(
+                SUBCATEGORIA_DETALHES_DTO_ATUALIZADA);
+        assertThat(manutencaoService.atualizar(1L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).isEqualTo(
                 SUBCATEGORIA_DETALHES_DTO_ATUALIZADA);
         then(subcategoriaRepository).should().save(SUBCATEGORIA_ATUALIZADA);
     }
@@ -99,28 +103,30 @@ class SubcategoriaManutencaoServiceTest {
 
     @Test
     void atualizarSubcategoriaComIdInexistenteThrowsException() {
-        given(subcategoriaRepository.existsById(10L)).willReturn(false);
+        given(subcategoriaRepository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> manutencaoService.atualizar(10L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).isInstanceOf(
-                SubcategoriaNotFoundException.class);
-        then(subcategoriaRepository).should(never()).save(SUBCATEGORIA_ATUALIZADA);
-    }
-
-    @Test
-    void atualizarSubcategoriaComIdICategoriaInexistenteThrowsException() {
-        given(subcategoriaRepository.existsById(10L)).willReturn(true);
-        given(categoriaRepository.existsById(2L)).willReturn(false);
-        assertThatThrownBy(() -> manutencaoService.atualizar(10L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).isInstanceOf(
-                CategoriaNotFoundException.class);
+                SubcategoriaNotFoundException.class).hasMessage("Ops! Nenhuma subcategoria foi encontrada com o id 10");
         then(subcategoriaRepository).should(never()).save(SUBCATEGORIA_ATUALIZADA);
     }
 
     @Test
     void atualizarSubcategoriaComNomeExistenteThrowsException() {
-        given(categoriaRepository.existsById(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.idCategoria())).willReturn(true);
-        given(subcategoriaRepository.existsById(1L)).willReturn(true);
-        given(subcategoriaRepository.existsByNome(SUBCATEGORIA_ATUALIZADA.getNome())).willReturn(true);
+        given(subcategoriaRepository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA));
+        given(subcategoriaRepository.existsByNome(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.nome())).willReturn(true);
         assertThatThrownBy(() -> manutencaoService.atualizar(1L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).isInstanceOf(
-                SubcategoriaAlreadyExistsException.class);
+                SubcategoriaAlreadyExistsException.class).hasMessage(
+                MessageFormat.format("Poxa! Já existe uma subcategoria cadastrada com o nome {0}",
+                        SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.nome()));
+        then(subcategoriaRepository).should(never()).save(SUBCATEGORIA_ATUALIZADA);
+    }
+
+    @Test
+    void atualizarSubcategoriaComIdICategoriaInexistenteThrowsException() {
+        given(subcategoriaRepository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA_ATUALIZADA));
+        given(subcategoriaRepository.existsByNome(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.nome())).willReturn(false);
+        given(categoriaRepository.findById(2L)).willReturn(Optional.empty());
+        assertThatThrownBy(() -> manutencaoService.atualizar(1L, SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).isInstanceOf(
+                CategoriaNotFoundException.class).hasMessage("Ops! Nenhuma categoria foi encontrada com o id 2");
         then(subcategoriaRepository).should(never()).save(SUBCATEGORIA_ATUALIZADA);
     }
 
@@ -135,8 +141,7 @@ class SubcategoriaManutencaoServiceTest {
     void removerSubcategoriaComIdInexistenteThrowsException() {
         given(subcategoriaRepository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> manutencaoService.remover(10L)).isInstanceOf(
-                SubcategoriaNotFoundException.class).hasMessage(
-                "Ops! Não foi possível encontrar uma subcategoria com o id 10");
+                SubcategoriaNotFoundException.class).hasMessage("Ops! Nenhuma subcategoria foi encontrada com o id 10");
         then(subcategoriaRepository).should(never()).deleteById(10L);
     }
 

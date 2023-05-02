@@ -12,20 +12,21 @@ import com.github.andregpereira.resilientshop.productsapi.infra.repositories.Pro
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA;
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.PRODUTO;
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.PRODUTO_ATUALIZADO;
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoDtoConstants.*;
+import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaConstants.SUBCATEGORIA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,8 +40,8 @@ class ProdutoConsultaServiceTest {
     @InjectMocks
     private ProdutoConsultaServiceImpl produtoConsultaService;
 
-    @Spy
-    private ProdutoMapper mapper = Mappers.getMapper(ProdutoMapper.class);
+    @Mock
+    private ProdutoMapper mapper;
 
     @Mock
     private ProdutoRepository produtoRepository;
@@ -59,6 +60,8 @@ class ProdutoConsultaServiceTest {
         listaProdutos.add(PRODUTO_ATUALIZADO);
         Page<Produto> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
         given(produtoRepository.findAll(pageable)).willReturn(pageProdutos);
+        given(mapper.toProdutoDto(PRODUTO)).willReturn(PRODUTO_DTO);
+        given(mapper.toProdutoDto(PRODUTO_ATUALIZADO)).willReturn(PRODUTO_DTO_ATUALIZADO);
         Page<ProdutoDto> sut = produtoConsultaService.listar(pageable);
         assertThat(sut).isNotEmpty().hasSize(2);
         assertThat(sut.getContent().get(0)).isEqualTo(PRODUTO_DTO);
@@ -70,12 +73,13 @@ class ProdutoConsultaServiceTest {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
         given(produtoRepository.findAll(pageable)).willReturn(Page.empty());
         assertThatThrownBy(() -> produtoConsultaService.listar(pageable)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Ops! Ainda não há produtos cadastrados");
+                ProdutoNotFoundException.class).hasMessage("Poxa! Ainda não há produtos cadastrados");
     }
 
     @Test
     void consultarProdutoPorIdExistenteRetornaProdutoDetalhesDto() {
         given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
+        given(mapper.toProdutoDetalhesDto(PRODUTO)).willReturn(PRODUTO_DETALHES_DTO);
         ProdutoDetalhesDto sut = produtoConsultaService.consultarPorId(1L);
         assertThat(sut).isNotNull().isEqualTo(PRODUTO_DETALHES_DTO);
     }
@@ -84,7 +88,7 @@ class ProdutoConsultaServiceTest {
     void consultarProdutoPorIdInexistenteThrowsException() {
         given(produtoRepository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> produtoConsultaService.consultarPorId(10L)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Poxa! Nenhum produto foi encontrado com o id 10");
+                ProdutoNotFoundException.class).hasMessage("Ops! Nenhum produto foi encontrado com o id 10");
     }
 
     @Test
@@ -95,6 +99,8 @@ class ProdutoConsultaServiceTest {
         listaProdutos.add(PRODUTO_ATUALIZADO);
         Page<Produto> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
         given(produtoRepository.findByNome("nome", pageable)).willReturn(pageProdutos);
+        given(mapper.toProdutoDto(PRODUTO)).willReturn(PRODUTO_DTO);
+        given(mapper.toProdutoDto(PRODUTO_ATUALIZADO)).willReturn(PRODUTO_DTO_ATUALIZADO);
         Page<ProdutoDto> sut = produtoConsultaService.consultarPorNome("nome", pageable);
         assertThat(sut).isNotEmpty().hasSize(2);
         assertThat(sut.getContent().get(0)).isEqualTo(PRODUTO_DTO);
@@ -104,19 +110,16 @@ class ProdutoConsultaServiceTest {
     @Test
     void consultarProdutoPorNomeInexistenteThrowsException() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
-        given(produtoRepository.findByNome("produto", pageable)).willReturn(Page.empty());
+        given(produtoRepository.findByNome(anyString(), any(Pageable.class))).willReturn(Page.empty());
         assertThatThrownBy(() -> produtoConsultaService.consultarPorNome("produto", pageable)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage(
-                "Desculpe, não foi possível encontrar um produto com esse nome. Verifique e tente novamente");
+                ProdutoNotFoundException.class).hasMessage("Opa! Nenhum produto foi encontrado com o nome produto");
     }
 
     @Test
-    void consultarProdutoPorNomeEmBrancoThrowsException() {
+    void consultarProdutoPorNomeNuloThrowsException() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
-        given(produtoRepository.findByNome(anyString(), any(Pageable.class))).willReturn(Page.empty());
-        assertThatThrownBy(() -> produtoConsultaService.consultarPorNome("", pageable)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage(
-                "Desculpe, não foi possível encontrar um produto com esse nome. Verifique e tente novamente");
+        assertThatThrownBy(() -> produtoConsultaService.consultarPorNome(null, pageable)).isInstanceOf(
+                RuntimeException.class);
     }
 
     @Test
@@ -125,8 +128,9 @@ class ProdutoConsultaServiceTest {
         List<Produto> listaProdutos = new ArrayList<>();
         listaProdutos.add(PRODUTO);
         Page<Produto> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
-        given(subcategoriaRepository.existsById(1L)).willReturn(true);
+        given(subcategoriaRepository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA));
         when(produtoRepository.findAllBySubcategoriaId(1L, pageable)).thenReturn(pageProdutos);
+        given(mapper.toProdutoDto(PRODUTO)).willReturn(PRODUTO_DTO);
         Page<ProdutoDto> sut = produtoConsultaService.consultarPorSubcategoria(1L, pageable);
         assertThat(sut).isNotEmpty().hasSize(1);
         assertThat(sut.getContent().get(0)).isEqualTo(PRODUTO_DTO);
@@ -135,19 +139,20 @@ class ProdutoConsultaServiceTest {
     @Test
     void consultarProdutoPorSubcategoriaInexistenteThrowsException() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(subcategoriaRepository.existsById(10L)).willReturn(false);
+        given(subcategoriaRepository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> produtoConsultaService.consultarPorSubcategoria(10L, pageable)).isInstanceOf(
-                SubcategoriaNotFoundException.class).hasMessage(
-                "Desculpe, não foi possível encontrar uma subcategoria com o id 10. Verifique e tente novamente");
+                SubcategoriaNotFoundException.class).hasMessage("Ops! Nenhuma subcategoria foi encontrada com o id 10");
     }
 
     @Test
     void consultarProdutoInexistentePorSubcategoriaExistenteThrowsException() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(subcategoriaRepository.existsById(1L)).willReturn(true);
+        given(subcategoriaRepository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA));
         given(produtoRepository.findAllBySubcategoriaId(1L, pageable)).willReturn(Page.empty());
         assertThatThrownBy(() -> produtoConsultaService.consultarPorSubcategoria(1L, pageable)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Ops! Nenhum produto foi encontrado com essa subcategoria");
+                ProdutoNotFoundException.class).hasMessage(
+                MessageFormat.format("Opa! Nenhum produto foi encontrado com a subcategoria {0}",
+                        SUBCATEGORIA.getNome()));
     }
 
     @Test
@@ -156,8 +161,9 @@ class ProdutoConsultaServiceTest {
         List<Produto> listaProdutos = new ArrayList<>();
         listaProdutos.add(PRODUTO);
         Page<Produto> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
-        given(categoriaRepository.existsById(1L)).willReturn(true);
+        given(categoriaRepository.findById(1L)).willReturn(Optional.of(CATEGORIA));
         when(produtoRepository.findAllBySubcategoriaCategoriaId(1L, pageable)).thenReturn(pageProdutos);
+        given(mapper.toProdutoDto(PRODUTO)).willReturn(PRODUTO_DTO);
         Page<ProdutoDto> sut = produtoConsultaService.consultarPorCategoria(1L, pageable);
         assertThat(sut).isNotEmpty().hasSize(1);
         assertThat(sut.getContent().get(0)).isEqualTo(PRODUTO_DTO);
@@ -166,19 +172,19 @@ class ProdutoConsultaServiceTest {
     @Test
     void consultarProdutoPorCategoriaInexistenteThrowsException() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(categoriaRepository.existsById(10L)).willReturn(false);
+        given(categoriaRepository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> produtoConsultaService.consultarPorCategoria(10L, pageable)).isInstanceOf(
-                CategoriaNotFoundException.class).hasMessage(
-                "Desculpe, não foi possível encontrar uma categoria com o id 10. Verifique e tente novamente");
+                CategoriaNotFoundException.class).hasMessage("Ops! Nenhuma categoria foi encontrada com o id 10");
     }
 
     @Test
     void consultarProdutoInexistentePorCategoriaExistenteThrowsException() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(categoriaRepository.existsById(1L)).willReturn(true);
+        given(categoriaRepository.findById(1L)).willReturn(Optional.of(CATEGORIA));
         given(produtoRepository.findAllBySubcategoriaCategoriaId(1L, pageable)).willReturn(Page.empty());
         assertThatThrownBy(() -> produtoConsultaService.consultarPorCategoria(1L, pageable)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Ops! Nenhum produto foi encontrado com essa categoria");
+                ProdutoNotFoundException.class).hasMessage(
+                MessageFormat.format("Opa! Nenhum produto foi encontrado com a categoria {0}", CATEGORIA.getNome()));
     }
 
 }

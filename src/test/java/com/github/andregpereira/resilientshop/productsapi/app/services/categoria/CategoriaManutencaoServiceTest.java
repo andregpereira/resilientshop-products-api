@@ -6,10 +6,8 @@ import com.github.andregpereira.resilientshop.productsapi.cross.mappers.Categori
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -28,16 +26,18 @@ class CategoriaManutencaoServiceTest {
     @InjectMocks
     private CategoriaManutencaoServiceImpl manutencaoService;
 
-    @Spy
-    private CategoriaMapper mapper = Mappers.getMapper(CategoriaMapper.class);
+    @Mock
+    private CategoriaMapper mapper;
 
     @Mock
     private CategoriaRepository repository;
 
     @Test
     void criarCategoriaComDadosValidosRetornaCategoriaDto() {
-        given(repository.existsByNome(CATEGORIA.getNome())).willReturn(false);
+        given(repository.existsByNome(CATEGORIA_REGISTRO_DTO.nome())).willReturn(false);
+        given(mapper.toCategoria(CATEGORIA_REGISTRO_DTO)).willReturn(CATEGORIA);
         given(repository.save(CATEGORIA)).willReturn(CATEGORIA);
+        given(mapper.toCategoriaDto(CATEGORIA)).willReturn(CATEGORIA_DTO);
         assertThat(manutencaoService.registrar(CATEGORIA_REGISTRO_DTO)).isEqualTo(CATEGORIA_DTO);
         then(repository).should().save(CATEGORIA);
     }
@@ -61,10 +61,12 @@ class CategoriaManutencaoServiceTest {
 
     @Test
     void atualizarCategoriaComDadosValidosRetornaCategoriaDto() {
-        given(repository.existsById(CATEGORIA.getId())).willReturn(true);
-        given(repository.existsByNome(CATEGORIA_ATUALIZADA.getNome())).willReturn(false);
+        given(repository.findById(1L)).willReturn(Optional.of(CATEGORIA));
+        given(mapper.toCategoria(CATEGORIA_REGISTRO_DTO_ATUALIZADA)).willReturn(CATEGORIA_ATUALIZADA);
+        given(repository.existsByNome(CATEGORIA_REGISTRO_DTO_ATUALIZADA.nome())).willReturn(false);
         given(repository.save(CATEGORIA_ATUALIZADA)).willReturn(CATEGORIA_ATUALIZADA);
-        assertThat(manutencaoService.atualizar(CATEGORIA.getId(), CATEGORIA_REGISTRO_DTO_ATUALIZADA)).isEqualTo(
+        given(mapper.toCategoriaDto(CATEGORIA_ATUALIZADA)).willReturn(CATEGORIA_DTO_ATUALIZADA);
+        assertThat(manutencaoService.atualizar(1L, CATEGORIA_REGISTRO_DTO_ATUALIZADA)).isEqualTo(
                 CATEGORIA_DTO_ATUALIZADA);
         then(repository).should().save(CATEGORIA_ATUALIZADA);
     }
@@ -78,18 +80,19 @@ class CategoriaManutencaoServiceTest {
 
     @Test
     void atualizarCategoriaComIdInexistenteThrowsException() {
-        given(repository.existsById(10L)).willReturn(false);
+        given(repository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> manutencaoService.atualizar(10L, CATEGORIA_REGISTRO_DTO)).isInstanceOf(
-                CategoriaNotFoundException.class);
+                CategoriaNotFoundException.class).hasMessage("Ops! Nenhuma categoria foi encontrada com o id 10");
         then(repository).should(never()).save(CATEGORIA);
     }
 
     @Test
     void atualizarCategoriaComNomeExistenteThrowsException() {
-        given(repository.existsById(1L)).willReturn(true);
+        given(repository.findById(1L)).willReturn(Optional.of(CATEGORIA));
         given(repository.existsByNome(CATEGORIA.getNome())).willReturn(true);
         assertThatThrownBy(() -> manutencaoService.atualizar(1L, CATEGORIA_REGISTRO_DTO)).isInstanceOf(
-                CategoriaAlreadyExistsException.class);
+                CategoriaAlreadyExistsException.class).hasMessage(
+                "Opa! Já existe uma categoria cadastrada com o nome nome");
         then(repository).should(never()).save(CATEGORIA);
     }
 
@@ -104,7 +107,7 @@ class CategoriaManutencaoServiceTest {
     void removerCategoriaComIdInexistenteRetornaString() {
         given(repository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> manutencaoService.remover(10L)).isInstanceOf(
-                CategoriaNotFoundException.class).hasMessage("Ops! Não foi encontrada uma categoria com o id 10");
+                CategoriaNotFoundException.class).hasMessage("Ops! Nenhuma categoria foi encontrada com o id 10");
         then(repository).should(never()).deleteById(10L);
     }
 

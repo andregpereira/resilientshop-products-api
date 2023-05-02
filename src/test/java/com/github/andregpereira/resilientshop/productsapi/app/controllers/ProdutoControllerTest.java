@@ -2,11 +2,12 @@ package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoConsultaService;
+import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoManutencaoService;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoConsultaService;
-import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoManutencaoService;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.security.InvalidParameterException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -122,9 +122,9 @@ class ProdutoControllerTest {
 
     @Test
     void removerProdutoPorIdExistenteRetornaOk() throws Exception {
-        given(manutencaoService.remover(10L)).willReturn("Produto removido");
+        given(manutencaoService.remover(10L)).willReturn("Produto com id 10 removido com sucesso");
         mockMvc.perform(delete("/produtos/10")).andExpect(status().isOk()).andExpectAll(
-                jsonPath("$").value("Produto removido"));
+                jsonPath("$").value("Produto com id 10 removido com sucesso"));
     }
 
     @Test
@@ -148,12 +148,7 @@ class ProdutoControllerTest {
     @Test
     void listarProdutosInexistentesRetornaNotFound() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-//        List<ProdutoDto> listaProdutos = new ArrayList<>();
-//        Page<ProdutoDto> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
         given(consultaService.listar(pageable)).willThrow(ProdutoNotFoundException.class);
-//        when(consultaService.listar(pageable)).thenReturn(pageProdutos);
-//        mockMvc.perform(get("/produtos")).andExpect(status().isOk()).andExpectAll(jsonPath("$").exists(),
-//                jsonPath("$.empty").value(true), jsonPath("$.numberOfElements").value(0));
         mockMvc.perform(get("/produtos")).andExpect(status().isNotFound());
     }
 
@@ -240,8 +235,10 @@ class ProdutoControllerTest {
     @Test
     void inserirParametroNomeVazioThrowsException() throws Exception {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
-        given(consultaService.consultarPorNome("", pageable)).willThrow(InvalidParameterException.class);
-        mockMvc.perform(get("/produtos/nome").param("nome", "")).andExpect(status().isBadRequest());
+        given(consultaService.consultarPorNome("", pageable)).willThrow(ConstraintViolationException.class);
+        mockMvc.perform(get("/produtos/nome").param("nome", "")).andExpect(status().isBadRequest()).andExpectAll(
+                jsonPath("$[0].campo").value("nome"),
+                jsonPath("$[0].mensagem").value("O nome deve ter pelo menos 2 caracteres"));
     }
 
     @Test
