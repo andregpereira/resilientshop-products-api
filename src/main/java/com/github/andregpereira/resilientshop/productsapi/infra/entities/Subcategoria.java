@@ -25,7 +25,7 @@ public class Subcategoria {
     @Column(nullable = false, length = 45)
     private String nome;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String descricao;
 
     @ManyToOne
