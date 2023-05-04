@@ -69,7 +69,8 @@ class ProdutoManutencaoServiceTest {
         given(produtoRepository.existsBySku(PRODUTO_REGISTRO_DTO.sku())).willReturn(true);
         assertThatThrownBy(() -> manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
                 ProdutoAlreadyExistsException.class).hasMessage(
-                MessageFormat.format("Opa! Já existe um produto cadastrado com o SKU {0}", PRODUTO_REGISTRO_DTO.sku()));
+                MessageFormat.format("Opa! Já existe um produto cadastrado com o SKU {0}",
+                        PRODUTO_REGISTRO_DTO.sku().toString().replace(".", "")));
         then(produtoRepository).should(never()).save(PRODUTO);
     }
 
