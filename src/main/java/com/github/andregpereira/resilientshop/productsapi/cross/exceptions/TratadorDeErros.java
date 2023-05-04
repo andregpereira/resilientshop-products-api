@@ -19,8 +19,8 @@ public class TratadorDeErros {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Stream<DadoInvalido>> erro400(ConstraintViolationException e) {
-        Stream<ConstraintViolation<?>> erros = e.getConstraintViolations().stream();
-        return ResponseEntity.badRequest().body(erros.map(DadoInvalido::new));
+        return ResponseEntity.badRequest().body(
+                e.getConstraintViolations().stream().map(cv -> new DadoInvalido(cv, cv.getPropertyPath().toString())));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -71,8 +71,7 @@ public class TratadorDeErros {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Stream<DadoInvalido>> erro422(MethodArgumentNotValidException e) {
-        Stream<FieldError> erros = e.getFieldErrors().stream();
-        return ResponseEntity.unprocessableEntity().body(erros.map(DadoInvalido::new));
+        return ResponseEntity.unprocessableEntity().body(e.getFieldErrors().stream().map(DadoInvalido::new));
     }
 
     private record DadoInvalido(String campo,
@@ -82,9 +81,8 @@ public class TratadorDeErros {
             this(erro.getField(), erro.getDefaultMessage());
         }
 
-        public DadoInvalido(ConstraintViolation<?> erro) {
-            this(new StringBuffer(erro.getPropertyPath().toString()).replace(0,
-                    erro.getPropertyPath().toString().indexOf(".") + 1, "").toString(), erro.getMessageTemplate());
+        public DadoInvalido(ConstraintViolation<?> erro, String path) {
+            this(new StringBuffer(path).replace(0, path.indexOf(".") + 1, "").toString(), erro.getMessageTemplate());
         }
 
     }
