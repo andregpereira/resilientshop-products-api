@@ -1,9 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoAtualizacaoDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.*;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoManutencaoService;
 import jakarta.validation.Valid;
@@ -53,6 +50,11 @@ public class ProdutoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> remover(@PathVariable Long id) {
         return ResponseEntity.ok(manutencaoService.remover(id));
+    }
+
+    @PutMapping("/subtrair/{id}")
+    public void subtrair(@PathVariable Long id, @RequestBody ProdutoAtualizarEstoqueDto dto) {
+        manutencaoService.subtrair(id, dto);
     }
 
     // Listar todos os produtos

@@ -1,6 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.app.services.produto;
 
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoAtualizacaoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoAtualizarEstoqueDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoAlreadyExistsException;
@@ -28,6 +29,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
     private final ProdutoMapper mapper;
     private final SubcategoriaRepository subcategoriaRepository;
 
+    @Override
     public ProdutoDetalhesDto registrar(ProdutoRegistroDto dto) {
         if (produtoRepository.existsBySku(dto.sku())) {
             log.info("Produto já cadastrado com o SKU {}", dto.sku());
@@ -49,6 +51,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
             });
     }
 
+    @Override
     public ProdutoDetalhesDto atualizar(Long id, ProdutoAtualizacaoDto dto) {
         return produtoRepository.findById(id).map(produtoAntigo -> {
             if (produtoRepository.existsByNome(dto.nome())) {
@@ -74,6 +77,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
         });
     }
 
+    @Override
     public String remover(Long id) {
         return produtoRepository.findById(id).map(p -> {
             produtoRepository.deleteById(id);
@@ -82,6 +86,22 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
         }).orElseThrow(() -> {
             log.info("Produto não encontrado com id {}", id);
             return new ProdutoNotFoundException(id);
+        });
+    }
+
+    @Override
+    public void subtrair(Long id, ProdutoAtualizarEstoqueDto dto) {
+        produtoRepository.findById(id).ifPresentOrElse(p -> {
+            if (p.getEstoque() >= dto.estoque()) {
+                p.setEstoque(p.getEstoque() - dto.estoque());
+                produtoRepository.save(p);
+                log.info("Produto {} com {} itens subtraídos do estoque. Estoque atual: {}", p.getNome(), dto.estoque(),
+                        p.getEstoque());
+            } else
+                throw new RuntimeException("estoque insuficiente");
+        }, () -> {
+            log.info("Produto não encontrado com id {}", id);
+            throw new ProdutoNotFoundException(id);
         });
     }
 
