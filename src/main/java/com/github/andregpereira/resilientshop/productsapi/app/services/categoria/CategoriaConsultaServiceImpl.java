@@ -19,6 +19,7 @@ public class CategoriaConsultaServiceImpl implements CategoriaConsultaService {
     private final CategoriaRepository repository;
     private final CategoriaMapper mapper;
 
+    @Override
     public Page<CategoriaDto> listar(Pageable pageable) {
         Page<Categoria> categorias = repository.findAll(pageable);
         if (categorias.isEmpty()) {
@@ -29,6 +30,7 @@ public class CategoriaConsultaServiceImpl implements CategoriaConsultaService {
         return categorias.map(mapper::toCategoriaDto);
     }
 
+    @Override
     public CategoriaDto consultarPorId(Long id) {
         return repository.findById(id).map(c -> {
             log.info("Retornando categoria com id {}", id);

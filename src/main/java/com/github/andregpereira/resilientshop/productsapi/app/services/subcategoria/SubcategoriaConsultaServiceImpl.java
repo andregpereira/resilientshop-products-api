@@ -20,6 +20,7 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
     private final SubcategoriaRepository repository;
     private final SubcategoriaMapper mapper;
 
+    @Override
     public Page<SubcategoriaDto> listar(Pageable pageable) {
         Page<Subcategoria> subcategorias = repository.findAll(pageable);
         if (subcategorias.isEmpty()) {
@@ -30,6 +31,7 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
         return subcategorias.map(mapper::toSubcategoriaDto);
     }
 
+    @Override
     public SubcategoriaDetalhesDto consultarPorId(Long id) {
         return repository.findById(id).map(c -> {
             log.info("Retornando subcategoria com id {}", id);

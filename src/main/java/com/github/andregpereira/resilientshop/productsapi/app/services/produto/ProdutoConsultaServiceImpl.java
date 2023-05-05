@@ -26,6 +26,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     private final SubcategoriaRepository subcategoriaRepository;
     private final CategoriaRepository categoriaRepository;
 
+    @Override
     public Page<ProdutoDto> listar(Pageable pageable) {
         Page<Produto> produtos = produtoRepository.findAll(pageable);
         if (produtos.isEmpty()) {
@@ -36,6 +37,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
         return produtos.map(mapper::toProdutoDto);
     }
 
+    @Override
     public ProdutoDetalhesDto consultarPorId(Long id) {
         return produtoRepository.findById(id).map(p -> {
             log.info("Retornando produto com id {}", id);
@@ -46,6 +48,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
         });
     }
 
+    @Override
     public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
         Page<Produto> produtos = produtoRepository.findByNome(nome, pageable);
         if (produtos.isEmpty()) {
@@ -56,6 +59,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
         return produtos.map(mapper::toProdutoDto);
     }
 
+    @Override
     public Page<ProdutoDto> consultarPorSubcategoria(Long id, Pageable pageable) {
         return subcategoriaRepository.findById(id).map(sc -> {
             Page<Produto> produtos = produtoRepository.findAllBySubcategoriaId(id, pageable);
@@ -71,6 +75,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
         });
     }
 
+    @Override
     public Page<ProdutoDto> consultarPorCategoria(Long id, Pageable pageable) {
         return categoriaRepository.findById(id).map(c -> {
             Page<Produto> produtos = produtoRepository.findAllBySubcategoriaCategoriaId(id, pageable);

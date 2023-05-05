@@ -23,6 +23,7 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
     private final CategoriaRepository repository;
     private final CategoriaMapper mapper;
 
+    @Override
     public CategoriaDto registrar(CategoriaRegistroDto dto) {
         if (repository.existsByNome(dto.nome())) {
             log.info("Categoria já cadastrada com o nome {}", dto.nome());
@@ -34,6 +35,7 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
         return mapper.toCategoriaDto(categoria);
     }
 
+    @Override
     public CategoriaDto atualizar(Long id, CategoriaRegistroDto dto) {
         return repository.findById(id).map(categoriaAntiga -> {
             if (repository.existsByNome(dto.nome())) {
@@ -51,6 +53,7 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
         });
     }
 
+    @Override
     public String remover(Long id) {
         return repository.findById(id).map(c -> {
             repository.deleteById(id);

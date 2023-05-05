@@ -26,6 +26,7 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
     private final SubcategoriaMapper mapper;
     private final CategoriaRepository categoriaRepository;
 
+    @Override
     public SubcategoriaDetalhesDto registrar(SubcategoriaRegistroDto dto) {
         if (subcategoriaRepository.existsByNome(dto.nome())) {
             log.info("Subcategoria já cadastrada com o nome {}", dto.nome());
@@ -43,6 +44,7 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
         });
     }
 
+    @Override
     public SubcategoriaDetalhesDto atualizar(Long id, SubcategoriaRegistroDto dto) {
         return subcategoriaRepository.findById(id).map(subcategoriaAntiga -> {
             if (subcategoriaRepository.existsByNome(dto.nome())) {
@@ -66,6 +68,7 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
         });
     }
 
+    @Override
     public String remover(Long id) {
         return subcategoriaRepository.findById(id).map(c -> {
             subcategoriaRepository.deleteById(id);
