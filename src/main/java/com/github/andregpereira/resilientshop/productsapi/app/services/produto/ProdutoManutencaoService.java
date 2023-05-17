@@ -5,6 +5,8 @@ import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.Produ
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoRegistroDto;
 
+import java.util.List;
+
 public interface ProdutoManutencaoService {
 
     ProdutoDetalhesDto registrar(ProdutoRegistroDto dto);
@@ -13,6 +15,6 @@ public interface ProdutoManutencaoService {
 
     String remover(Long id);
 
-    void subtrair(Long id, ProdutoAtualizarEstoqueDto dto);
+    void subtrair(List<ProdutoAtualizarEstoqueDto> dto);
 
 }

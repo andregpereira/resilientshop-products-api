@@ -11,13 +11,14 @@ import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoM
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -90,19 +91,19 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
     }
 
     @Override
-    public void subtrair(Long id, ProdutoAtualizarEstoqueDto dto) {
-        produtoRepository.findById(id).ifPresentOrElse(p -> {
-            if (p.getEstoque() >= dto.estoque()) {
-                p.setEstoque(p.getEstoque() - dto.estoque());
-                produtoRepository.save(p);
-                log.info("Produto {} com {} itens subtraídos do estoque. Estoque atual: {}", p.getNome(), dto.estoque(),
-                        p.getEstoque());
-            } else
-                throw new RuntimeException("estoque insuficiente");
+    public void subtrair(List<ProdutoAtualizarEstoqueDto> dto) {
+        dto.stream().forEach(pDto -> produtoRepository.findById(pDto.id()).ifPresentOrElse(p -> {
+            if (p.getEstoque() < pDto.quantidade())
+                throw new ProdutoNotFoundException(
+                        MessageFormat.format("Ops! O produto {0} não possui estoque suficiente", p.getNome()));
+            p.setEstoque(p.getEstoque() - pDto.quantidade());
+            produtoRepository.save(p);
+            log.info("Produto {} com {} itens subtraídos do estoque. Estoque atual: {}", p.getNome(), pDto.quantidade(),
+                    p.getEstoque());
         }, () -> {
-            log.info("Produto não encontrado com id {}", id);
-            throw new ProdutoNotFoundException(id);
-        });
+            log.info("Produto não encontrado com id {}", pDto.id());
+            throw new ProdutoNotFoundException(pDto.id());
+        }));
     }
 
 }
