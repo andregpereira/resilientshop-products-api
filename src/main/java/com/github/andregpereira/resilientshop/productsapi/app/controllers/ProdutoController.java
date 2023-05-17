@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -54,10 +55,10 @@ public class ProdutoController {
         return ResponseEntity.ok(manutencaoService.remover(id));
     }
 
-    @PutMapping("/subtrair/{id}")
-    public void subtrair(@PathVariable Long id, @RequestBody ProdutoAtualizarEstoqueDto dto) {
-        log.info("Subtraindo estoque do produto com id {}...", id);
-        manutencaoService.subtrair(id, dto);
+    @PutMapping("/subtrair")
+    public void subtrair(@RequestBody List<ProdutoAtualizarEstoqueDto> dto) {
+        log.info("Subtraindo estoque do produto com id {}...");
+        manutencaoService.subtrair(dto);
     }
 
     // Listar todos os produtos
