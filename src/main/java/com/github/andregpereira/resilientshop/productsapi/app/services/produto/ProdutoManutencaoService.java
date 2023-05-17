@@ -15,6 +15,8 @@ public interface ProdutoManutencaoService {
 
     String remover(Long id);
 
-    void subtrair(List<ProdutoAtualizarEstoqueDto> dto);
+    void subtrairEstoque(List<ProdutoAtualizarEstoqueDto> dtos);
+
+    void retornarEstoque(List<ProdutoAtualizarEstoqueDto> dtos);
 
 }

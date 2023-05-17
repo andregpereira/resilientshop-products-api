@@ -91,14 +91,27 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
     }
 
     @Override
-    public void subtrair(List<ProdutoAtualizarEstoqueDto> dto) {
-        dto.stream().forEach(pDto -> produtoRepository.findById(pDto.id()).ifPresentOrElse(p -> {
+    public void subtrairEstoque(List<ProdutoAtualizarEstoqueDto> dtos) {
+        dtos.stream().forEach(pDto -> produtoRepository.findById(pDto.id()).ifPresentOrElse(p -> {
             if (p.getEstoque() < pDto.quantidade())
                 throw new ProdutoNotFoundException(
                         MessageFormat.format("Ops! O produto {0} não possui estoque suficiente", p.getNome()));
             p.setEstoque(p.getEstoque() - pDto.quantidade());
             produtoRepository.save(p);
             log.info("Produto {} com {} itens subtraídos do estoque. Estoque atual: {}", p.getNome(), pDto.quantidade(),
+                    p.getEstoque());
+        }, () -> {
+            log.info("Produto não encontrado com id {}", pDto.id());
+            throw new ProdutoNotFoundException(pDto.id());
+        }));
+    }
+
+    @Override
+    public void retornarEstoque(List<ProdutoAtualizarEstoqueDto> dtos) {
+        dtos.stream().forEach(pDto -> produtoRepository.findById(pDto.id()).ifPresentOrElse(p -> {
+            p.setEstoque(p.getEstoque() + pDto.quantidade());
+            produtoRepository.save(p);
+            log.info("Produto {} com {} itens retornados ao estoque. Estoque atual: {}", p.getNome(), pDto.quantidade(),
                     p.getEstoque());
         }, () -> {
             log.info("Produto não encontrado com id {}", pDto.id());

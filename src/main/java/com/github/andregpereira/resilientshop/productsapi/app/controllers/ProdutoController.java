@@ -57,8 +57,14 @@ public class ProdutoController {
 
     @PutMapping("/subtrair")
     public void subtrair(@RequestBody List<ProdutoAtualizarEstoqueDto> dto) {
-        log.info("Subtraindo estoque do produto com id {}...");
-        manutencaoService.subtrair(dto);
+        log.info("Subtraindo estoque...");
+        manutencaoService.subtrairEstoque(dto);
+    }
+
+    @PutMapping("/estoque/retornar")
+    public void retornarEstoque(@RequestBody List<ProdutoAtualizarEstoqueDto> dto) {
+        log.info("Retornando estoque...");
+        manutencaoService.retornarEstoque(dto);
     }
 
     // Listar todos os produtos
