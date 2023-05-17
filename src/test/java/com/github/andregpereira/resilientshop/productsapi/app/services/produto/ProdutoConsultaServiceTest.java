@@ -112,7 +112,7 @@ class ProdutoConsultaServiceTest {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
         given(produtoRepository.findByNome(anyString(), any(Pageable.class))).willReturn(Page.empty());
         assertThatThrownBy(() -> produtoConsultaService.consultarPorNome("produto", pageable)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Opa! Nenhum produto foi encontrado com o nome produto");
+                ProdutoNotFoundException.class).hasMessage("Opa! Nenhum produto foi encontrado com o/a nome produto");
     }
 
     @Test
@@ -151,7 +151,7 @@ class ProdutoConsultaServiceTest {
         given(produtoRepository.findAllBySubcategoriaId(1L, pageable)).willReturn(Page.empty());
         assertThatThrownBy(() -> produtoConsultaService.consultarPorSubcategoria(1L, pageable)).isInstanceOf(
                 ProdutoNotFoundException.class).hasMessage(
-                MessageFormat.format("Opa! Nenhum produto foi encontrado com a subcategoria {0}",
+                MessageFormat.format("Opa! Nenhum produto foi encontrado com o/a subcategoria {0}",
                         SUBCATEGORIA.getNome()));
     }
 
@@ -184,7 +184,7 @@ class ProdutoConsultaServiceTest {
         given(produtoRepository.findAllBySubcategoriaCategoriaId(1L, pageable)).willReturn(Page.empty());
         assertThatThrownBy(() -> produtoConsultaService.consultarPorCategoria(1L, pageable)).isInstanceOf(
                 ProdutoNotFoundException.class).hasMessage(
-                MessageFormat.format("Opa! Nenhum produto foi encontrado com a categoria {0}", CATEGORIA.getNome()));
+                MessageFormat.format("Opa! Nenhum produto foi encontrado com o/a categoria {0}", CATEGORIA.getNome()));
     }
 
 }

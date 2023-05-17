@@ -1,6 +1,5 @@
 package com.github.andregpereira.resilientshop.productsapi.cross.mappers;
 
-import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapperImpl;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -2,11 +2,11 @@ package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaConsultaService;
+import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaManutencaoService;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaConsultaService;
-import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaManutencaoService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

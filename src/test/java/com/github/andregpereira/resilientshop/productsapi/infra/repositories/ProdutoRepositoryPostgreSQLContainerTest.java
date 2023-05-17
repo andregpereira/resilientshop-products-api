@@ -180,8 +180,7 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
         em.persist(SUBCATEGORIA);
         Produto produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = repository.findAllBySubcategoriaId(produto.getSubcategoria().getId(),
-                pageable);
+        Page<Produto> pageProdutos = repository.findAllBySubcategoriaId(produto.getSubcategoria().getId(), pageable);
         assertThat(pageProdutos).isNotEmpty().hasSize(1);
         assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
     }
