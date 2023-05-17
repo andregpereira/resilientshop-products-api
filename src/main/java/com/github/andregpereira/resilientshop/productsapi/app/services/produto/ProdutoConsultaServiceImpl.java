@@ -53,7 +53,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
         Page<Produto> produtos = produtoRepository.findByNome(nome, pageable);
         if (produtos.isEmpty()) {
             log.info("Nenhum produto foi encontrado com o nome {}", nome);
-            throw new ProdutoNotFoundException(nome);
+            throw new ProdutoNotFoundException("nome", nome);
         }
         log.info("Retornando produto com nome {}", nome);
         return produtos.map(mapper::toProdutoDto);
