@@ -19,6 +19,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+/**
+ * Controller de produtos da API de Produtos
+ */
 @RequiredArgsConstructor
 @Slf4j
 @Validated
