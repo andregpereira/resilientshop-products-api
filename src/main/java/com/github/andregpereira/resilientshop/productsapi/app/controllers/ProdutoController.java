@@ -26,7 +26,14 @@ import java.util.List;
 @RequestMapping("/produtos")
 public class ProdutoController {
 
+    /**
+     * Injeção da dependência {@link ProdutoManutencaoService} para serviços de manutenção.
+     */
     private final ProdutoManutencaoService manutencaoService;
+
+    /**
+     * Injeção da dependência {@link ProdutoConsultaService} para serviços de consulta.
+     */
     private final ProdutoConsultaService consultaService;
 
     /**
