@@ -40,7 +40,7 @@ public class ProdutoController {
     private final ProdutoConsultaService consultaService;
 
     /**
-     * Cadastra um produto e retorna um {@link ProdutoDetalhesDto}.
+     * Cadastra um produto. Retorna um {@link ProdutoDetalhesDto}.
      *
      * @param dto        o produto a ser cadastrado.
      * @param uriBuilder
@@ -58,7 +58,7 @@ public class ProdutoController {
     }
 
     /**
-     * Atualiza um produto por {@code id} e retorna um {@link ProdutoDetalhesDto}.
+     * Atualiza um produto por {@code id}. Retorna um {@link ProdutoDetalhesDto}.
      *
      * @param id  o {@code id} do produto a ser atualizado.
      * @param dto o produto a ser atualizado.
@@ -73,7 +73,7 @@ public class ProdutoController {
     }
 
     /**
-     * Remove um produto por {@code id}.
+     * Remove um produto por {@code id}. Retorna uma {@link String}.
      *
      * @param id o {@code id} do produto a ser removido.
      *
@@ -108,7 +108,7 @@ public class ProdutoController {
     }
 
     /**
-     * Lista todos os produtos cadastrados e retorna uma {@link Page} de {@link ProdutoDto}.
+     * Lista todos os produtos cadastrados. Retorna uma {@link Page} de {@link ProdutoDto}.
      *
      * @param pageable o {@code pageable} padrão.
      *
@@ -122,7 +122,7 @@ public class ProdutoController {
     }
 
     /**
-     * Pesquisa um produto por {@code id} e retorna um {@link ProdutoDetalhesDto}.
+     * Pesquisa um produto por {@code id}. Retorna um {@link ProdutoDetalhesDto}.
      *
      * @param id o {@code id} do produto a ser consultado.
      *
@@ -135,7 +135,7 @@ public class ProdutoController {
     }
 
     /**
-     * Pesquisa produtos pelo {@code nome} e retorna uma {@link Page} de {@link ProdutoDto}.
+     * Pesquisa produtos pelo {@code nome}. Retorna uma {@link Page} de {@link ProdutoDto}.
      *
      * @param nome     o {@code nome} do produto.
      * @param pageable o {@code pageable} padrão.
@@ -151,7 +151,7 @@ public class ProdutoController {
     }
 
     /**
-     * Pesquisa produtos pelo {@code id} da subcategoria e retorna uma {@link Page} de {@link ProdutoDto}.
+     * Pesquisa produtos pelo {@code id} da subcategoria. Retorna uma {@link Page} de {@link ProdutoDto}.
      *
      * @param id       o {@code id} da subcategoria.
      * @param pageable o {@code pageable} padrão.
@@ -166,7 +166,7 @@ public class ProdutoController {
     }
 
     /**
-     * Pesquisa produtos pelo {@code id} da categoria e retorna uma {@link Page} de {@link ProdutoDto}.
+     * Pesquisa produtos pelo {@code id} da categoria. Retorna uma {@link Page} de {@link ProdutoDto}.
      *
      * @param id       o {@code id} da categoria.
      * @param pageable o {@code pageable} padrão.
