@@ -28,13 +28,13 @@ paths:
   /subcategorias/{id}:
     get:
       tags:
-      - Subcategorias
+        - Subcategorias
       operationId: consultarSubcategoriaPorId
       summary: |-
         Consulta uma subcategoria pelo id
 
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       responses:
         "404":
@@ -51,13 +51,13 @@ paths:
 
     put:
       tags:
-      - Subcategorias
+        - Subcategorias
       operationId: atualizarSubcategoria
       summary: |-
         Consulta uma subcategoria por id
 
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       requestBody:
         $ref: '#/components/requestBodies/SubcategoriaRegistroDto'
@@ -76,13 +76,13 @@ paths:
 
     delete:
       tags:
-      - Subcategorias
+        - Subcategorias
       operationId: removerSubcategoria
       summary: |-
         Remove uma subcategoria por id
 
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       responses:
         "404":
@@ -101,13 +101,13 @@ paths:
   /produtos/{id}:
     get:
       tags:
-      - Produtos
+        - Produtos
       operationId: consultarProdutoPorId
       summary: |-
         Consulta um produto por id
 
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       responses:
         "404":
@@ -122,13 +122,13 @@ paths:
 
     put:
       tags:
-      - Produtos
+        - Produtos
       operationId: atualizarProduto
       summary: |-
         Atualiza um produto por id
 
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       requestBody:
         $ref: '#/components/requestBodies/ProdutoAtualizacaoDto'
@@ -147,13 +147,13 @@ paths:
 
     delete:
       tags:
-      - Produtos
+        - Produtos
       operationId: removerProduto
       summary: |-
         Remove um produto por id
 
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       responses:
         "404":
@@ -170,13 +170,13 @@ paths:
   /produtos/subtrair/{id}:
     put:
       tags:
-      - Produtos
+        - Produtos
       operationId: subtrairProduto
       summary: |-
         Subtrai estoque do produto
 
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       requestBody:
         content:
@@ -196,12 +196,12 @@ paths:
   /categorias/{id}:
     get:
       tags:
-      - Categorias
+        - Categorias
       operationId: consultarCategoriaPorId
       summary: |-
         Consulta uma categoria por id
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       responses:
         "200":
@@ -214,12 +214,12 @@ paths:
 
     put:
       tags:
-      - Categorias
+        - Categorias
       operationId: atualizarCategoria
       summary: |-
         Atualiza uma categoria por id
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       requestBody:
         content:
@@ -242,12 +242,12 @@ paths:
 
     delete:
       tags:
-      - Categorias
+        - Categorias
       operationId: removerCategoria
       summary: |-
         Remove uma categoria
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       responses:
         "404":
@@ -264,7 +264,7 @@ paths:
   /subcategorias:
     get:
       tags:
-      - Subcategorias
+        - Subcategorias
       operationId: listar
       summary: |-
         Retorna todas as subcategorias
@@ -282,7 +282,7 @@ paths:
 
     post:
       tags:
-      - Subcategorias
+        - Subcategorias
       operationId: registrar
       summary: |-
         Cria uma subcategoria
@@ -295,7 +295,7 @@ paths:
 
         "409":
           $ref: '#/components/responses/SubcategriaConflict'
-  
+
         "400":
           $ref: '#/components/responses/BadRequest'
 
@@ -305,7 +305,7 @@ paths:
   /produtos:
     get:
       tags:
-      - Produtos
+        - Produtos
       operationId: listarProdutos
       summary: |-
         Retorna todos os produtos
@@ -323,7 +323,7 @@ paths:
 
     post:
       tags:
-      - Produtos
+        - Produtos
       operationId: registrarProduto
       summary: |-
         Cria um produto
@@ -336,7 +336,7 @@ paths:
 
         "409":
           $ref: '#/components/responses/ProdutoConflict'
-  
+
         "400":
           $ref: '#/components/responses/BadRequest'
 
@@ -346,7 +346,7 @@ paths:
   /categorias:
     get:
       tags:
-      - Categorias
+        - Categorias
       operationId: listarCategorias
       summary: |-
         Retorna todas as categorias
@@ -364,7 +364,7 @@ paths:
 
     post:
       tags:
-      - Categorias
+        - Categorias
       operationId: registrarCategoria
       summary: |-
         Cria uma categoria
@@ -377,7 +377,7 @@ paths:
 
         "409":
           $ref: '#/components/responses/CategoriaConflict'
-  
+
         "400":
           $ref: '#/components/responses/BadRequest'
 
@@ -387,12 +387,12 @@ paths:
   /produtos/subcategoria/{id}:
     get:
       tags:
-      - Produtos
+        - Produtos
       operationId: consultarPorSubcategoria
       summary: |-
         Retorna produtos pelo id da subcategoria
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       responses:
         "404":
@@ -409,12 +409,12 @@ paths:
   /produtos/nome:
     get:
       tags:
-      - Produtos
+        - Produtos
       operationId: consultarPorNome
       summary: |-
         Retorna produtos pelo nome
       parameters:
-      - $ref: '#/components/parameters/Nome'
+        - $ref: '#/components/parameters/Nome'
 
       responses:
         "404":
@@ -431,12 +431,12 @@ paths:
   /produtos/categoria/{id}:
     get:
       tags:
-      - Produtos
+        - Produtos
       operationId: consultarPorCategoria
       summary: |-
         Retorna produtos pelo id da categoria
       parameters:
-      - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Id'
 
       responses:
         "404":
@@ -454,9 +454,9 @@ components:
   schemas:
     SubcategoriaRegistroDto:
       required:
-      - descricao
-      - idCategoria
-      - nome
+        - descricao
+        - idCategoria
+        - nome
       type: object
       properties:
         nome:
@@ -495,11 +495,11 @@ components:
 
     ProdutoAtualizacaoDto:
       required:
-      - descricao
-      - estoque
-      - idSubcategoria
-      - nome
-      - valorUnitario
+        - descricao
+        - estoque
+        - idSubcategoria
+        - nome
+        - valorUnitario
       type: object
       properties:
         nome:
@@ -563,7 +563,7 @@ components:
 
     CategoriaRegistroDto:
       required:
-      - nome
+        - nome
       type: object
       properties:
         nome:
@@ -573,12 +573,12 @@ components:
 
     ProdutoRegistroDto:
       required:
-      - descricao
-      - estoque
-      - idSubcategoria
-      - nome
-      - sku
-      - valorUnitario
+        - descricao
+        - estoque
+        - idSubcategoria
+        - nome
+        - sku
+        - valorUnitario
       type: object
       properties:
         sku:
@@ -771,7 +771,7 @@ components:
           type: string
         mensagem:
           type: string
-          
+
     ResponseProdutoConflict:
       type: string
       example: |-
@@ -957,13 +957,6 @@ components:
     #   required: false
     #   schema:
     #     $ref: '#/components/schemas/Pageable'
-
-    # PageableCpf:
-    #   name: pageable
-    #   in: query
-    #   required: false
-    #   schema:
-    #     $ref: '#/components/schemas/PageableCpf'
 
     # PageableNome:
     #   name: pageable
