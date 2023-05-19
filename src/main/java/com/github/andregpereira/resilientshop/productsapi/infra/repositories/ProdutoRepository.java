@@ -15,7 +15,10 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     boolean existsByNome(String nome);
 
-    @Query(value = "select * from tb_produtos p where p.nome ilike %:nome%", nativeQuery = true)
+    @Query(value = """
+            SELECT * FROM tb_produtos p
+            WHERE p.nome ILIKE %:nome%
+            """, nativeQuery = true)
     Page<Produto> findByNome(@Param("nome") String nome, Pageable pageable);
 
     Page<Produto> findAllBySubcategoriaId(Long id, Pageable pageable);
