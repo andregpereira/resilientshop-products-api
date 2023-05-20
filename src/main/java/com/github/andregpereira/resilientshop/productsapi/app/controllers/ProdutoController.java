@@ -21,6 +21,8 @@ import java.util.List;
 
 /**
  * Controller de produtos da API de Produtos
+ *
+ * @author André Garcia
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -40,30 +42,30 @@ public class ProdutoController {
     private final ProdutoConsultaService consultaService;
 
     /**
-     * Cadastra um produto. Retorna um {@link ProdutoDetalhesDto}.
+     * Cadastra um {@linkplain ProdutoRegistroDto produto}.
+     * Retorna um {@linkplain ProdutoDetalhesDto produto detalhado}.
      *
-     * @param dto        o produto a ser cadastrado.
-     * @param uriBuilder
+     * @param dto o produto a ser cadastrado.
      *
-     * @return Um {@link ProdutoDetalhesDto} com o produto criado.
+     * @return o produto criado.
      */
     @PostMapping
-    public ResponseEntity<ProdutoDetalhesDto> criar(@RequestBody @Valid ProdutoRegistroDto dto,
-            UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<ProdutoDetalhesDto> criar(@RequestBody @Valid ProdutoRegistroDto dto) {
         log.info("Criando produto...");
         ProdutoDetalhesDto produto = manutencaoService.registrar(dto);
-        URI uri = uriBuilder.path("/produtos/{id}").buildAndExpand(produto.id()).toUri();
+        URI uri = UriComponentsBuilder.fromPath("/produtos/{id}").buildAndExpand(produto.id()).toUri();
         log.info("Produto criado com sucesso");
         return ResponseEntity.created(uri).body(produto);
     }
 
     /**
-     * Atualiza um produto por {@code id}. Retorna um {@link ProdutoDetalhesDto}.
+     * Atualiza um {@linkplain ProdutoAtualizacaoDto produto} por {@code id}.
+     * Retorna um {@linkplain ProdutoDetalhesDto produto detalhado}.
      *
-     * @param id  o {@code id} do produto a ser atualizado.
+     * @param id  o id do produto a ser atualizado.
      * @param dto o produto a ser atualizado.
      *
-     * @return Um {@link ProdutoDetalhesDto} com o produto atualizado.
+     * @return o produto atualizado.
      */
     @PutMapping("/{id}")
     public ResponseEntity<ProdutoDetalhesDto> atualizar(@PathVariable Long id,
@@ -73,11 +75,11 @@ public class ProdutoController {
     }
 
     /**
-     * Remove um produto por {@code id}. Retorna uma {@link String}.
+     * Remove um produto por {@code id}. Retorna uma mensagem de confirmação de remoção.
      *
-     * @param id o {@code id} do produto a ser removido.
+     * @param id o id do produto a ser removido.
      *
-     * @return Uma {@link String} com uma mensagem de confirmação de remoção.
+     * @return uma mensagem de confirmação de remoção.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> remover(@PathVariable Long id) {
@@ -86,7 +88,7 @@ public class ProdutoController {
     }
 
     /**
-     * Subtrai produtos do estoque.
+     * Subtrai produtos do estoque, dado a lista de {@linkplain ProdutoAtualizarEstoqueDto produtos}.
      *
      * @param dtos a lista de produtos a terem seus estoques subtraídos.
      */
@@ -97,7 +99,7 @@ public class ProdutoController {
     }
 
     /**
-     * Retorna produtos ao estoque.
+     * Retorna produtos ao estoque, dado a lista de {@linkplain ProdutoAtualizarEstoqueDto produtos}.
      *
      * @param dtos a lista de produtos a serem retornados ao estoque.
      */
@@ -108,11 +110,12 @@ public class ProdutoController {
     }
 
     /**
-     * Lista todos os produtos cadastrados. Retorna uma {@link Page} de {@link ProdutoDto}.
+     * Lista todos os produtos cadastrados.
+     * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
      *
-     * @param pageable o {@code pageable} padrão.
+     * @param pageable o pageable padrão.
      *
-     * @return Uma {@link Page} de {@link ProdutoDto} com todos os produtos cadastrados.
+     * @return uma sublista de uma lista com todos os produtos cadastrados.
      */
     @GetMapping
     public ResponseEntity<Page<ProdutoDto>> listar(
@@ -122,11 +125,11 @@ public class ProdutoController {
     }
 
     /**
-     * Pesquisa um produto por {@code id}. Retorna um {@link ProdutoDetalhesDto}.
+     * Pesquisa um produto por {@code id}. Retorna um {@linkplain ProdutoDetalhesDto produto detalhado}.
      *
-     * @param id o {@code id} do produto a ser consultado.
+     * @param id o id do produto a ser consultado.
      *
-     * @return Um {@link ProdutoDetalhesDto} com o produto encontrado pelo {@code id}.
+     * @return um produto encontrado pelo {@code id}.
      */
     @GetMapping("/{id}")
     public ResponseEntity<ProdutoDetalhesDto> consultarPorId(@PathVariable Long id) {
@@ -135,12 +138,13 @@ public class ProdutoController {
     }
 
     /**
-     * Pesquisa produtos pelo {@code nome}. Retorna uma {@link Page} de {@link ProdutoDto}.
+     * Pesquisa produtos pelo {@code nome}.
+     * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
      *
-     * @param nome     o {@code nome} do produto.
-     * @param pageable o {@code pageable} padrão.
+     * @param nome     o nome do(s) produto(s).
+     * @param pageable o pageable padrão.
      *
-     * @return Uma {@link Page} de {@link ProdutoDto} com todos os produtos encontrados pelo {@code nome}.
+     * @return uma sublista de uma lista com todos os produtos encontrados pelo {@code nome}.
      */
     @GetMapping("/nome")
     public ResponseEntity<Page<ProdutoDto>> consultarPorNome(
@@ -151,12 +155,13 @@ public class ProdutoController {
     }
 
     /**
-     * Pesquisa produtos pelo {@code id} da subcategoria. Retorna uma {@link Page} de {@link ProdutoDto}.
+     * Pesquisa produtos pelo {@code id} da subcategoria.
+     * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
      *
-     * @param id       o {@code id} da subcategoria.
-     * @param pageable o {@code pageable} padrão.
+     * @param id       o id da subcategoria.
+     * @param pageable o pageable padrão.
      *
-     * @return Uma {@link Page} de {@link ProdutoDto} com todos os produtos encontrados pelo {@code id} da subcategoria.
+     * @return uma sublista de uma lista com todos os produtos encontrados pelo {@code id} da subcategoria.
      */
     @GetMapping("/subcategoria/{id}")
     public ResponseEntity<Page<ProdutoDto>> consultarPorSubcategoria(@PathVariable Long id,
@@ -166,12 +171,13 @@ public class ProdutoController {
     }
 
     /**
-     * Pesquisa produtos pelo {@code id} da categoria. Retorna uma {@link Page} de {@link ProdutoDto}.
+     * Pesquisa produtos pelo {@code id} da categoria.
+     * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
      *
-     * @param id       o {@code id} da categoria.
-     * @param pageable o {@code pageable} padrão.
+     * @param id       o id da categoria.
+     * @param pageable o pageable padrão.
      *
-     * @return Uma {@link Page} de {@link ProdutoDto} com todos os produtos encontrados pelo {@code id} da categoria.
+     * @return uma sublista de uma lista com todos os produtos encontrados pelo {@code id} da categoria.
      */
     @GetMapping("/categoria/{id}")
     public ResponseEntity<Page<ProdutoDto>> consultarPorCategoria(@PathVariable Long id,
