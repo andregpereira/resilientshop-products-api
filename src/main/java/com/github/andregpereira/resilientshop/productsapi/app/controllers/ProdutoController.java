@@ -63,7 +63,7 @@ public class ProdutoController {
      * Retorna um {@linkplain ProdutoDetalhesDto produto detalhado}.
      *
      * @param id  o id do produto a ser atualizado.
-     * @param dto o produto a ser atualizado.
+     * @param dto os dados produto a serem atualizados.
      *
      * @return o produto atualizado.
      */
