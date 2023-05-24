@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * Controller de produtos da API de Produtos
+ * Controller de produtos da API de Produtos.
  *
  * @author André Garcia
  */
