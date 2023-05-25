@@ -5,7 +5,7 @@ import com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria.
 
 public interface SubcategoriaManutencaoService {
 
-    SubcategoriaDetalhesDto registrar(SubcategoriaRegistroDto dto);
+    SubcategoriaDetalhesDto criar(SubcategoriaRegistroDto dto);
 
     SubcategoriaDetalhesDto atualizar(Long id, SubcategoriaRegistroDto dto);
 
