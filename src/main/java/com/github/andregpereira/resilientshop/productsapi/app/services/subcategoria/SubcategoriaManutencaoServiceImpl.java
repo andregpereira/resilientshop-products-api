@@ -27,7 +27,7 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
     private final CategoriaRepository categoriaRepository;
 
     @Override
-    public SubcategoriaDetalhesDto registrar(SubcategoriaRegistroDto dto) {
+    public SubcategoriaDetalhesDto criar(SubcategoriaRegistroDto dto) {
         if (subcategoriaRepository.existsByNome(dto.nome())) {
             log.info("Subcategoria já cadastrada com o nome {}", dto.nome());
             throw new SubcategoriaAlreadyExistsException(dto.nome());
