@@ -94,6 +94,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      *
      * @throws ProdutoNotFoundException      caso o produto não seja encontrado.
      * @throws ProdutoAlreadyExistsException caso exista um produto com o nome já cadastrados.
+     * @throws SubcategoriaNotFoundException caso nenhuma subcategoria seja encontrada.
      */
     @Override
     public ProdutoDetalhesDto atualizar(Long id, ProdutoAtualizacaoDto dto) {
