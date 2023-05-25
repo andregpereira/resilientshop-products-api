@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProdutoManutencaoService {
 
-    ProdutoDetalhesDto registrar(ProdutoRegistroDto dto);
+    ProdutoDetalhesDto criar(ProdutoRegistroDto dto);
 
     ProdutoDetalhesDto atualizar(Long id, ProdutoAtualizacaoDto dto);
 
