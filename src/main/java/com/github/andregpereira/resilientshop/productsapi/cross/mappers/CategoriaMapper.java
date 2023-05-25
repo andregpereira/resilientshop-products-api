@@ -7,6 +7,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants.ComponentModel;
 import org.mapstruct.ReportingPolicy;
 
+/**
+ * Interface mapper de {@link Categoria} e {@link CategoriaDto}.
+ *
+ * @author André Garcia
+ * @see CategoriaMapper
+ */
 @Mapper(componentModel = ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CategoriaMapper {
 

@@ -10,6 +10,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants.ComponentModel;
 import org.mapstruct.ReportingPolicy;
 
+/**
+ * Interface mapper de {@link Produto}, {@link ProdutoDto} e {@link ProdutoDetalhesDto}.
+ *
+ * @author André Garcia
+ * @see SubcategoriaMapper
+ */
 @Mapper(componentModel = ComponentModel.SPRING, uses = SubcategoriaMapper.class,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ProdutoMapper {

@@ -9,6 +9,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants.ComponentModel;
 import org.mapstruct.ReportingPolicy;
 
+/**
+ * Interface mapper de {@link Subcategoria}, {@link SubcategoriaDto} e {@link SubcategoriaDetalhesDto}.
+ *
+ * @author André Garcia
+ * @see CategoriaMapper
+ */
 @Mapper(componentModel = ComponentModel.SPRING, uses = CategoriaMapper.class,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SubcategoriaMapper {
