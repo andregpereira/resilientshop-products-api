@@ -44,7 +44,7 @@ class CategoriaControllerTest {
 
     @Test
     void criarCategoriaComDadosValidosRetornaCreated() throws Exception {
-        given(manutencaoService.registrar(CATEGORIA_REGISTRO_DTO)).willReturn(CATEGORIA_DTO);
+        given(manutencaoService.criar(CATEGORIA_REGISTRO_DTO)).willReturn(CATEGORIA_DTO);
         mockMvc.perform(post("/categorias").content(
                 objectMapper.writeValueAsString(CATEGORIA_REGISTRO_DTO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isCreated()).andExpectAll(
@@ -60,7 +60,7 @@ class CategoriaControllerTest {
 
     @Test
     void criarSubcategoriaComNomeExistenteRetornaConflict() throws Exception {
-        given(manutencaoService.registrar(CATEGORIA_REGISTRO_DTO)).willThrow(CategoriaAlreadyExistsException.class);
+        given(manutencaoService.criar(CATEGORIA_REGISTRO_DTO)).willThrow(CategoriaAlreadyExistsException.class);
         mockMvc.perform(post("/categorias").content(
                 objectMapper.writeValueAsString(CATEGORIA_REGISTRO_DTO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isConflict());

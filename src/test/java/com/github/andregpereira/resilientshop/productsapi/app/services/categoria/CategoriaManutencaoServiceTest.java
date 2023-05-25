@@ -38,7 +38,7 @@ class CategoriaManutencaoServiceTest {
         given(mapper.toCategoria(CATEGORIA_REGISTRO_DTO)).willReturn(CATEGORIA);
         given(repository.save(CATEGORIA)).willReturn(CATEGORIA);
         given(mapper.toCategoriaDto(CATEGORIA)).willReturn(CATEGORIA_DTO);
-        assertThat(manutencaoService.registrar(CATEGORIA_REGISTRO_DTO)).isEqualTo(CATEGORIA_DTO);
+        assertThat(manutencaoService.criar(CATEGORIA_REGISTRO_DTO)).isEqualTo(CATEGORIA_DTO);
         then(repository).should().save(CATEGORIA);
     }
 
@@ -46,7 +46,7 @@ class CategoriaManutencaoServiceTest {
     void criarCategoriaComDadosInvalidosThrowsException() {
         given(repository.existsByNome(CATEGORIA_INVALIDA.getNome())).willReturn(false);
         given(repository.save(CATEGORIA_INVALIDA)).willThrow(RuntimeException.class);
-        assertThatThrownBy(() -> manutencaoService.registrar(CATEGORIA_REGISTRO_DTO_INVALIDA)).isInstanceOf(
+        assertThatThrownBy(() -> manutencaoService.criar(CATEGORIA_REGISTRO_DTO_INVALIDA)).isInstanceOf(
                 RuntimeException.class);
         then(repository).should(never()).save(CATEGORIA);
     }
@@ -54,7 +54,7 @@ class CategoriaManutencaoServiceTest {
     @Test
     void criarCategoriaComNomeExistenteThrowsException() {
         given(repository.existsByNome(CATEGORIA.getNome())).willReturn(true);
-        assertThatThrownBy(() -> manutencaoService.registrar(CATEGORIA_REGISTRO_DTO)).isInstanceOf(
+        assertThatThrownBy(() -> manutencaoService.criar(CATEGORIA_REGISTRO_DTO)).isInstanceOf(
                 CategoriaAlreadyExistsException.class);
         then(repository).should(never()).save(CATEGORIA);
     }

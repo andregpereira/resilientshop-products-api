@@ -48,13 +48,13 @@ class SubcategoriaManutencaoServiceTest {
         given(mapper.toSubcategoria(SUBCATEGORIA_REGISTRO_DTO)).willReturn(SUBCATEGORIA);
         given(subcategoriaRepository.save(SUBCATEGORIA)).willReturn(SUBCATEGORIA);
         given(mapper.toSubcategoriaDetalhesDto(SUBCATEGORIA)).willReturn(SUBCATEGORIA_DETALHES_DTO);
-        assertThat(manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).isEqualTo(SUBCATEGORIA_DETALHES_DTO);
+        assertThat(manutencaoService.criar(SUBCATEGORIA_REGISTRO_DTO)).isEqualTo(SUBCATEGORIA_DETALHES_DTO);
         then(subcategoriaRepository).should().save(SUBCATEGORIA);
     }
 
     @Test
     void criarSubcategoriaComDadosInvalidosThrowsException() {
-        assertThatThrownBy(() -> manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO_INVALIDA)).isInstanceOf(
+        assertThatThrownBy(() -> manutencaoService.criar(SUBCATEGORIA_REGISTRO_DTO_INVALIDA)).isInstanceOf(
                 RuntimeException.class);
         then(subcategoriaRepository).should(never()).save(SUBCATEGORIA);
     }
@@ -62,7 +62,7 @@ class SubcategoriaManutencaoServiceTest {
     @Test
     void criarSubcategoriaComNomeExistenteThrowsException() {
         given(subcategoriaRepository.existsByNome(SUBCATEGORIA_REGISTRO_DTO.nome())).willReturn(true);
-        assertThatThrownBy(() -> manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).isInstanceOf(
+        assertThatThrownBy(() -> manutencaoService.criar(SUBCATEGORIA_REGISTRO_DTO)).isInstanceOf(
                 SubcategoriaAlreadyExistsException.class).hasMessage(
                 MessageFormat.format("Poxa! Já existe uma subcategoria cadastrada com o nome {0}",
                         SUBCATEGORIA_REGISTRO_DTO.nome()));
@@ -73,7 +73,7 @@ class SubcategoriaManutencaoServiceTest {
     void criarSubcategoriaComIdCategoriaInexistenteThrowsException() {
         given(subcategoriaRepository.existsByNome(SUBCATEGORIA_REGISTRO_DTO.nome())).willReturn(false);
         given(categoriaRepository.findById(1L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).isInstanceOf(
+        assertThatThrownBy(() -> manutencaoService.criar(SUBCATEGORIA_REGISTRO_DTO)).isInstanceOf(
                 CategoriaNotFoundException.class).hasMessage("Ops! Nenhuma categoria foi encontrada com o id 1");
         then(subcategoriaRepository).should(never()).save(SUBCATEGORIA);
     }

@@ -44,7 +44,7 @@ class SubcategoriaControllerTest {
 
     @Test
     void criarSubcategoriaComDadosValidosRetornaCreated() throws Exception {
-        given(manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).willReturn(SUBCATEGORIA_DETALHES_DTO);
+        given(manutencaoService.criar(SUBCATEGORIA_REGISTRO_DTO)).willReturn(SUBCATEGORIA_DETALHES_DTO);
         mockMvc.perform(post("/subcategorias").content(
                 objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isCreated()).andExpectAll(jsonPath("$").exists(),
@@ -62,7 +62,7 @@ class SubcategoriaControllerTest {
 
     @Test
     void criarSubcategoriaComCategoriaInexistenteRetornaNotFound() throws Exception {
-        given(manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).willThrow(CategoriaNotFoundException.class);
+        given(manutencaoService.criar(SUBCATEGORIA_REGISTRO_DTO)).willThrow(CategoriaNotFoundException.class);
         mockMvc.perform(post("/subcategorias").content(
                 objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
@@ -70,7 +70,7 @@ class SubcategoriaControllerTest {
 
     @Test
     void criarSubcategoriaComNomeExistenteRetornaConflict() throws Exception {
-        given(manutencaoService.registrar(SUBCATEGORIA_REGISTRO_DTO)).willThrow(
+        given(manutencaoService.criar(SUBCATEGORIA_REGISTRO_DTO)).willThrow(
                 SubcategoriaAlreadyExistsException.class);
         mockMvc.perform(post("/subcategorias").content(
                 objectMapper.writeValueAsString(SUBCATEGORIA_REGISTRO_DTO)).contentType(
