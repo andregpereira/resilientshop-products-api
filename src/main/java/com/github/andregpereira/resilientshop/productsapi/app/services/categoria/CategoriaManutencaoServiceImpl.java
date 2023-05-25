@@ -24,7 +24,7 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
     private final CategoriaMapper mapper;
 
     @Override
-    public CategoriaDto registrar(CategoriaRegistroDto dto) {
+    public CategoriaDto criar(CategoriaRegistroDto dto) {
         if (repository.existsByNome(dto.nome())) {
             log.info("Categoria já cadastrada com o nome {}", dto.nome());
             throw new CategoriaAlreadyExistsException(dto.nome());
