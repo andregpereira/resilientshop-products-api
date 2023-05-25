@@ -5,7 +5,7 @@ import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.Cat
 
 public interface CategoriaManutencaoService {
 
-    CategoriaDto registrar(CategoriaRegistroDto dto);
+    CategoriaDto criar(CategoriaRegistroDto dto);
 
     CategoriaDto atualizar(Long id, CategoriaRegistroDto dto);
 
