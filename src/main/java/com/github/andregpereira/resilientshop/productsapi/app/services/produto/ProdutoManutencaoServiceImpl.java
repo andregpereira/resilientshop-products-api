@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Classe de serviço de consulta de {@link Produto}.
+ * Classe de serviço de manutenção de {@link Produto}.
  *
  * @author André Garcia
  */
