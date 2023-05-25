@@ -24,6 +24,7 @@ import java.util.List;
  * Classe de serviço de manutenção de {@link Produto}.
  *
  * @author André Garcia
+ * @see ProdutoManutencaoService
  */
 
 @RequiredArgsConstructor

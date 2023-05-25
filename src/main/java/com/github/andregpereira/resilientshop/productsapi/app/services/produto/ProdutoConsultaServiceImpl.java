@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
  * Classe de serviço de consulta de {@link Produto}.
  *
  * @author André Garcia
+ * @see ProdutoConsultaService
  */
 
 @RequiredArgsConstructor
