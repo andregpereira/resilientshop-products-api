@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
  * Classe de serviço de consulta de {@link Subcategoria}.
  *
  * @author André Garcia
+ * @see SubcategoriaConsultaService
  */
 @RequiredArgsConstructor
 @Slf4j
