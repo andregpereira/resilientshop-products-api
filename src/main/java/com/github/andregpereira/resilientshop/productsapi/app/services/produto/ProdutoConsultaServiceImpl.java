@@ -16,16 +16,51 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+/**
+ * Classe de serviço de manutenção de {@link Produto}.
+ *
+ * @author André Garcia
+ */
+
 @RequiredArgsConstructor
 @Slf4j
 @Service
 public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
 
+    /**
+     * Injeção da dependência {@link ProdutoRepository} para realizar operações de
+     * consulta na tabela de produtos no banco de dados.
+     */
     private final ProdutoRepository produtoRepository;
+
+    /**
+     * Injeção da dependência {@link ProdutoMapper} para realizar
+     * conversões de entidade para DTO de produtos.
+     */
     private final ProdutoMapper mapper;
+
+    /**
+     * Injeção da dependência {@link SubcategoriaRepository} para realizar operações de
+     * consulta na tabela de subcategorias no banco de dados.
+     */
     private final SubcategoriaRepository subcategoriaRepository;
+
+    /**
+     * Injeção da dependência {@link CategoriaRepository} para realizar operações de
+     * consulta na tabela de categorias no banco de dados.
+     */
     private final CategoriaRepository categoriaRepository;
 
+    /**
+     * Lista todos os {@linkplain Produto produtos} cadastrados.
+     * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
+     *
+     * @param pageable o pageable padrão.
+     *
+     * @return uma sublista de uma lista com todos os produtos cadastrados.
+     *
+     * @throws ProdutoNotFoundException caso nenhum produto seja encontrado.
+     */
     @Override
     public Page<ProdutoDto> listar(Pageable pageable) {
         Page<Produto> produtos = produtoRepository.findAll(pageable);
@@ -37,6 +72,16 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
         return produtos.map(mapper::toProdutoDto);
     }
 
+    /**
+     * Pesquisa um {@linkplain Produto produto} por {@code id}.
+     * Retorna um {@linkplain  ProdutoDetalhesDto produto detalhado}.
+     *
+     * @param id o id do produto.
+     *
+     * @return um produto encontrado pelo {@code id}.
+     *
+     * @throws ProdutoNotFoundException caso o produto não seja encontrado.
+     */
     @Override
     public ProdutoDetalhesDto consultarPorId(Long id) {
         return produtoRepository.findById(id).map(p -> {
@@ -48,6 +93,17 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
         });
     }
 
+    /**
+     * Pesquisa {@linkplain Produto produtos} por {@code nome}.
+     * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
+     *
+     * @param nome     o nome do produto.
+     * @param pageable o pageable padrão.
+     *
+     * @return uma sublista de uma lista de produtos encontrados pelo {@code nome}.
+     *
+     * @throws ProdutoNotFoundException caso nenhum produto seja encontrado.
+     */
     @Override
     public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
         Page<Produto> produtos = produtoRepository.findByNome(nome, pageable);
@@ -59,6 +115,18 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
         return produtos.map(mapper::toProdutoDto);
     }
 
+    /**
+     * Pesquisa {@linkplain Produto produtos} pelo {@code id} da subcategoria.
+     * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
+     *
+     * @param id       o id da subcategoria.
+     * @param pageable o pageable padrão.
+     *
+     * @return uma sublista de uma lista com todos os produtos encontrados pelo {@code id} da subcategoria.
+     *
+     * @throws ProdutoNotFoundException      caso nenhum produto seja encontrado.
+     * @throws SubcategoriaNotFoundException caso nenhuma subcategoria seja encontrada.
+     */
     @Override
     public Page<ProdutoDto> consultarPorSubcategoria(Long id, Pageable pageable) {
         return subcategoriaRepository.findById(id).map(sc -> {
@@ -75,6 +143,18 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
         });
     }
 
+    /**
+     * Pesquisa {@linkplain Produto produtos} pelo {@code id} da categoria.
+     * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
+     *
+     * @param id       o id da categoria.
+     * @param pageable o pageable padrão.
+     *
+     * @return uma sublista de uma lista com todos os produtos encontrados pelo {@code id} da categoria.
+     *
+     * @throws ProdutoNotFoundException   caso nenhum produto seja encontrado.
+     * @throws CategoriaNotFoundException caso nenhuma categoria seja encontrada.
+     */
     @Override
     public Page<ProdutoDto> consultarPorCategoria(Long id, Pageable pageable) {
         return categoriaRepository.findById(id).map(c -> {
