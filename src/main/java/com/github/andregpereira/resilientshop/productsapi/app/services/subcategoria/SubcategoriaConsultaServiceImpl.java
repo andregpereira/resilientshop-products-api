@@ -12,14 +12,39 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+/**
+ * Classe de consulta de manutenção de {@link Subcategoria}.
+ *
+ * @author André Garcia
+ */
+
 @RequiredArgsConstructor
 @Slf4j
 @Service
 public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaService {
 
+    /**
+     * Injeção da dependência {@link SubcategoriaRepository} para realizar operações de
+     * consulta na tabela de subcategorias no banco de dados.
+     */
     private final SubcategoriaRepository repository;
+
+    /**
+     * Injeção da dependência {@link SubcategoriaMapper} para realizar
+     * conversões de entidade para DTO de subcategorias.
+     */
     private final SubcategoriaMapper mapper;
 
+    /**
+     * Lista todas as {@linkplain Subcategoria subcategorias} cadastradas.
+     * Retorna uma {@linkplain Page sublista} de {@linkplain SubcategoriaDto subcategorias}.
+     *
+     * @param pageable o pageable padrão.
+     *
+     * @return uma sublista de uma lista com todas as subcategorias cadastradas.
+     *
+     * @throws SubcategoriaNotFoundException caso nenhuma subcategoria seja encontrada.
+     */
     @Override
     public Page<SubcategoriaDto> listar(Pageable pageable) {
         Page<Subcategoria> subcategorias = repository.findAll(pageable);
@@ -31,6 +56,16 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
         return subcategorias.map(mapper::toSubcategoriaDto);
     }
 
+    /**
+     * Pesquisa uma {@linkplain Subcategoria subcategoria} por {@code id}.
+     * Retorna uma {@linkplain  SubcategoriaDetalhesDto subcategoria detalhada}.
+     *
+     * @param id o id da subcategoria.
+     *
+     * @return uma subcategoria encontrada pelo {@code id}.
+     *
+     * @throws SubcategoriaNotFoundException caso a subcategoria não seja encontrada.
+     */
     @Override
     public SubcategoriaDetalhesDto consultarPorId(Long id) {
         return repository.findById(id).map(c -> {
