@@ -20,18 +20,48 @@ import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Classe de serviço de consulta de {@link Produto}.
+ *
+ * @author André Garcia
+ */
+
 @RequiredArgsConstructor
 @Slf4j
 @Service
 @Transactional
 public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
 
+    /**
+     * Injeção da dependência {@link ProdutoRepository} para realizar operações de
+     * manutenção na tabela de produtos no banco de dados.
+     */
     private final ProdutoRepository produtoRepository;
+
+    /**
+     * Injeção da dependência {@link ProdutoMapper} para realizar
+     * conversões de DTO e entidade de produtos.
+     */
     private final ProdutoMapper mapper;
+
+    /**
+     * Injeção da dependência {@link SubcategoriaRepository} para realizar operações de
+     * consulta na tabela de subcategorias no banco de dados.
+     */
     private final SubcategoriaRepository subcategoriaRepository;
 
+    /**
+     * Cadastra um {@linkplain ProdutoRegistroDto produto}.
+     * Retorna um {@linkplain ProdutoDetalhesDto produto detalhado}.
+     *
+     * @param dto o produto a ser cadastrado.
+     *
+     * @return o produto salvo no banco de dados.
+     *
+     * @throws ProdutoAlreadyExistsException caso exista um produto com o SKU ou o nome já cadastrados.
+     */
     @Override
-    public ProdutoDetalhesDto registrar(ProdutoRegistroDto dto) {
+    public ProdutoDetalhesDto criar(ProdutoRegistroDto dto) {
         if (produtoRepository.existsBySku(dto.sku())) {
             log.info("Produto já cadastrado com o SKU {}", dto.sku());
             throw new ProdutoAlreadyExistsException(dto.sku());
@@ -52,6 +82,18 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
             });
     }
 
+    /**
+     * Atualiza um {@linkplain ProdutoAtualizacaoDto produto} por {@code id}.
+     * Retorna um {@linkplain ProdutoDetalhesDto produto detalhado}.
+     *
+     * @param id  o id do produto a ser atualizado.
+     * @param dto os dados do produto a serem atualizados.
+     *
+     * @return o produto atualizado no banco de dados.
+     *
+     * @throws ProdutoNotFoundException      caso o produto não seja encontrado.
+     * @throws ProdutoAlreadyExistsException caso exista um produto com o nome já cadastrados.
+     */
     @Override
     public ProdutoDetalhesDto atualizar(Long id, ProdutoAtualizacaoDto dto) {
         return produtoRepository.findById(id).map(produtoAntigo -> {
@@ -78,6 +120,16 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
         });
     }
 
+    /**
+     * Remove um {@linkplain Produto produto} por {@code id}.
+     * Retorna uma mensagem de confirmação de remoção.
+     *
+     * @param id o id do produto a ser removido.
+     *
+     * @return uma mensagem de confirmação de remoção.
+     *
+     * @throws ProdutoNotFoundException caso o produto não seja encontrado.
+     */
     @Override
     public String remover(Long id) {
         return produtoRepository.findById(id).map(p -> {
@@ -90,6 +142,13 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
         });
     }
 
+    /**
+     * Subtrai {@linkplain Produto produtos} do estoque, dado a lista de {@linkplain ProdutoAtualizarEstoqueDto produtos}.
+     *
+     * @param dtos a lista de produtos a terem seus estoques subtraídos.
+     *
+     * @throws ProdutoNotFoundException caso o produto não seja encontrado ou o estoque é insuficiente.
+     */
     @Override
     public void subtrairEstoque(List<ProdutoAtualizarEstoqueDto> dtos) {
         dtos.stream().forEach(pDto -> produtoRepository.findById(pDto.id()).ifPresentOrElse(p -> {
@@ -106,6 +165,13 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
         }));
     }
 
+    /**
+     * Retorna {@linkplain Produto produtos} ao estoque, dado a lista de {@linkplain ProdutoAtualizarEstoqueDto produtos}.
+     *
+     * @param dtos a lista de produtos a serem retornados ao estoque.
+     *
+     * @throws ProdutoNotFoundException caso o produto não seja encontrado.
+     */
     @Override
     public void retornarEstoque(List<ProdutoAtualizarEstoqueDto> dtos) {
         dtos.stream().forEach(pDto -> produtoRepository.findById(pDto.id()).ifPresentOrElse(p -> {
