@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
- * Classe de consulta de manutenção de {@link Subcategoria}.
+ * Classe de serviço de consulta de {@link Subcategoria}.
  *
  * @author André Garcia
  */
