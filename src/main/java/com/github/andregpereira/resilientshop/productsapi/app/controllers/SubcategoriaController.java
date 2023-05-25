@@ -50,7 +50,7 @@ public class SubcategoriaController {
     @PostMapping
     public ResponseEntity<SubcategoriaDetalhesDto> registrar(@RequestBody @Valid SubcategoriaRegistroDto dto) {
         log.info("Criando subcategoria...");
-        SubcategoriaDetalhesDto subcategoria = manutencaoService.registrar(dto);
+        SubcategoriaDetalhesDto subcategoria = manutencaoService.criar(dto);
         URI uri = UriComponentsBuilder.fromPath("/categorias/{id}").buildAndExpand(subcategoria.id()).toUri();
         log.info("Subcategoria criada com sucesso");
         return ResponseEntity.created(uri).body(subcategoria);

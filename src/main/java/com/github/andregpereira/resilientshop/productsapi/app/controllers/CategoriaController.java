@@ -49,7 +49,7 @@ public class CategoriaController {
     @PostMapping
     public ResponseEntity<CategoriaDto> registrar(@RequestBody @Valid CategoriaRegistroDto dto) {
         log.info("Criando categoria...");
-        CategoriaDto categoria = manutencaoService.registrar(dto);
+        CategoriaDto categoria = manutencaoService.criar(dto);
         URI uri = UriComponentsBuilder.fromPath("/categorias/{id}").buildAndExpand(categoria.id()).toUri();
         log.info("Categoria criada com sucesso");
         return ResponseEntity.created(uri).body(categoria);
