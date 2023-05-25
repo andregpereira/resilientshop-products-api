@@ -17,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
- * Classe de serviço de manutenção de {@link Produto}.
+ * Classe de serviço de consulta de {@link Produto}.
  *
  * @author André Garcia
  */
