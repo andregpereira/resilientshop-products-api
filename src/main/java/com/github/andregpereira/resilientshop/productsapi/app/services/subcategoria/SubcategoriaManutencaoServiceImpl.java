@@ -16,16 +16,47 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 
+/**
+ * Classe de serviço de manutenção de {@link Subcategoria}.
+ *
+ * @author André Garcia
+ * @see SubcategoriaManutencaoService
+ */
 @RequiredArgsConstructor
 @Slf4j
 @Service
 @Transactional
 public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencaoService {
 
+    /**
+     * Injeção da dependência {@link SubcategoriaRepository} para realizar operações de
+     * manutenção na tabela de subcategorias no banco de dados.
+     */
     private final SubcategoriaRepository subcategoriaRepository;
+
+    /**
+     * Injeção da dependência {@link SubcategoriaMapper} para realizar
+     * conversões de DTO e entidade de subcategorias.
+     */
     private final SubcategoriaMapper mapper;
+
+    /**
+     * Injeção da dependência {@link CategoriaRepository} para realizar operações de
+     * consulta na tabela de categorias no banco de dados.
+     */
     private final CategoriaRepository categoriaRepository;
 
+    /**
+     * Cadastra uma {@linkplain SubcategoriaRegistroDto subcategoria}.
+     * Retorna uma {@linkplain SubcategoriaDetalhesDto subcategoria detalhada}.
+     *
+     * @param dto a subcategoria a ser cadastrada.
+     *
+     * @return a subcategoria salva no banco de dados.
+     *
+     * @throws SubcategoriaAlreadyExistsException caso exista uma subcategoria com o nome já cadastrado
+     * @throws CategoriaNotFoundException         caso nenhuma categoria seja encontrada.
+     */
     @Override
     public SubcategoriaDetalhesDto criar(SubcategoriaRegistroDto dto) {
         if (subcategoriaRepository.existsByNome(dto.nome())) {
@@ -44,6 +75,19 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
         });
     }
 
+    /**
+     * Atualiza uma {@linkplain SubcategoriaRegistroDto subcategoria} por {@code id}.
+     * Retorna uma {@linkplain SubcategoriaDetalhesDto subcategoria detalhada}.
+     *
+     * @param id  o id da subcategoria a ser atualizada.
+     * @param dto a subcategoria a ser atualizada.
+     *
+     * @return a subcategoria atualizada.
+     *
+     * @throws SubcategoriaNotFoundException      caso nenhuma subcategoria seja encontrada.
+     * @throws SubcategoriaAlreadyExistsException caso exista uma subcategoria com o nome já cadastrado
+     * @throws CategoriaNotFoundException         caso nenhuma categoria seja encontrada.
+     */
     @Override
     public SubcategoriaDetalhesDto atualizar(Long id, SubcategoriaRegistroDto dto) {
         return subcategoriaRepository.findById(id).map(subcategoriaAntiga -> {
@@ -68,6 +112,16 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
         });
     }
 
+    /**
+     * Remove uma {@linkplain Subcategoria subcategoria} por {@code id}.
+     * Retorna uma mensagem de confirmação de remoção.
+     *
+     * @param id o id da subcategoria a ser removida.
+     *
+     * @return uma mensagem de confirmação de remoção.
+     *
+     * @throws SubcategoriaNotFoundException caso nenhuma subcategoria seja encontrada.
+     */
     @Override
     public String remover(Long id) {
         return subcategoriaRepository.findById(id).map(c -> {
