@@ -59,6 +59,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      * @return o produto salvo no banco de dados.
      *
      * @throws ProdutoAlreadyExistsException caso exista um produto com o SKU ou o nome já cadastrados.
+     * @throws SubcategoriaNotFoundException caso nenhuma subcategoria seja encontrada.
      */
     @Override
     public ProdutoDetalhesDto criar(ProdutoRegistroDto dto) {
