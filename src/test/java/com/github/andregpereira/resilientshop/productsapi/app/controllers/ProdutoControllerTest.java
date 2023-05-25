@@ -47,7 +47,7 @@ class ProdutoControllerTest {
 
     @Test
     void criarProdutoComDadosValidosRetornaCreated() throws Exception {
-        given(manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).willReturn(PRODUTO_DETALHES_DTO);
+        given(manutencaoService.criar(PRODUTO_REGISTRO_DTO)).willReturn(PRODUTO_DETALHES_DTO);
         mockMvc.perform(post("/produtos").content(objectMapper.writeValueAsString(PRODUTO_REGISTRO_DTO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isCreated()).andExpectAll(jsonPath("$").exists(),
                 jsonPath("$.sku").value(PRODUTO_DETALHES_DTO.sku()),
@@ -69,14 +69,14 @@ class ProdutoControllerTest {
 
     @Test
     void criarProdutoComSubcategoriaInexistenteRetornaNotFound() throws Exception {
-        given(manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).willThrow(SubcategoriaNotFoundException.class);
+        given(manutencaoService.criar(PRODUTO_REGISTRO_DTO)).willThrow(SubcategoriaNotFoundException.class);
         mockMvc.perform(post("/produtos").content(objectMapper.writeValueAsString(PRODUTO_REGISTRO_DTO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
     }
 
     @Test
     void criarProdutoComSkuOuNomeExistentesRetornaConflict() throws Exception {
-        given(manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).willThrow(ProdutoAlreadyExistsException.class);
+        given(manutencaoService.criar(PRODUTO_REGISTRO_DTO)).willThrow(ProdutoAlreadyExistsException.class);
         mockMvc.perform(post("/produtos").content(objectMapper.writeValueAsString(PRODUTO_REGISTRO_DTO)).contentType(
                 MediaType.APPLICATION_JSON)).andExpect(status().isConflict());
     }

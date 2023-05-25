@@ -51,7 +51,7 @@ class ProdutoManutencaoServiceTest {
                 PRODUTO_DETALHES_DTO_LOCAL_DATE_TIME_FIXADO);
         try (MockedStatic<LocalDateTime> mockedStatic = mockStatic(LocalDateTime.class)) {
             mockedStatic.when(LocalDateTime::now).thenReturn(LOCAL_DATE_TIME_FIXADO);
-            assertThat(manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).isEqualTo(
+            assertThat(manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isEqualTo(
                     PRODUTO_DETALHES_DTO_LOCAL_DATE_TIME_FIXADO);
         }
         then(produtoRepository).should().save(PRODUTO_LOCAL_DATE_TIME_FIXADO);
@@ -59,7 +59,7 @@ class ProdutoManutencaoServiceTest {
 
     @Test
     void criarProdutoComDadosInvalidosThrowsException() {
-        assertThatThrownBy(() -> manutencaoService.registrar(PRODUTO_REGISTRO_DTO_INVALIDO)).isInstanceOf(
+        assertThatThrownBy(() -> manutencaoService.criar(PRODUTO_REGISTRO_DTO_INVALIDO)).isInstanceOf(
                 RuntimeException.class);
         then(produtoRepository).should(never()).save(PRODUTO);
     }
@@ -67,7 +67,7 @@ class ProdutoManutencaoServiceTest {
     @Test
     void criarProdutoComSkuExistenteThrowsException() {
         given(produtoRepository.existsBySku(PRODUTO_REGISTRO_DTO.sku())).willReturn(true);
-        assertThatThrownBy(() -> manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
+        assertThatThrownBy(() -> manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
                 ProdutoAlreadyExistsException.class).hasMessage(
                 MessageFormat.format("Opa! Já existe um produto cadastrado com o SKU {0}",
                         PRODUTO_REGISTRO_DTO.sku().toString().replace(".", "")));
@@ -78,7 +78,7 @@ class ProdutoManutencaoServiceTest {
     void criarProdutoComNomeExistenteThrowsException() {
         given(produtoRepository.existsBySku(PRODUTO_REGISTRO_DTO.sku())).willReturn(false);
         given(produtoRepository.existsByNome(PRODUTO_REGISTRO_DTO.nome())).willReturn(true);
-        assertThatThrownBy(() -> manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
+        assertThatThrownBy(() -> manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
                 ProdutoAlreadyExistsException.class).hasMessage(
                 MessageFormat.format("Opa! Já existe um produto cadastrado com o nome {0}",
                         PRODUTO_REGISTRO_DTO.nome()));
@@ -90,7 +90,7 @@ class ProdutoManutencaoServiceTest {
         given(produtoRepository.existsBySku(PRODUTO_REGISTRO_DTO.sku())).willReturn(false);
         given(produtoRepository.existsByNome(PRODUTO_REGISTRO_DTO.nome())).willReturn(false);
         given(subcategoriaRepository.findById(1L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> manutencaoService.registrar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
+        assertThatThrownBy(() -> manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
                 SubcategoriaNotFoundException.class).hasMessage(
                 MessageFormat.format("Ops! Nenhuma subcategoria foi encontrada com o id {0}",
                         PRODUTO_REGISTRO_DTO.idSubcategoria()));
