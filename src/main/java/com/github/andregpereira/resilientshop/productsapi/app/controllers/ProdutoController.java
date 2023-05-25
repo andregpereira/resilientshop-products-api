@@ -52,7 +52,7 @@ public class ProdutoController {
     @PostMapping
     public ResponseEntity<ProdutoDetalhesDto> criar(@RequestBody @Valid ProdutoRegistroDto dto) {
         log.info("Criando produto...");
-        ProdutoDetalhesDto produto = manutencaoService.registrar(dto);
+        ProdutoDetalhesDto produto = manutencaoService.criar(dto);
         URI uri = UriComponentsBuilder.fromPath("/produtos/{id}").buildAndExpand(produto.id()).toUri();
         log.info("Produto criado com sucesso");
         return ResponseEntity.created(uri).body(produto);
@@ -63,7 +63,7 @@ public class ProdutoController {
      * Retorna um {@linkplain ProdutoDetalhesDto produto detalhado}.
      *
      * @param id  o id do produto a ser atualizado.
-     * @param dto os dados produto a serem atualizados.
+     * @param dto os dados do produto a serem atualizados.
      *
      * @return o produto atualizado.
      */
@@ -75,7 +75,8 @@ public class ProdutoController {
     }
 
     /**
-     * Remove um produto por {@code id}. Retorna uma mensagem de confirmação de remoção.
+     * Remove um produto por {@code id}.
+     * Retorna uma mensagem de confirmação de remoção.
      *
      * @param id o id do produto a ser removido.
      *
