@@ -93,9 +93,10 @@ public class ProdutoController {
      * @param dtos a lista de produtos a terem seus estoques subtraídos.
      */
     @PutMapping("/estoque/subtrair")
-    public void subtrairEstoque(@RequestBody List<ProdutoAtualizarEstoqueDto> dtos) {
-        log.info("Subtraindo estoque...");
+    public ResponseEntity<Void> subtrairEstoque(@RequestBody List<ProdutoAtualizarEstoqueDto> dtos) {
+        log.info("Subtraindo produtos do estoque...");
         manutencaoService.subtrairEstoque(dtos);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -104,9 +105,10 @@ public class ProdutoController {
      * @param dtos a lista de produtos a serem retornados ao estoque.
      */
     @PutMapping("/estoque/retornar")
-    public void retornarEstoque(@RequestBody List<ProdutoAtualizarEstoqueDto> dtos) {
-        log.info("Retornando estoque...");
+    public ResponseEntity<Void> retornarEstoque(@RequestBody List<ProdutoAtualizarEstoqueDto> dtos) {
+        log.info("Retornando produtos ao estoque...");
         manutencaoService.retornarEstoque(dtos);
+        return ResponseEntity.ok().build();
     }
 
     /**
