@@ -12,6 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+import static java.util.function.Predicate.not;
+
 /**
  * Classe de serviço de consulta de {@link Subcategoria}.
  *
@@ -47,13 +51,13 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
      */
     @Override
     public Page<SubcategoriaDto> listar(Pageable pageable) {
-        Page<Subcategoria> subcategorias = repository.findAll(pageable);
-        if (subcategorias.isEmpty()) {
+        return Optional.of(repository.findAll(pageable)).filter(not(Page::isEmpty)).map(p -> {
+            log.info("Retornando subcategorias");
+            return p.map(mapper::toSubcategoriaDto);
+        }).orElseThrow(() -> {
             log.info("Não há subcategorias cadastradas");
-            throw new SubcategoriaNotFoundException();
-        }
-        log.info("Retornando subcategorias");
-        return subcategorias.map(mapper::toSubcategoriaDto);
+            return new SubcategoriaNotFoundException();
+        });
     }
 
     /**

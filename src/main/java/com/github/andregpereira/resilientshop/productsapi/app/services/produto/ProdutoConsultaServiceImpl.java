@@ -16,6 +16,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+import static java.util.function.Predicate.not;
+
 /**
  * Classe de serviço de consulta de {@link Produto}.
  *
@@ -64,13 +68,13 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public Page<ProdutoDto> listar(Pageable pageable) {
-        Page<Produto> produtos = produtoRepository.findAll(pageable);
-        if (produtos.isEmpty()) {
+        return Optional.of(produtoRepository.findAll(pageable)).filter(not(Page::isEmpty)).map(p -> {
+            log.info("Retornando produtos");
+            return p.map(mapper::toProdutoDto);
+        }).orElseThrow(() -> {
             log.info("Não há produtos cadastrados");
-            throw new ProdutoNotFoundException();
-        }
-        log.info("Retornando produtos");
-        return produtos.map(mapper::toProdutoDto);
+            return new ProdutoNotFoundException();
+        });
     }
 
     /**
@@ -107,13 +111,13 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
-        Page<Produto> produtos = produtoRepository.findByNome(nome, pageable);
-        if (produtos.isEmpty()) {
+        return Optional.of(produtoRepository.findByNome(nome, pageable)).filter(not(Page::isEmpty)).map(p -> {
+            log.info("Retornando produto com nome {}", nome);
+            return p.map(mapper::toProdutoDto);
+        }).orElseThrow(() -> {
             log.info("Nenhum produto foi encontrado com o nome {}", nome);
-            throw new ProdutoNotFoundException("nome", nome);
-        }
-        log.info("Retornando produto com nome {}", nome);
-        return produtos.map(mapper::toProdutoDto);
+            return new ProdutoNotFoundException("nome", nome);
+        });
     }
 
     /**
@@ -130,15 +134,14 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public Page<ProdutoDto> consultarPorSubcategoria(Long id, Pageable pageable) {
-        return subcategoriaRepository.findById(id).map(sc -> {
-            Page<Produto> produtos = produtoRepository.findAllBySubcategoriaId(id, pageable);
-            if (produtos.isEmpty()) {
-                log.info("Nenhum produto foi encontrado com a subcategoria id {}", id);
-                throw new ProdutoNotFoundException("subcategoria", sc.getNome());
-            }
+        return subcategoriaRepository.findById(id).map(sc -> Optional.of(
+                produtoRepository.findAllBySubcategoriaId(id, pageable)).filter(not(Page::isEmpty)).map(p -> {
             log.info("Retornando produtos com subcategoria id {}", id);
-            return produtos.map(mapper::toProdutoDto);
+            return p.map(mapper::toProdutoDto);
         }).orElseThrow(() -> {
+            log.info("Nenhum produto foi encontrado com a subcategoria id {}", id);
+            return new ProdutoNotFoundException("subcategoria", sc.getNome());
+        })).orElseThrow(() -> {
             log.info("Nenhuma subcategoria foi encontrada com id {}", id);
             return new SubcategoriaNotFoundException(id);
         });
@@ -158,15 +161,14 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public Page<ProdutoDto> consultarPorCategoria(Long id, Pageable pageable) {
-        return categoriaRepository.findById(id).map(c -> {
-            Page<Produto> produtos = produtoRepository.findAllBySubcategoriaCategoriaId(id, pageable);
-            if (produtos.isEmpty()) {
-                log.info("Nenhum produto foi encontrado com a categoria id {}", id);
-                throw new ProdutoNotFoundException("categoria", c.getNome());
-            }
+        return categoriaRepository.findById(id).map(c -> Optional.of(
+                produtoRepository.findAllBySubcategoriaCategoriaId(id, pageable)).filter(not(Page::isEmpty)).map(p -> {
             log.info("Retornando produtos com categoria id {}", id);
-            return produtos.map(mapper::toProdutoDto);
+            return p.map(mapper::toProdutoDto);
         }).orElseThrow(() -> {
+            log.info("Nenhum produto foi encontrado com a categoria id {}", id);
+            return new ProdutoNotFoundException("categoria", c.getNome());
+        })).orElseThrow(() -> {
             log.info("Nenhuma categoria foi encontrada com id {}", id);
             return new CategoriaNotFoundException(id);
         });

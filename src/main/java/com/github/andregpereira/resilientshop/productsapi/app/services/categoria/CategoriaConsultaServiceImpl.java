@@ -11,6 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+import static java.util.function.Predicate.not;
+
 /**
  * Classe de serviço de consulta de {@link Categoria}.
  *
@@ -46,13 +50,13 @@ public class CategoriaConsultaServiceImpl implements CategoriaConsultaService {
      */
     @Override
     public Page<CategoriaDto> listar(Pageable pageable) {
-        Page<Categoria> categorias = repository.findAll(pageable);
-        if (categorias.isEmpty()) {
+        return Optional.of(repository.findAll(pageable)).filter(not(Page::isEmpty)).map(p -> {
+            log.info("Retornando categorias");
+            return p.map(mapper::toCategoriaDto);
+        }).orElseThrow(() -> {
             log.info("Não há categorias cadastradas");
-            throw new CategoriaNotFoundException();
-        }
-        log.info("Retornando categorias");
-        return categorias.map(mapper::toCategoriaDto);
+            return new CategoriaNotFoundException();
+        });
     }
 
     /**
