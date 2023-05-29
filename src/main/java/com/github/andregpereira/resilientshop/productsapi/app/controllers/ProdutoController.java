@@ -53,8 +53,8 @@ public class ProdutoController {
     public ResponseEntity<ProdutoDetalhesDto> criar(@RequestBody @Valid ProdutoRegistroDto dto) {
         log.info("Criando produto...");
         ProdutoDetalhesDto produto = manutencaoService.criar(dto);
-        URI uri = UriComponentsBuilder.fromPath("/produtos/{id}").buildAndExpand(produto.id()).toUri();
         log.info("Produto criado com sucesso");
+        URI uri = UriComponentsBuilder.fromPath("/produtos/{id}").buildAndExpand(produto.id()).toUri();
         return ResponseEntity.created(uri).body(produto);
     }
 
@@ -71,7 +71,10 @@ public class ProdutoController {
     public ResponseEntity<ProdutoDetalhesDto> atualizar(@PathVariable Long id,
             @RequestBody @Valid ProdutoAtualizacaoDto dto) {
         log.info("Atualizando produto com id {}...", id);
-        return ResponseEntity.ok(manutencaoService.atualizar(id, dto));
+        ProdutoDetalhesDto produto = manutencaoService.atualizar(id, dto);
+        log.info("Produto com id {} atualizado", id);
+        URI uri = UriComponentsBuilder.fromPath("/produtos/{id}").buildAndExpand(id).toUri();
+        return ResponseEntity.ok().location(uri).body(produto);
     }
 
     /**
