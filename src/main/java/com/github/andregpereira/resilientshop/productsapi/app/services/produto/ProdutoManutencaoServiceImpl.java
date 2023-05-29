@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -73,11 +72,8 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
         } else
             return subcategoriaRepository.findById(dto.idSubcategoria()).map(sc -> {
                 Produto produto = mapper.toProduto(dto);
-                produto.setDataCriacao(LocalDateTime.now());
                 produto.setSubcategoria(sc);
-                produtoRepository.save(produto);
-                log.info("Produto criado");
-                return mapper.toProdutoDetalhesDto(produto);
+                return mapper.toProdutoDetalhesDto(produtoRepository.save(produto));
             }).orElseThrow(() -> {
                 log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
                 return new SubcategoriaNotFoundException(dto.idSubcategoria());
@@ -99,21 +95,25 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      */
     @Override
     public ProdutoDetalhesDto atualizar(Long id, ProdutoAtualizacaoDto dto) {
-        return produtoRepository.findById(id).map(produtoAntigo -> {
+        return produtoRepository.findById(id).map(p -> {
             if (produtoRepository.existsByNome(dto.nome())) {
                 log.info("Produto já cadastrado com o nome {}", dto.nome());
                 throw new ProdutoAlreadyExistsException(dto.nome());
             } else
                 return subcategoriaRepository.findById(dto.idSubcategoria()).map(sc -> {
-                    Produto produtoAtualizado = mapper.toProduto(dto);
-                    produtoAtualizado.setId(id);
-                    produtoAtualizado.setSku(produtoAntigo.getSku());
-                    produtoAtualizado.setDataCriacao(produtoAntigo.getDataCriacao());
-                    produtoAtualizado.setSubcategoria(sc);
-                    produtoRepository.save(produtoAtualizado);
-                    log.info("Produto com id {} atualizado", id);
-                    return mapper.toProdutoDetalhesDto(produtoAtualizado);
-                }).orElseThrow(() -> {
+                    p.setNome(dto.nome());
+                    p.setDescricao(dto.descricao());
+                    p.setValorUnitario(dto.valorUnitario());
+                    p.setEstoque(dto.estoque());
+                    p.setSubcategoria(sc);
+//                    Produto produtoAtualizado = mapper.toProduto(dto);
+//                    produtoAtualizado.setId(id);
+//                    produtoAtualizado.setSku(produtoAntigo.getSku());
+//                    produtoAtualizado.setSubcategoria(sc);
+//                    produtoRepository.save(produtoAntigo);
+//                    return mapper.toProdutoDetalhesDto(produtoAntigo);
+                    return p;
+                }).map(produtoRepository::save).map(mapper::toProdutoDetalhesDto).orElseThrow(() -> {
                     log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
                     return new SubcategoriaNotFoundException(dto.idSubcategoria());
                 });
