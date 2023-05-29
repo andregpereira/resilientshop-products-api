@@ -1,4 +1,4 @@
-package com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria;
+package com.github.andregpereira.resilientshop.productsapi.app.dto.categoria;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

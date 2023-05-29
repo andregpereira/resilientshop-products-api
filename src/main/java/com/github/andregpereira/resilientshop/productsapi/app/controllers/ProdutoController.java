@@ -1,6 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.*;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.*;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoManutencaoService;
 import jakarta.validation.Valid;

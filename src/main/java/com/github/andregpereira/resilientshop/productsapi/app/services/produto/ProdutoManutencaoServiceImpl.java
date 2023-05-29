@@ -1,9 +1,9 @@
 package com.github.andregpereira.resilientshop.productsapi.app.services.produto;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoAtualizacaoDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoAtualizarEstoqueDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoAtualizacaoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoAtualizarEstoqueDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoDetalhesDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;

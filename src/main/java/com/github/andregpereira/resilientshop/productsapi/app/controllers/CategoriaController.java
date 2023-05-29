@@ -1,7 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaManutencaoService;
 import jakarta.validation.Valid;

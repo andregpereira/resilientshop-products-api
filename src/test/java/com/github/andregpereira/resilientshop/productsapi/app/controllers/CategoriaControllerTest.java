@@ -1,7 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaManutencaoService;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaAlreadyExistsException;

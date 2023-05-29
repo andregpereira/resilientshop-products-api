@@ -1,7 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.cross.mappers;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants.ComponentModel;

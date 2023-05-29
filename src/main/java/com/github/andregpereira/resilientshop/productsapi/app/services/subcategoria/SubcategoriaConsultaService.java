@@ -1,7 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.app.services.subcategoria;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria.SubcategoriaDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria.SubcategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaDetalhesDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

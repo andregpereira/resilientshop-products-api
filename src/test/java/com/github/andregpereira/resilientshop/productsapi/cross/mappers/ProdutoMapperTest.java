@@ -1,7 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.cross.mappers;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoAtualizacaoDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoAtualizacaoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

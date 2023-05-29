@@ -1,7 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.subcategoria.SubcategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.app.services.subcategoria.SubcategoriaConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.subcategoria.SubcategoriaManutencaoService;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;

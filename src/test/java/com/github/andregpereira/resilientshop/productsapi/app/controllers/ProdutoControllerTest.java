@@ -1,7 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoDto;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoManutencaoService;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoAlreadyExistsException;

@@ -1,6 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.app.services.categoria;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.categoria.CategoriaDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapper;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;

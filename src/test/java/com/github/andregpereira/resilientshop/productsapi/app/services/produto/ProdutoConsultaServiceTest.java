@@ -1,7 +1,7 @@
 package com.github.andregpereira.resilientshop.productsapi.app.services.produto;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dtos.produto.ProdutoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoDetalhesDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
