@@ -106,12 +106,6 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
                     p.setValorUnitario(dto.valorUnitario());
                     p.setEstoque(dto.estoque());
                     p.setSubcategoria(sc);
-//                    Produto produtoAtualizado = mapper.toProduto(dto);
-//                    produtoAtualizado.setId(id);
-//                    produtoAtualizado.setSku(produtoAntigo.getSku());
-//                    produtoAtualizado.setSubcategoria(sc);
-//                    produtoRepository.save(produtoAntigo);
-//                    return mapper.toProdutoDetalhesDto(produtoAntigo);
                     return p;
                 }).map(produtoRepository::save).map(mapper::toProdutoDetalhesDto).orElseThrow(() -> {
                     log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
