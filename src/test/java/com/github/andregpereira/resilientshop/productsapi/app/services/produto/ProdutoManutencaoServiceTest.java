@@ -10,11 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.*;
@@ -49,11 +47,8 @@ class ProdutoManutencaoServiceTest {
         given(produtoRepository.save(PRODUTO_LOCAL_DATE_TIME_FIXADO)).willReturn(PRODUTO_LOCAL_DATE_TIME_FIXADO);
         given(mapper.toProdutoDetalhesDto(PRODUTO_LOCAL_DATE_TIME_FIXADO)).willReturn(
                 PRODUTO_DETALHES_DTO_LOCAL_DATE_TIME_FIXADO);
-        try (MockedStatic<LocalDateTime> mockedStatic = mockStatic(LocalDateTime.class)) {
-            mockedStatic.when(LocalDateTime::now).thenReturn(LOCAL_DATE_TIME_FIXADO);
-            assertThat(manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isEqualTo(
-                    PRODUTO_DETALHES_DTO_LOCAL_DATE_TIME_FIXADO);
-        }
+        assertThat(manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isEqualTo(
+                PRODUTO_DETALHES_DTO_LOCAL_DATE_TIME_FIXADO);
         then(produtoRepository).should().save(PRODUTO_LOCAL_DATE_TIME_FIXADO);
     }
 
@@ -102,7 +97,6 @@ class ProdutoManutencaoServiceTest {
         given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
         given(produtoRepository.existsByNome(PRODUTO_ATUALIZACAO_DTO.nome())).willReturn(false);
         given(subcategoriaRepository.findById(2L)).willReturn(Optional.of(SUBCATEGORIA_ATUALIZADA));
-        given(mapper.toProduto(PRODUTO_ATUALIZACAO_DTO)).willReturn(PRODUTO_ATUALIZADO);
         given(produtoRepository.save(PRODUTO_ATUALIZADO)).willReturn(PRODUTO_ATUALIZADO);
         given(mapper.toProdutoDetalhesDto(PRODUTO_ATUALIZADO)).willReturn(PRODUTO_DETALHES_DTO_ATUALIZADO);
         assertThat(manutencaoService.atualizar(1L, PRODUTO_ATUALIZACAO_DTO)).isEqualTo(PRODUTO_DETALHES_DTO_ATUALIZADO);
@@ -155,8 +149,8 @@ class ProdutoManutencaoServiceTest {
     @Test
     void removerProdutoComIdInexistenteThrowsException() {
         given(produtoRepository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> manutencaoService.remover(10L)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Ops! Nenhum produto foi encontrado com o id 10");
+        assertThatThrownBy(() -> manutencaoService.remover(10L)).isInstanceOf(ProdutoNotFoundException.class)
+                .hasMessage("Ops! Nenhum produto foi encontrado com o id 10");
         then(produtoRepository).should(never()).deleteById(10L);
     }
 
