@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,6 +18,7 @@ import java.util.StringJoiner;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "tb_produtos", uniqueConstraints = {@UniqueConstraint(name = "uc_sku", columnNames = "sku")})
 @SequenceGenerator(name = "produto", sequenceName = "sq_produtos", allocationSize = 1)
 public class Produto {
@@ -34,6 +37,7 @@ public class Produto {
     @Column(nullable = false)
     private String descricao;
 
+    @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
@@ -67,9 +71,9 @@ public class Produto {
     @Override
     public String toString() {
         return new StringJoiner(", ", Produto.class.getSimpleName() + "[", "]").add("id=" + id).add("sku=" + sku).add(
-                "nome='" + nome + "'").add("descricao='" + descricao + "'").add("dataCriacao=" + dataCriacao).add(
-                "valorUnitario=" + valorUnitario).add("estoque=" + estoque).add(
-                "subcategoria=" + subcategoria).toString();
+                        "nome='" + nome + "'").add("descricao='" + descricao + "'").add("dataCriacao=" + dataCriacao).add(
+                        "valorUnitario=" + valorUnitario).add("estoque=" + estoque).add("subcategoria=" + subcategoria)
+                .toString();
     }
 
 }
