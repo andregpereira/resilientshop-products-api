@@ -26,7 +26,6 @@ import static java.util.function.Predicate.not;
  * @author André Garcia
  * @see ProdutoConsultaService
  */
-
 @RequiredArgsConstructor
 @Slf4j
 @Service
