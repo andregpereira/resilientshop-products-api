@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Controller de produtos da API de Produtos.
@@ -97,7 +98,7 @@ public class ProdutoController {
      * @param dtos a lista de produtos a terem seus estoques subtraídos.
      */
     @PutMapping("/estoque/subtrair")
-    public ResponseEntity<Void> subtrairEstoque(@RequestBody List<ProdutoAtualizarEstoqueDto> dtos) {
+    public ResponseEntity<Void> subtrairEstoque(@RequestBody Set<ProdutoAtualizarEstoqueDto> dtos) {
         log.info("Subtraindo produtos do estoque...");
         manutencaoService.subtrairEstoque(dtos);
         return ResponseEntity.ok().build();
@@ -109,7 +110,7 @@ public class ProdutoController {
      * @param dtos a lista de produtos a serem retornados ao estoque.
      */
     @PutMapping("/estoque/retornar")
-    public ResponseEntity<Void> retornarEstoque(@RequestBody List<ProdutoAtualizarEstoqueDto> dtos) {
+    public ResponseEntity<Void> retornarEstoque(@RequestBody Set<ProdutoAtualizarEstoqueDto> dtos) {
         log.info("Retornando produtos ao estoque...");
         manutencaoService.retornarEstoque(dtos);
         return ResponseEntity.ok().build();

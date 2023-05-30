@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Classe de serviço de manutenção de {@link Produto}.
@@ -147,7 +147,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      * @throws ProdutoNotFoundException caso o produto não seja encontrado ou o estoque é insuficiente.
      */
     @Override
-    public void subtrairEstoque(List<ProdutoAtualizarEstoqueDto> dtos) {
+    public void subtrairEstoque(Set<ProdutoAtualizarEstoqueDto> dtos) {
         dtos.stream().forEach(pDto -> produtoRepository.findById(pDto.id()).ifPresentOrElse(p -> {
             if (p.getEstoque() < pDto.quantidade())
                 throw new ProdutoNotFoundException(
@@ -170,7 +170,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      * @throws ProdutoNotFoundException caso o produto não seja encontrado.
      */
     @Override
-    public void retornarEstoque(List<ProdutoAtualizarEstoqueDto> dtos) {
+    public void retornarEstoque(Set<ProdutoAtualizarEstoqueDto> dtos) {
         dtos.stream().forEach(pDto -> produtoRepository.findById(pDto.id()).ifPresentOrElse(p -> {
             p.setEstoque(p.getEstoque() + pDto.quantidade());
             produtoRepository.save(p);
