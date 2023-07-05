@@ -58,9 +58,8 @@ public class Produto {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (o == null || getClass() != o.getClass())
+        if (!(o instanceof Produto produto))
             return false;
-        Produto produto = (Produto) o;
         return estoque == produto.estoque && ativo == produto.ativo && Objects.equals(id, produto.id) && Objects.equals(
                 sku, produto.sku) && Objects.equals(nome, produto.nome) && Objects.equals(descricao,
                 produto.descricao) && Objects.equals(dataCriacao, produto.dataCriacao) && Objects.equals(valorUnitario,
