@@ -8,12 +8,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     boolean existsBySku(Long sku);
 
     boolean existsByNome(String nome);
+
+    Optional<Produto> findByIdAndAtivoTrue(Long id);
+
+    Optional<Produto> findByIdAndAtivoFalse(Long id);
 
     @Query(value = """
             SELECT * FROM tb_produtos p
