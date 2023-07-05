@@ -127,14 +127,28 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      * @throws ProdutoNotFoundException caso o produto não seja encontrado.
      */
     @Override
-    public String remover(Long id) {
+    public String desativar(Long id) {
         return produtoRepository.findById(id).map(p -> {
-            produtoRepository.deleteById(id);
-            log.info("Produto com id {} removido", id);
-            return MessageFormat.format("Produto com id {0} removido com sucesso", id);
+            p.setAtivo(false);
+            produtoRepository.save(p);
+            log.info("Produto com id {} desativado", id);
+            return MessageFormat.format("Produto com id {0} desativado com sucesso", id);
         }).orElseThrow(() -> {
-            log.info("Produto não encontrado com id {}", id);
-            return new ProdutoNotFoundException(id);
+            log.info("Produto ativo não encontrado com id {}", id);
+            return new ProdutoNotFoundException(id, true);
+        });
+    }
+
+    @Override
+    public String reativar(Long id) {
+        return produtoRepository.findById(id).map(p -> {
+            p.setAtivo(true);
+            produtoRepository.save(p);
+            log.info("Produto com id {} reativado", id);
+            return MessageFormat.format("Produto com id {0} reativado com sucesso", id);
+        }).orElseThrow(() -> {
+            log.info("Produto inativo não encontrado com id {}", id);
+            return new ProdutoNotFoundException(id, false);
         });
     }
 

@@ -13,7 +13,9 @@ public interface ProdutoManutencaoService {
 
     ProdutoDetalhesDto atualizar(Long id, ProdutoAtualizacaoDto dto);
 
-    String remover(Long id);
+    String desativar(Long id);
+
+    String reativar(Long id);
 
     void subtrairEstoque(Set<ProdutoAtualizarEstoqueDto> dtos);
 

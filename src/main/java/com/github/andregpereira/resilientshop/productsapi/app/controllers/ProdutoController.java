@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -79,17 +78,31 @@ public class ProdutoController {
     }
 
     /**
-     * Remove um produto por {@code id}.
-     * Retorna uma mensagem de confirmação de remoção.
+     * Desativa um produto por {@code id}.
+     * Retorna uma mensagem de confirmação de desativação.
      *
-     * @param id o id do produto a ser removido.
+     * @param id o id do produto a ser desativado.
      *
-     * @return uma mensagem de confirmação de remoção.
+     * @return uma mensagem de confirmação de desativação.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> remover(@PathVariable Long id) {
-        log.info("Removendo produto com id {}...", id);
-        return ResponseEntity.ok(manutencaoService.remover(id));
+    public ResponseEntity<String> desativar(@PathVariable Long id) {
+        log.info("Desativando produto com id {}...", id);
+        return ResponseEntity.ok(manutencaoService.desativar(id));
+    }
+
+    /**
+     * Reativa um produto por {@code id}.
+     * Retorna uma mensagem de confirmação de reativação.
+     *
+     * @param id o id do produto a ser reativado.
+     *
+     * @return uma mensagem de confirmação de reativação.
+     */
+    @PatchMapping("/reativar/{id}")
+    public ResponseEntity<String> reativar(@PathVariable Long id) {
+        log.info("Reativando produto com id {}...", id);
+        return ResponseEntity.ok(manutencaoService.desativar(id));
     }
 
     /**
