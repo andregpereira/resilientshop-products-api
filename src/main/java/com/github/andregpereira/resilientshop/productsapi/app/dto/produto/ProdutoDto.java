@@ -11,6 +11,7 @@ public record ProdutoDto(Long id,
         String descricao,
         @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/yyyy HH:mm") LocalDateTime dataCriacao,
         BigDecimal valorUnitario,
-        int estoque) {
+        int estoque,
+        boolean ativo) {
 
 }

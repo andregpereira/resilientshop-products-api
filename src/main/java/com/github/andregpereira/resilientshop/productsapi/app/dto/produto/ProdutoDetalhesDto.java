@@ -14,6 +14,7 @@ public record ProdutoDetalhesDto(Long id,
         @JsonFormat(shape = Shape.STRING, pattern = "dd/MM/uuuu HH:mm") LocalDateTime dataCriacao,
         BigDecimal valorUnitario,
         int estoque,
+        boolean ativo,
         SubcategoriaDto subcategoria) {
 
 }
