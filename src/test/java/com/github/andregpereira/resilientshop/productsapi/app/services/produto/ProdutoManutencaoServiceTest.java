@@ -4,6 +4,7 @@ import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.Produ
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import org.junit.jupiter.api.Test;
@@ -142,16 +143,17 @@ class ProdutoManutencaoServiceTest {
     @Test
     void removerProdutoComIdExistenteRetornaString() {
         given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
-        assertThat(manutencaoService.remover(1L)).isEqualTo("Produto com id 1 removido com sucesso");
-        then(produtoRepository).should().deleteById(1L);
+        assertThat(manutencaoService.desativar(1L)).isEqualTo("Produto com id 1 desativado com sucesso");
+        then(produtoRepository).should().findById(1L);
+        then(produtoRepository).should().save(PRODUTO);
     }
 
     @Test
     void removerProdutoComIdInexistenteThrowsException() {
         given(produtoRepository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> manutencaoService.remover(10L)).isInstanceOf(ProdutoNotFoundException.class)
-                .hasMessage("Ops! Nenhum produto foi encontrado com o id 10");
-        then(produtoRepository).should(never()).deleteById(10L);
+        assertThatThrownBy(() -> manutencaoService.desativar(10L)).isInstanceOf(
+                ProdutoNotFoundException.class).hasMessage("Ops! Não foi encontrado um produto ativo com o id 10");
+        then(produtoRepository).should(never()).save(any(Produto.class));
     }
 
 }

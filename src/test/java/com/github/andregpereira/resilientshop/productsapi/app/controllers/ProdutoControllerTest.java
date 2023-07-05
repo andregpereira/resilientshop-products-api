@@ -122,14 +122,14 @@ class ProdutoControllerTest {
 
     @Test
     void removerProdutoPorIdExistenteRetornaOk() throws Exception {
-        given(manutencaoService.remover(10L)).willReturn("Produto com id 10 removido com sucesso");
+        given(manutencaoService.desativar(10L)).willReturn("Produto com id 10 removido com sucesso");
         mockMvc.perform(delete("/produtos/10")).andExpect(status().isOk()).andExpectAll(
                 jsonPath("$").value("Produto com id 10 removido com sucesso"));
     }
 
     @Test
     void removerProdutoPorIdInexistenteRetornaNotFound() throws Exception {
-        given(manutencaoService.remover(10L)).willThrow(ProdutoNotFoundException.class);
+        given(manutencaoService.desativar(10L)).willThrow(ProdutoNotFoundException.class);
         mockMvc.perform(delete("/produtos/10")).andExpectAll(status().isNotFound());
     }
 
