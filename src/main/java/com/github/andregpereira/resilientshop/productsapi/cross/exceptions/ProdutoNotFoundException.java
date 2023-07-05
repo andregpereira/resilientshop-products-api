@@ -20,4 +20,9 @@ public class ProdutoNotFoundException extends RuntimeException {
         super(MessageFormat.format("Ops! Nenhum produto foi encontrado com o id {0}", id));
     }
 
+    public ProdutoNotFoundException(Long id, boolean ativo) {
+        super(MessageFormat.format("Ops! Não foi encontrado um produto {1} com o id {0}", id,
+                ativo ? "ativo" : "inativo"));
+    }
+
 }
