@@ -1,0 +1,987 @@
+openapi: 3.0.3
+info:
+  title: API de Produtos
+  description: |-
+    API do microsserviço de Produtos do e-Commerce Resilient Shop.
+  contact:
+    name: @author André Garcia
+    url: https://github.com/andregpereira
+    email: 61523970+andregpereira@users.noreply.github.com
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8763
+    description: |-
+      Caminho base da API Gateway
+
+tags:
+  - name: Produtos
+    description: |-
+      Operações de criação, atualização, remoção, subtração de estoque, retorno de estoque e consulta de produtos.
+  - name: Subcategorias
+    description: |-
+      Operações de criação, atualização, remoção e consulta de subcategorias.
+  - name: Categorias
+    description: |-
+      Operações de criação, atualização, remoção e consulta de categorias.
+
+paths:
+  /produtos:
+    post:
+      tags:
+        - Produtos
+      operationId: cadastrarProduto
+      summary: |-
+        Cria um produto
+      requestBody:
+        $ref: '#/components/requestBodies/ProdutoRegistroDto'
+
+      responses:
+        "422":
+          $ref: '#/components/responses/UnprocessableEntity'
+
+        "409":
+          $ref: '#/components/responses/ProdutoConflict'
+
+        "400":
+          $ref: '#/components/responses/BadRequest'
+
+        "201":
+          $ref: '#/components/responses/ProdutoCreated'
+
+    get:
+      tags:
+        - Produtos
+      operationId: listarProdutos
+      summary: |-
+        Retorna todos os produtos
+      responses:
+        "404":
+          $ref: '#/components/responses/ProdutoNotFound'
+
+        "200":
+          description: |-
+            Listando todos os produtos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageProdutoDto'
+
+  /produtos/{id}:
+    put:
+      tags:
+        - Produtos
+      operationId: atualizarProduto
+      summary: |-
+        Atualiza um produto por id
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      requestBody:
+        $ref: '#/components/requestBodies/ProdutoAtualizacaoDto'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/ProdutoNotFound'
+
+        "200":
+          $ref: '#/components/responses/ProdutoAtualizado'
+
+    delete:
+      tags:
+        - Produtos
+      operationId: removerProduto
+      summary: |-
+        Remove um produto por id
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/ProdutoNotFound'
+
+        "200":
+          description: |-
+            Produto removido
+          content:
+            '*/*':
+              schema:
+                type: string
+
+    get:
+      tags:
+        - Produtos
+      operationId: consultarProdutoPorId
+      summary: |-
+        Consulta um produto por id
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/ProdutoNotFound'
+
+        "200":
+          description: Produto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProdutoDetalhesDto'
+
+  /produtos/nome:
+    get:
+      tags:
+        - Produtos
+      operationId: consultarProdutoPorNome
+      summary: |-
+        Retorna produtos pelo nome
+      parameters:
+        - $ref: '#/components/parameters/Nome'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/ProdutoNotFound'
+
+        "200":
+          description: |-
+            Listando produtos encontrados pelo nome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageProdutoDto'
+
+  /produtos/subcategoria/{id}:
+    get:
+      tags:
+        - Produtos
+      operationId: consultarProdutoPorSubcategoria
+      summary: |-
+        Retorna produtos pelo id da subcategoria
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/ProdutoNotFound'
+
+        "200":
+          description: |-
+            Listando produtos encontrados pelo id da subcategoria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageProdutoDto'
+
+  /produtos/categoria/{id}:
+    get:
+      tags:
+        - Produtos
+      operationId: consultarProdutoPorCategoria
+      summary: |-
+        Retorna produtos pelo id da categoria
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/ProdutoNotFound'
+
+        "200":
+          description: |-
+            Listando produtos encontrados pelo id da categoria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageProdutoDto'
+
+  /produtos/estoque/subtrair:
+    put:
+      tags:
+        - Produtos
+      operationId: subtrairEstoque
+      summary: |-
+        Subtrai produtos do estoque
+      requestBody:
+        $ref: '#/components/requestBodies/ProdutoAtualizarEstoqueDto'
+      responses:
+        "200":
+          description: |-
+            Produtos subtraídos do estoque
+
+  /produtos/estoque/retornar:
+    put:
+      tags:
+        - Produtos
+      operationId: retornarEstoque
+      summary: |-
+        Retorna produtos ao estoque
+      requestBody:
+        $ref: '#/components/requestBodies/ProdutoAtualizarEstoqueDto'
+      responses:
+        "200":
+          description: |-
+            Produtos retornados ao estoque
+
+  /subcategorias:
+    post:
+      tags:
+        - Subcategorias
+      operationId: cadastrarSubcategoria
+      summary: |-
+        Cria uma subcategoria
+      requestBody:
+        $ref: '#/components/requestBodies/SubcategoriaRegistroDto'
+
+      responses:
+        "422":
+          $ref: '#/components/responses/UnprocessableEntity'
+
+        "409":
+          $ref: '#/components/responses/SubcategriaConflict'
+
+        "400":
+          $ref: '#/components/responses/BadRequest'
+
+        "201":
+          $ref: '#/components/responses/SubcategoriaCreated'
+
+    get:
+      tags:
+        - Subcategorias
+      operationId: listar
+      summary: |-
+        Retorna todas as subcategorias
+      responses:
+        "404":
+          $ref: '#/components/responses/SubcategoriaNotFound'
+
+        "200":
+          description: |-
+            Listando todas as subcategorias
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageSubcategoriaDto'
+
+  /subcategorias/{id}:
+    put:
+      tags:
+        - Subcategorias
+      operationId: atualizarSubcategoria
+      summary: |-
+        Consulta uma subcategoria por id
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      requestBody:
+        $ref: '#/components/requestBodies/SubcategoriaRegistroDto'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/SubcategoriaNotFound'
+
+        "200":
+          $ref: '#/components/responses/SubcategoriaAtualizada'
+
+    delete:
+      tags:
+        - Subcategorias
+      operationId: removerSubcategoria
+      summary: |-
+        Remove uma subcategoria por id
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/SubcategoriaNotFound'
+
+        "200":
+          description: |-
+            Subcategoria removida
+          content:
+            application/json:
+              schema:
+                type: string
+                example: |-
+                  Subcategoria com id 8 removida com sucesso
+
+    get:
+      tags:
+        - Subcategorias
+      operationId: consultarSubcategoriaPorId
+      summary: |-
+        Consulta uma subcategoria pelo id
+
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/SubcategoriaNotFound'
+
+        "200":
+          description: |-
+            Subcategoria encontrada
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubcategoriaDetalhesDto'
+
+  /categorias:
+    post:
+      tags:
+        - Categorias
+      operationId: cadastrarCategoria
+      summary: |-
+        Cria uma categoria
+      requestBody:
+        $ref: '#/components/requestBodies/CategoriaRegistroDto'
+
+      responses:
+        "422":
+          $ref: '#/components/responses/UnprocessableEntity'
+
+        "409":
+          $ref: '#/components/responses/CategoriaConflict'
+
+        "400":
+          $ref: '#/components/responses/BadRequest'
+
+        "201":
+          $ref: '#/components/responses/CategoriaCreated'
+
+    get:
+      tags:
+        - Categorias
+      operationId: listarCategorias
+      summary: |-
+        Retorna todas as categorias
+      responses:
+        "404":
+          $ref: '#/components/responses/CategoriaNotFound'
+
+        "200":
+          description: |-
+            Listando todas as categorias
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCategoriaDto'
+
+  /categorias/{id}:
+    put:
+      tags:
+        - Categorias
+      operationId: atualizarCategoria
+      summary: |-
+        Atualiza uma categoria por id
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      requestBody:
+        $ref: '#/components/requestBodies/CategoriaRegistroDto'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/CategoriaNotFound'
+
+        "200":
+          $ref: '#/components/responses/CategoriaAtualizada'
+
+    delete:
+      tags:
+        - Categorias
+      operationId: removerCategoria
+      summary: |-
+        Remove uma categoria
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+        "404":
+          $ref: '#/components/responses/CategoriaNotFound'
+
+        "200":
+          description: |-
+            Categoria removida
+          content:
+            '*/*':
+              schema:
+                type: string
+
+    get:
+      tags:
+        - Categorias
+      operationId: consultarCategoriaPorId
+      summary: |-
+        Consulta uma categoria por id
+      parameters:
+        - $ref: '#/components/parameters/Id'
+
+      responses:
+        "200":
+          description: |-
+            Categoria encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriaDto'
+
+components:
+  schemas:
+    ProdutoRegistroDto:
+      required:
+        - descricao
+        - estoque
+        - idSubcategoria
+        - nome
+        - sku
+        - valorUnitario
+      type: object
+      properties:
+        sku:
+          type: integer
+          format: int64
+        nome:
+          maxLength: 45
+          minLength: 2
+          type: string
+        descricao:
+          maxLength: 255
+          minLength: 15
+          type: string
+        valorUnitario:
+          type: number
+        estoque:
+          type: integer
+          format: int32
+        idSubcategoria:
+          type: integer
+          format: int64
+
+    ProdutoAtualizacaoDto:
+      required:
+        - descricao
+        - estoque
+        - idSubcategoria
+        - nome
+        - valorUnitario
+      type: object
+      properties:
+        nome:
+          maxLength: 45
+          minLength: 2
+          type: string
+        descricao:
+          maxLength: 255
+          minLength: 15
+          type: string
+        valorUnitario:
+          type: number
+        estoque:
+          type: integer
+          format: int32
+        idSubcategoria:
+          type: integer
+          format: int64
+
+    ProdutoAtualizarEstoqueDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        quantidade:
+          type: integer
+          format: int32
+
+    ProdutoDetalhesDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        sku:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        descricao:
+          type: string
+        dataCriacao:
+          type: string
+          format: date-time
+        valorUnitario:
+          type: number
+        estoque:
+          type: integer
+          format: int32
+        subcategoria:
+          $ref: '#/components/schemas/SubcategoriaDto'
+
+    ProdutoDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        descricao:
+          type: string
+        dataCriacao:
+          type: string
+          format: date-time
+        valorUnitario:
+          type: number
+        estoque:
+          type: integer
+          format: int32
+
+    SubcategoriaRegistroDto:
+      required:
+        - descricao
+        - idCategoria
+        - nome
+      type: object
+      properties:
+        nome:
+          maxLength: 45
+          minLength: 3
+          type: string
+        descricao:
+          maxLength: 2147483647
+          minLength: 0
+          type: string
+        idCategoria:
+          type: integer
+          format: int64
+
+    SubcategoriaDetalhesDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        descricao:
+          type: string
+        categoria:
+          $ref: '#/components/schemas/CategoriaDto'
+
+    SubcategoriaDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        descricao:
+          type: string
+
+    CategoriaRegistroDto:
+      required:
+        - nome
+      type: object
+      properties:
+        nome:
+          maxLength: 45
+          minLength: 3
+          type: string
+
+    CategoriaDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+
+    # Pageable:
+    #   type: object
+    #   properties:
+    #     page:
+    #       minimum: 0
+    #       type: integer
+    #       format: int32
+    #     size:
+    #       minimum: 1
+    #       type: integer
+    #       format: int32
+    #     sort:
+    #       type: array
+    #       items:
+    #         type: string
+
+    PageSubcategoriaDto:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubcategoriaDto'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+
+    PageProdutoDto:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProdutoDto'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+
+    PageCategoriaDto:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoriaDto'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+
+    DadoInvalido:
+      type: object
+      properties:
+        campo:
+          type: string
+        mensagem:
+          type: string
+
+    ResponseProdutoConflict:
+      type: string
+      example: |-
+        Produto já cadastrado no banco de dados
+
+    ResponseSubcategoriaConflict:
+      type: string
+      example: |-
+        Subcategoria já cadastrada no banco de dados
+
+    ResponseCategoriaConflict:
+      type: string
+      example: |-
+        Categoria já cadastrada no banco de dados
+
+    ResponseBadRequest:
+      type: string
+      example: |-
+        Parâmetro inválido
+
+    ResponseProdutoNotFound:
+      type: string
+      example: |-
+        Nenhum produto foi encontrado no banco de dados
+
+    ResponseSubcategoriaNotFound:
+      type: string
+      example: |-
+        Nenhuma subcategoria foi encontrada no banco de dados
+
+    ResponseCategoriaNotFound:
+      type: string
+      example: |-
+        Nenhuma categoria foi encontrada no banco de dados
+
+  responses:
+    ProdutoCreated:
+      description: |-
+        Produto criado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProdutoDetalhesDto'
+
+    ProdutoAtualizado:
+      description: |-
+        Produto atualizado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProdutoDetalhesDto'
+
+    SubcategoriaCreated:
+      description: |-
+        Subcategoria criada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubcategoriaDetalhesDto'
+
+    SubcategoriaAtualizada:
+      description: |-
+        Subcategoria atualizada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubcategoriaDetalhesDto'
+
+
+    CategoriaCreated:
+      description: |-
+        Categoria criada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CategoriaDto'
+
+    CategoriaAtualizada:
+      description: |-
+        Categoria atualizada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CategoriaDto'
+
+    ProdutoConflict:
+      description: |-
+        Produto já cadastrado
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/ResponseProdutoConflict'
+
+    SubcategriaConflict:
+      description: |-
+        Subcategoria já cadastrada
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/ResponseSubcategoriaConflict'
+
+    CategoriaConflict:
+      description: |-
+        Categoria já cadastrada
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/ResponseCategoriaConflict'
+
+    BadRequest:
+      description: |
+        Problema ao processar requisição
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/ResponseBadRequest'
+
+    ProdutoNotFound:
+      description: |-
+        Produto não encontrado
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/ResponseProdutoNotFound'
+
+    SubcategoriaNotFound:
+      description: |-
+        Subcategoria não encontrada
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/ResponseSubcategoriaNotFound'
+
+    CategoriaNotFound:
+      description: |-
+        Categoria não encontrada
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/ResponseCategoriaNotFound'
+
+    UnprocessableEntity:
+      description: |-
+        Campo inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DadoInvalido'
+
+  requestBodies:
+    ProdutoRegistroDto:
+      description: |-
+        Produto a ser cadastrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProdutoRegistroDto'
+      required: true
+
+    ProdutoAtualizacaoDto:
+      description: |-
+        Produto a ser atualizado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProdutoAtualizacaoDto'
+      required: true
+
+    ProdutoAtualizarEstoqueDto:
+      description: |-
+        Produto a ter seu estoque atualizado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProdutoAtualizarEstoqueDto'
+      required: true
+
+    SubcategoriaRegistroDto:
+      description: |-
+        Subcategoria a ser cadastrada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SubcategoriaRegistroDto'
+      required: true
+
+    CategoriaRegistroDto:
+      description: |-
+        Categoria a ser cadastrada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CategoriaRegistroDto'
+      required: true
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+
+    Nome:
+      name: nome
+      in: query
+      required: true
+      schema:
+        maxLength: 2147483647
+        minLength: 2
+        type: string
+
+    # Pageable:
+    #   name: pageable
+    #   in: query
+    #   required: false
+    #   schema:
+    #     $ref: '#/components/schemas/Pageable'
+
+    # PageableNome:
+    #   name: pageable
+    #   in: query
+    #   required: false
+    #   schema:
+    #     $ref: '#/components/schemas/PageableNome'

@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: resilientshop-products-api
+  #PostgreSQL
+  datasource:
+    url: jdbc:postgresql://localhost:5432/resilientshop-product
+    username: postgres
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+#Swagger
+spring-doc:
+  api-docs:
+    path: /api-docs
+
+eureka:
+  instance:
+    hostname: localhost
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    registerWithEureka: true
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:8761/eureka/
+
+server:
+  port: 0
+  error:
+    include-stacktrace: never
