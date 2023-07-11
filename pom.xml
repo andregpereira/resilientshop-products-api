@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.andregpereira</groupId>
-    <artifactId>productsapi</artifactId>
+    <artifactId>resilientshop-products-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>productsapi</name>
-    <description>Produtos Api for Resilient Shop Ecommerce Project</description>
+    <name>Resilient Shop Products API</name>
+    <description>Products API for Resilient Shop Ecommerce Project</description>
     <properties>
         <java.version>17</java.version>
         <lombok.version>1.18.26</lombok.version>
