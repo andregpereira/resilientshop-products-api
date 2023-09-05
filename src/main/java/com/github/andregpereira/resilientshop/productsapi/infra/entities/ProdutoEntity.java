@@ -1,27 +1,26 @@
 package com.github.andregpereira.resilientshop.productsapi.infra.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.StringJoiner;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name = "Produto")
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "tb_produtos", uniqueConstraints = {@UniqueConstraint(name = "uc_sku", columnNames = "sku")})
 @SequenceGenerator(name = "produto", sequenceName = "sq_produtos", allocationSize = 1)
-public class Produto {
+public class ProdutoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "produto")
@@ -37,46 +36,50 @@ public class Produto {
     @Column(nullable = false)
     private String descricao;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
-
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 8, scale = 2)
     private BigDecimal valorUnitario;
 
     @Column(nullable = false)
     private int estoque;
 
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime dataCriacao;
+
+    @LastModifiedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime dataModificacao;
+
     @Column(nullable = false)
     private boolean ativo;
 
     @ManyToOne
-    @JoinColumn(name = "id_subcategoria", nullable = false, foreignKey = @ForeignKey(name = "fk_id_subcategoria"))
-    private Subcategoria subcategoria;
+    @JoinColumn(name = "id_categoria", nullable = false, foreignKey = @ForeignKey(name = "fk_id_categoria"))
+    private CategoriaEntity categoria;
+
+    @ManyToOne
+    @JoinColumn(name = "id_subcategoria", foreignKey = @ForeignKey(name = "fk_id_subcategoria"))
+    private SubcategoriaEntity subcategoria;
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Produto produto))
+        if (!(o instanceof ProdutoEntity produto))
             return false;
-        return estoque == produto.estoque && ativo == produto.ativo && Objects.equals(id, produto.id) && Objects.equals(
-                sku, produto.sku) && Objects.equals(nome, produto.nome) && Objects.equals(descricao,
-                produto.descricao) && Objects.equals(dataCriacao, produto.dataCriacao) && Objects.equals(valorUnitario,
-                produto.valorUnitario) && Objects.equals(subcategoria, produto.subcategoria);
+        Class<?> oEffectiveClass = o instanceof HibernateProxy hibernateProxy
+                ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy hibernateProxy
+                ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass)
+            return false;
+        return getId() != null && Objects.equals(getId(), produto.getId());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id, sku, nome, descricao, dataCriacao, valorUnitario, estoque, ativo, subcategoria);
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Produto.class.getSimpleName() + "[", "]").add("id=" + id).add("sku=" + sku).add(
-                "nome='" + nome + "'").add("descricao='" + descricao + "'").add("dataCriacao=" + dataCriacao).add(
-                "valorUnitario=" + valorUnitario).add("estoque=" + estoque).add("ativo=" + ativo).add(
-                "subcategoria=" + subcategoria).toString();
+    public final int hashCode() {
+        return this instanceof HibernateProxy hibernateProxy
+                ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 
 }

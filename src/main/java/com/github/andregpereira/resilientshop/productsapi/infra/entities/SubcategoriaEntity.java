@@ -1,24 +1,22 @@
 package com.github.andregpereira.resilientshop.productsapi.infra.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringJoiner;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name = "Subcategoria")
 @Table(name = "tb_subcategorias")
 @SequenceGenerator(name = "subcategoria", sequenceName = "sq_subcategorias", allocationSize = 1)
-public class Subcategoria {
+public class SubcategoriaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "subcategoria")
@@ -33,30 +31,31 @@ public class Subcategoria {
 
     @ManyToOne
     @JoinColumn(name = "id_categoria", nullable = false, foreignKey = @ForeignKey(name = "fk_id_categoria"))
-    private Categoria categoria;
+    private CategoriaEntity categoria;
 
-    @OneToMany(mappedBy = "subcategorias", orphanRemoval = true)
+    @ToString.Exclude
+    @OneToMany(mappedBy = "subcategoria")
     private Set<ProdutoEntity> produtos = new LinkedHashSet<>();
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Subcategoria subcategoria))
+        if (!(o instanceof SubcategoriaEntity subcategoria))
             return false;
-        return Objects.equals(id, subcategoria.id) && Objects.equals(nome, subcategoria.nome) && Objects.equals(
-                descricao, subcategoria.descricao) && Objects.equals(categoria, subcategoria.categoria);
+        Class<?> oEffectiveClass = o instanceof HibernateProxy hibernateProxy
+                ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy hibernateProxy
+                ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass)
+            return false;
+        return getId() != null && Objects.equals(getId(), subcategoria.getId());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id, nome, descricao, categoria);
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Subcategoria.class.getSimpleName() + "[", "]").add("id=" + id).add(
-                "nome='" + nome + "'").add("descricao='" + descricao + "'").add("categoria=" + categoria).toString();
+    public final int hashCode() {
+        return this instanceof HibernateProxy hibernateProxy
+                ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 
 }

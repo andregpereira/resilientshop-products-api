@@ -1,22 +1,22 @@
 package com.github.andregpereira.resilientshop.productsapi.infra.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
+import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.Set;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Entity(name = "Categoria")
 @Table(name = "tb_categorias")
 @SequenceGenerator(name = "categoria", sequenceName = "sq_categorias", allocationSize = 1)
-public class Categoria {
+public class CategoriaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "categoria")
@@ -26,24 +26,33 @@ public class Categoria {
     @Column(length = 45, nullable = false)
     private String nome;
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "categoria")
+    private Set<SubcategoriaEntity> subcategorias = new LinkedHashSet<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "categoria")
+    private Set<ProdutoEntity> produtos = new LinkedHashSet<>();
+
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Categoria categoria))
+        if (!(o instanceof CategoriaEntity categoria))
             return false;
-        return Objects.equals(id, categoria.id) && Objects.equals(nome, categoria.nome);
+        Class<?> oEffectiveClass = o instanceof HibernateProxy hibernateProxy
+                ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy hibernateProxy
+                ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass)
+            return false;
+        return getId() != null && Objects.equals(getId(), categoria.getId());
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id, nome);
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Categoria.class.getSimpleName() + "[", "]").add("id=" + id).add(
-                "nome='" + nome + "'").toString();
+    public final int hashCode() {
+        return this instanceof HibernateProxy hibernateProxy
+                ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 
 }

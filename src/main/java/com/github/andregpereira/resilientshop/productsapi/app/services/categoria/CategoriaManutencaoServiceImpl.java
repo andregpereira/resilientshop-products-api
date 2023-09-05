@@ -5,7 +5,7 @@ import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.Cate
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapper;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.MessageFormat;
 
 /**
- * Classe de serviço de manutenção de {@link Categoria}.
+ * Classe de serviço de manutenção de {@link CategoriaEntity}.
  *
  * @author André Garcia
  * @see CategoriaManutencaoService
@@ -55,7 +55,7 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
             log.info("Categoria já cadastrada com o nome {}", dto.nome());
             throw new CategoriaAlreadyExistsException(dto.nome());
         }
-        Categoria categoria = mapper.toCategoria(dto);
+        CategoriaEntity categoria = mapper.toCategoria(dto);
         repository.save(categoria);
         log.info("Categoria criada");
         return mapper.toCategoriaDto(categoria);
@@ -81,7 +81,7 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
                 log.info("Categoria já cadastrada com o nome {}", dto.nome());
                 throw new CategoriaAlreadyExistsException(dto.nome());
             }
-            Categoria categoriaAtualizada = mapper.toCategoria(dto);
+            CategoriaEntity categoriaAtualizada = mapper.toCategoria(dto);
             categoriaAtualizada.setId(id);
             repository.save(categoriaAtualizada);
             log.info("Categoria com id {} atualizada", id);
@@ -93,7 +93,7 @@ public class CategoriaManutencaoServiceImpl implements CategoriaManutencaoServic
     }
 
     /**
-     * Remove uma {@linkplain Categoria categoria} por {@code id}.
+     * Remove uma {@linkplain CategoriaEntity categoria} por {@code id}.
      * Retorna uma mensagem de confirmação de remoção.
      *
      * @param id o id da categoria a ser removida.
