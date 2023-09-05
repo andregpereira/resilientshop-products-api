@@ -4,7 +4,7 @@ import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.Produ
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import org.junit.jupiter.api.Test;
@@ -153,7 +153,7 @@ class ProdutoManutencaoServiceTest {
         given(produtoRepository.findById(10L)).willReturn(Optional.empty());
         assertThatThrownBy(() -> manutencaoService.desativar(10L)).isInstanceOf(
                 ProdutoNotFoundException.class).hasMessage("Ops! Não foi encontrado um produto ativo com o id 10");
-        then(produtoRepository).should(never()).save(any(Produto.class));
+        then(produtoRepository).should(never()).save(any(ProdutoEntity.class));
     }
 
 }

@@ -1,6 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.infra.repositories;
 
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.SubcategoriaEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +35,8 @@ class SubcategoriaRepositoryTest {
     @Test
     void criarSubcategoriaComDadosValidosRetornaSubcategoria() {
         em.persist(CATEGORIA);
-        Subcategoria subcategoria = subcategoriaRepository.save(SUBCATEGORIA);
-        Subcategoria sut = em.find(Subcategoria.class, subcategoria.getId());
+        SubcategoriaEntity subcategoria = subcategoriaRepository.save(SUBCATEGORIA);
+        SubcategoriaEntity sut = em.find(SubcategoriaEntity.class, subcategoria.getId());
         assertThat(sut).isNotNull();
         assertThat(sut.getNome()).isEqualTo(SUBCATEGORIA.getNome());
         assertThat(sut.getDescricao()).isEqualTo(SUBCATEGORIA.getDescricao());
@@ -54,7 +54,7 @@ class SubcategoriaRepositoryTest {
     @Test
     void criarSubcategoriaComSkuExistenteThrowsRuntimeException() {
         em.persist(CATEGORIA);
-        Subcategoria sut = em.persistFlushFind(SUBCATEGORIA);
+        SubcategoriaEntity sut = em.persistFlushFind(SUBCATEGORIA);
         sut.setId(null);
         assertThatThrownBy(() -> subcategoriaRepository.saveAndFlush(sut)).isInstanceOf(RuntimeException.class);
     }
@@ -62,14 +62,14 @@ class SubcategoriaRepositoryTest {
     @Test
     void atualizarSubcategoriaComDadosValidosRetornaSubcategoria() {
         em.persist(CATEGORIA);
-        Subcategoria subcategoriaAntigo = em.persistFlushFind(SUBCATEGORIA);
-        Subcategoria subcategoriaAtualizado = SUBCATEGORIA_ATUALIZADA;
+        SubcategoriaEntity subcategoriaAntigo = em.persistFlushFind(SUBCATEGORIA);
+        SubcategoriaEntity subcategoriaAtualizado = SUBCATEGORIA_ATUALIZADA;
         subcategoriaAtualizado.setId(subcategoriaAntigo.getId());
         subcategoriaAtualizado.setNome(SUBCATEGORIA_ATUALIZADA.getNome());
         subcategoriaAtualizado.setDescricao(SUBCATEGORIA_ATUALIZADA.getDescricao());
         subcategoriaAtualizado.getCategoria().setId(SUBCATEGORIA_ATUALIZADA.getCategoria().getId());
         em.persist(CATEGORIA_ATUALIZADA);
-        Subcategoria sut = subcategoriaRepository.save(subcategoriaAtualizado);
+        SubcategoriaEntity sut = subcategoriaRepository.save(subcategoriaAtualizado);
         assertThat(sut).isNotNull();
         assertThat(sut.getId()).isEqualTo(subcategoriaAntigo.getId());
         assertThat(sut.getNome()).isEqualTo(SUBCATEGORIA_ATUALIZADA.getNome());
@@ -80,9 +80,9 @@ class SubcategoriaRepositoryTest {
     @Test
     void atualizarSubcategoriaComDadosInvalidosThrowsRuntimeException() {
         em.persist(CATEGORIA);
-        Subcategoria subcategoriaAntigo = em.persistFlushFind(SUBCATEGORIA);
-        Subcategoria sutVazio = SUBCATEGORIA_VAZIA;
-        Subcategoria sutInvalido = SUBCATEGORIA_INVALIDA;
+        SubcategoriaEntity subcategoriaAntigo = em.persistFlushFind(SUBCATEGORIA);
+        SubcategoriaEntity sutVazio = SUBCATEGORIA_VAZIA;
+        SubcategoriaEntity sutInvalido = SUBCATEGORIA_INVALIDA;
         sutVazio.setId(subcategoriaAntigo.getId());
         sutInvalido.setId(subcategoriaAntigo.getId());
         assertThatThrownBy(() -> subcategoriaRepository.saveAndFlush(sutVazio)).isInstanceOf(RuntimeException.class);
@@ -92,15 +92,15 @@ class SubcategoriaRepositoryTest {
     @Test
     void consultarSubcategoriaPorIdExistenteRetornaTrueESubcategoria() {
         em.persist(CATEGORIA);
-        Subcategoria subcategoria = em.persistFlushFind(SUBCATEGORIA);
-        Optional<Subcategoria> optionalSubcategoria = subcategoriaRepository.findById(subcategoria.getId());
+        SubcategoriaEntity subcategoria = em.persistFlushFind(SUBCATEGORIA);
+        Optional<SubcategoriaEntity> optionalSubcategoria = subcategoriaRepository.findById(subcategoria.getId());
         assertThat(subcategoriaRepository.existsById(subcategoria.getId())).isTrue();
         assertThat(optionalSubcategoria).isNotEmpty().get().isEqualTo(subcategoria);
     }
 
     @Test
     void consultarSubcategoriaPorIdInexistenteRetornaFalseEEmpty() {
-        Optional<Subcategoria> optionalSubcategoria = subcategoriaRepository.findById(10L);
+        Optional<SubcategoriaEntity> optionalSubcategoria = subcategoriaRepository.findById(10L);
         assertThat(subcategoriaRepository.existsById(10L)).isFalse();
         assertThat(optionalSubcategoria).isEmpty();
     }
@@ -108,9 +108,9 @@ class SubcategoriaRepositoryTest {
     @Test
     void removerSubcategoriaPorIdExistenteRetornaNulo() {
         em.persist(CATEGORIA);
-        Subcategoria sut = em.persistFlushFind(SUBCATEGORIA);
+        SubcategoriaEntity sut = em.persistFlushFind(SUBCATEGORIA);
         subcategoriaRepository.deleteById(sut.getId());
-        Subcategoria subcategoriaRemovido = em.find(Subcategoria.class, sut.getId());
+        SubcategoriaEntity subcategoriaRemovido = em.find(SubcategoriaEntity.class, sut.getId());
         assertThat(subcategoriaRemovido).isNull();
     }
 

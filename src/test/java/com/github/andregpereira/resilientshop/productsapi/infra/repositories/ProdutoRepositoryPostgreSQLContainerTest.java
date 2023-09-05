@@ -1,6 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.infra.repositories;
 
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.config.PostgreSQLContainerConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -48,8 +48,8 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void criarProdutoComDadosValidosRetornaProduto() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto produto = repository.save(PRODUTO);
-        Produto sut = em.find(Produto.class, produto.getId());
+        ProdutoEntity produto = repository.save(PRODUTO);
+        ProdutoEntity sut = em.find(ProdutoEntity.class, produto.getId());
         assertThat(sut).isNotNull();
         assertThat(sut.getSku()).isEqualTo(PRODUTO.getSku());
         assertThat(sut.getNome()).isEqualTo(PRODUTO.getNome());
@@ -70,7 +70,7 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void criarProdutoComSkuExistenteThrowsRuntimeException() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto sut = em.persistFlushFind(PRODUTO);
+        ProdutoEntity sut = em.persistFlushFind(PRODUTO);
         sut.setId(null);
         assertThatThrownBy(() -> repository.saveAndFlush(sut)).isInstanceOf(RuntimeException.class);
     }
@@ -79,8 +79,8 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void atualizarProdutoComDadosValidosRetornaProduto() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto produtoAntigo = em.persistFlushFind(PRODUTO);
-        Produto produtoAtualizado = PRODUTO_ATUALIZADO;
+        ProdutoEntity produtoAntigo = em.persistFlushFind(PRODUTO);
+        ProdutoEntity produtoAtualizado = PRODUTO_ATUALIZADO;
         produtoAtualizado.setId(produtoAntigo.getId());
         produtoAtualizado.setSku(PRODUTO_ATUALIZADO.getSku());
         produtoAtualizado.setNome(PRODUTO_ATUALIZADO.getNome());
@@ -92,7 +92,7 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
                 PRODUTO_ATUALIZADO.getSubcategoria().getCategoria().getId());
         em.persist(CATEGORIA_ATUALIZADA);
         em.persist(SUBCATEGORIA_ATUALIZADA);
-        Produto sut = repository.save(produtoAtualizado);
+        ProdutoEntity sut = repository.save(produtoAtualizado);
         assertThat(sut).isNotNull();
         assertThat(sut.getId()).isEqualTo(produtoAntigo.getId());
         assertThat(sut.getSku()).isEqualTo(PRODUTO_ATUALIZADO.getSku());
@@ -108,9 +108,9 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void atualizarProdutoComDadosInvalidosThrowsRuntimeException() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto produtoAntigo = em.persistFlushFind(PRODUTO);
-        Produto sutVazio = PRODUTO_VAZIO;
-        Produto sutInvalido = PRODUTO_INVALIDO;
+        ProdutoEntity produtoAntigo = em.persistFlushFind(PRODUTO);
+        ProdutoEntity sutVazio = PRODUTO_VAZIO;
+        ProdutoEntity sutInvalido = PRODUTO_INVALIDO;
         sutVazio.setId(produtoAntigo.getId());
         sutInvalido.setId(produtoAntigo.getId());
         assertThatThrownBy(() -> repository.saveAndFlush(sutVazio)).isInstanceOf(RuntimeException.class);
@@ -124,18 +124,18 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
         em.persistFlushFind(PRODUTO);
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto sut2 = new Produto(null, 1234567890L, "nome2", "Teste da classe Produto", LOCAL_DATE_TIME,
+        ProdutoEntity sut2 = new ProdutoEntity(null, 1234567890L, "nome2", "Teste da classe Produto", LOCAL_DATE_TIME,
                 BigDecimal.valueOf(10.99), 10, SUBCATEGORIA);
         em.persist(sut2);
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        Page<Produto> pageProdutos = repository.findAll(pageable);
+        Page<ProdutoEntity> pageProdutos = repository.findAll(pageable);
         assertThat(pageProdutos).isNotEmpty().hasSize(2);
     }
 
     @Test
     void listarProdutosInexistentesRetornaEmpty() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        Page<Produto> pageProdutos = repository.findAll(pageable);
+        Page<ProdutoEntity> pageProdutos = repository.findAll(pageable);
         assertThat(pageProdutos).isEmpty();
     }
 
@@ -143,15 +143,15 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void consultarProdutoPorIdExistenteRetornaTrueEProduto() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto produto = em.persistFlushFind(PRODUTO);
-        Optional<Produto> optionalProduto = repository.findById(produto.getId());
+        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
+        Optional<ProdutoEntity> optionalProduto = repository.findById(produto.getId());
         assertThat(repository.existsById(produto.getId())).isTrue();
         assertThat(optionalProduto).isNotEmpty().get().isEqualTo(produto);
     }
 
     @Test
     void consultarProdutoPorIdInexistenteRetornaFalseEEmpty() {
-        Optional<Produto> optionalProduto = repository.findById(10L);
+        Optional<ProdutoEntity> optionalProduto = repository.findById(10L);
         assertThat(repository.existsById(10L)).isFalse();
         assertThat(optionalProduto).isEmpty();
     }
@@ -160,9 +160,9 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void consultarProdutoPorNomeExistenteRetornaProduto() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto produto = em.persistFlushFind(PRODUTO);
+        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = repository.findByNome(produto.getNome(), pageable);
+        Page<ProdutoEntity> pageProdutos = repository.findByNome(produto.getNome(), pageable);
         assertThat(pageProdutos).isNotEmpty().hasSize(1);
         assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
     }
@@ -170,7 +170,7 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     @Test
     void consultarProdutoPorNomeInexistenteRetornaEmpty() {
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = repository.findByNome("", pageable);
+        Page<ProdutoEntity> pageProdutos = repository.findByNome("", pageable);
         assertThat(pageProdutos).isEmpty();
     }
 
@@ -178,9 +178,9 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void consultarProdutosPorSubcategoriaExistenteRetornaPageProduto() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto produto = em.persistFlushFind(PRODUTO);
+        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = repository.findAllBySubcategoriaId(produto.getSubcategoria().getId(), pageable);
+        Page<ProdutoEntity> pageProdutos = repository.findAllBySubcategoriaId(produto.getSubcategoria().getId(), pageable);
         assertThat(pageProdutos).isNotEmpty().hasSize(1);
         assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
     }
@@ -189,9 +189,9 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void consultarProdutosPorSubcategoriaInexistenteRetornaEmpty() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto produto = em.persistFlushFind(PRODUTO);
+        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = repository.findAllBySubcategoriaId(10L, pageable);
+        Page<ProdutoEntity> pageProdutos = repository.findAllBySubcategoriaId(10L, pageable);
         assertThat(pageProdutos).isEmpty();
     }
 
@@ -199,9 +199,9 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void consultarProdutosPorCategoriaExistenteRetornaPageProduto() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto produto = em.persistFlushFind(PRODUTO);
+        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = repository.findAllBySubcategoriaCategoriaId(
+        Page<ProdutoEntity> pageProdutos = repository.findAllBySubcategoriaCategoriaId(
                 produto.getSubcategoria().getCategoria().getId(), pageable);
         assertThat(pageProdutos).isNotEmpty().hasSize(1);
         assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
@@ -211,9 +211,9 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void consultarProdutosPorCategoriaInexistenteRetornaEmpty() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto produto = em.persistFlushFind(PRODUTO);
+        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<Produto> pageProdutos = repository.findAllBySubcategoriaCategoriaId(10L, pageable);
+        Page<ProdutoEntity> pageProdutos = repository.findAllBySubcategoriaCategoriaId(10L, pageable);
         assertThat(pageProdutos).isEmpty();
     }
 
@@ -221,9 +221,9 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     void removerProdutoPorIdExistenteRetornaNulo() {
         em.persist(CATEGORIA);
         em.persist(SUBCATEGORIA);
-        Produto sut = em.persistFlushFind(PRODUTO);
+        ProdutoEntity sut = em.persistFlushFind(PRODUTO);
         repository.deleteById(sut.getId());
-        Produto produtoRemovido = em.find(Produto.class, sut.getId());
+        ProdutoEntity produtoRemovido = em.find(ProdutoEntity.class, sut.getId());
         assertThat(produtoRemovido).isNull();
     }
 
