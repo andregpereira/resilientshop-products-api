@@ -14,6 +14,7 @@ public record ProdutoAtualizacaoDto(@NotBlank(message = "O nome é obrigatório"
                 message = "Poxa! O valor não pode ser igual ou inferior a R$0,00") BigDecimal valorUnitario,
         @NotNull(message = "A quantidade em estoque é obrigatória") @PositiveOrZero(
                 message = "Ops! Quantidade inválida, digite um número que não seja negativo.") int estoque,
+        boolean ativo,
         @NotNull(message = "A categoria é obrigatória") @Positive(
                 message = "O valor mínimo para esse campo é 1") Long categoriaId,
         @Positive(message = "O valor mínimo para esse campo é 1") Long subcategoriaId) {
