@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 
 @Getter
@@ -32,6 +34,9 @@ public class Subcategoria {
     @ManyToOne
     @JoinColumn(name = "id_categoria", nullable = false, foreignKey = @ForeignKey(name = "fk_id_categoria"))
     private Categoria categoria;
+
+    @OneToMany(mappedBy = "subcategorias", orphanRemoval = true)
+    private Set<ProdutoEntity> produtos = new LinkedHashSet<>();
 
     @Override
     public boolean equals(Object o) {
