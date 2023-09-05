@@ -25,10 +25,10 @@ public interface ProdutoRepository extends JpaRepository<ProdutoEntity, Long> {
             SELECT * FROM tb_produtos p
             WHERE p.nome ILIKE %:nome%
             """, nativeQuery = true)
-    Page<ProdutoEntity> findByNome(@Param("nome") String nome, Pageable pageable);
+    Page<ProdutoEntity> findByName(@Param("nome") String nome, Pageable pageable);
 
     Page<ProdutoEntity> findAllBySubcategoriaId(Long id, Pageable pageable);
 
-    Page<ProdutoEntity> findAllBySubcategoriaCategoriaId(Long id, Pageable pageable);
+    Page<ProdutoEntity> findAllByCategoriaId(Long id, Pageable pageable);
 
 }

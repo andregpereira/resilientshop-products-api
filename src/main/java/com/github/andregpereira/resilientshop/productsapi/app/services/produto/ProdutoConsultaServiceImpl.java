@@ -110,7 +110,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
-        return Optional.of(produtoRepository.findByNome(nome, pageable)).filter(not(Page::isEmpty)).map(p -> {
+        return Optional.of(produtoRepository.findByName(nome, pageable)).filter(not(Page::isEmpty)).map(p -> {
             log.info("Retornando produto com nome {}", nome);
             return p.map(mapper::toProdutoDto);
         }).orElseThrow(() -> {
@@ -161,7 +161,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     @Override
     public Page<ProdutoDto> consultarPorCategoria(Long id, Pageable pageable) {
         return categoriaRepository.findById(id).map(c -> Optional.of(
-                produtoRepository.findAllBySubcategoriaCategoriaId(id, pageable)).filter(not(Page::isEmpty)).map(p -> {
+                produtoRepository.findAllByCategoriaId(id, pageable)).filter(not(Page::isEmpty)).map(p -> {
             log.info("Retornando produtos com categoria id {}", id);
             return p.map(mapper::toProdutoDto);
         }).orElseThrow(() -> {

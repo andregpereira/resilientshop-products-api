@@ -89,7 +89,7 @@ class ProdutoManutencaoServiceTest {
         assertThatThrownBy(() -> manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
                 SubcategoriaNotFoundException.class).hasMessage(
                 MessageFormat.format("Ops! Nenhuma subcategoria foi encontrada com o id {0}",
-                        PRODUTO_REGISTRO_DTO.idSubcategoria()));
+                        PRODUTO_REGISTRO_DTO.subcategoriaId()));
         then(produtoRepository).should(never()).save(PRODUTO);
     }
 

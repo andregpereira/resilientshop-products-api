@@ -82,7 +82,7 @@ class SubcategoriaManutencaoServiceTest {
     void atualizarSubcategoriaComDadosValidosRetornaSubcategoriaDetalhesDto() {
         given(subcategoriaRepository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA));
         given(subcategoriaRepository.existsByNome(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.nome())).willReturn(false);
-        given(categoriaRepository.findById(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.idCategoria())).willReturn(
+        given(categoriaRepository.findById(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA.categoriaId())).willReturn(
                 Optional.of(CATEGORIA_ATUALIZADA));
         given(mapper.toSubcategoria(SUBCATEGORIA_REGISTRO_DTO_ATUALIZADA)).willReturn(SUBCATEGORIA_ATUALIZADA);
         given(subcategoriaRepository.save(SUBCATEGORIA_ATUALIZADA)).willReturn(SUBCATEGORIA_ATUALIZADA);

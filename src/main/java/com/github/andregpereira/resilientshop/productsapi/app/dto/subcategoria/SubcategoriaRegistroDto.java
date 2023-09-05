@@ -10,6 +10,6 @@ public record SubcategoriaRegistroDto(@NotBlank(message = "O nome é obrigatóri
         @NotBlank(message = "A descrição é obrigatória") @Size(
                 message = "A descrição não pode ter menos de 15 e mais de 255 caracteres") String descricao,
         @NotNull(message = "A categoria é obrigatória") @Positive(
-                message = "Poxa! O id deve ser maior que 0") Long idCategoria) {
+                message = "Poxa! O id deve ser maior que 0") Long categoriaId) {
 
 }

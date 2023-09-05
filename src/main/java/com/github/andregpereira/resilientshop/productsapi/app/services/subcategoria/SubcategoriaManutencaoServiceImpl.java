@@ -63,15 +63,15 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
             log.info("Subcategoria já cadastrada com o nome {}", dto.nome());
             throw new SubcategoriaAlreadyExistsException(dto.nome());
         }
-        return categoriaRepository.findById(dto.idCategoria()).map(c -> {
+        return categoriaRepository.findById(dto.categoriaId()).map(c -> {
             SubcategoriaEntity subcategoria = mapper.toSubcategoria(dto);
             subcategoria.setCategoria(c);
             subcategoriaRepository.save(subcategoria);
             log.info("Subcategoria criada");
             return mapper.toSubcategoriaDetalhesDto(subcategoria);
         }).orElseThrow(() -> {
-            log.info("Categoria não encontrada com id {}", dto.idCategoria());
-            return new CategoriaNotFoundException(dto.idCategoria());
+            log.info("Categoria não encontrada com id {}", dto.categoriaId());
+            return new CategoriaNotFoundException(dto.categoriaId());
         });
     }
 
@@ -95,7 +95,7 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
                 log.info("Subcategoria já cadastrada com o nome {}", dto.nome());
                 throw new SubcategoriaAlreadyExistsException(dto.nome());
             }
-            return categoriaRepository.findById(dto.idCategoria()).map(c -> {
+            return categoriaRepository.findById(dto.categoriaId()).map(c -> {
                 SubcategoriaEntity subcategoriaAtualizada = mapper.toSubcategoria(dto);
                 subcategoriaAtualizada.setId(id);
                 subcategoriaAtualizada.setCategoria(c);
@@ -103,8 +103,8 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
                 log.info("Subcategoria com id {} atualizada", id);
                 return mapper.toSubcategoriaDetalhesDto(subcategoriaAtualizada);
             }).orElseThrow(() -> {
-                log.info("Categoria não encontrada com id {}", dto.idCategoria());
-                return new CategoriaNotFoundException(dto.idCategoria());
+                log.info("Categoria não encontrada com id {}", dto.categoriaId());
+                return new CategoriaNotFoundException(dto.categoriaId());
             });
         }).orElseThrow(() -> {
             log.info("Subcategoria não encontrada com id {}", id);

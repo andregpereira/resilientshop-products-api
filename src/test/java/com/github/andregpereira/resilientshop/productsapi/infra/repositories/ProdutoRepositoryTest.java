@@ -159,7 +159,7 @@ class ProdutoRepositoryTest {
         em.persist(SUBCATEGORIA);
         ProdutoEntity produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<ProdutoEntity> pageProdutos = repository.findByNome(produto.getNome(), pageable);
+        Page<ProdutoEntity> pageProdutos = repository.findByName(produto.getNome(), pageable);
         assertThat(pageProdutos).isNotEmpty().hasSize(1);
         assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
     }
@@ -167,7 +167,7 @@ class ProdutoRepositoryTest {
     @Test
     void consultarProdutoPorNomeInexistenteRetornaEmpty() {
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<ProdutoEntity> pageProdutos = repository.findByNome("", pageable);
+        Page<ProdutoEntity> pageProdutos = repository.findByName("", pageable);
         assertThat(pageProdutos).isEmpty();
     }
 
@@ -198,7 +198,7 @@ class ProdutoRepositoryTest {
         em.persist(SUBCATEGORIA);
         ProdutoEntity produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<ProdutoEntity> pageProdutos = repository.findAllBySubcategoriaCategoriaId(
+        Page<ProdutoEntity> pageProdutos = repository.findAllByCategoriaId(
                 produto.getSubcategoria().getCategoria().getId(), pageable);
         assertThat(pageProdutos).isNotEmpty().hasSize(1);
         assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
@@ -210,7 +210,7 @@ class ProdutoRepositoryTest {
         em.persist(SUBCATEGORIA);
         ProdutoEntity produto = em.persistFlushFind(PRODUTO);
         PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<ProdutoEntity> pageProdutos = repository.findAllBySubcategoriaCategoriaId(10L, pageable);
+        Page<ProdutoEntity> pageProdutos = repository.findAllByCategoriaId(10L, pageable);
         assertThat(pageProdutos).isEmpty();
     }
 

@@ -77,15 +77,15 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
             log.info("Produto já cadastrado com o nome {}", dto.nome());
             throw new ProdutoAlreadyExistsException(dto.nome());
         }
-        return categoriaRepository.findById(dto.idCategoria()).map(c -> {
+        return categoriaRepository.findById(dto.categoriaId()).map(c -> {
             ProdutoEntity produto = mapper.toProduto(dto);
             produto.setCategoria(c);
-            if (dto.idSubcategoria() != null)
-                subcategoriaRepository.findById(dto.idSubcategoria()).ifPresent(produto::setSubcategoria);
+            if (dto.subcategoriaId() != null)
+                subcategoriaRepository.findById(dto.subcategoriaId()).ifPresent(produto::setSubcategoria);
             return mapper.toProdutoDetalhesDto(produtoRepository.save(produto));
         }).orElseThrow(() -> {
-            log.info("Categoria não encontrada com id {}", dto.idCategoria());
-            return new CategoriaNotFoundException(dto.idCategoria());
+            log.info("Categoria não encontrada com id {}", dto.categoriaId());
+            return new CategoriaNotFoundException(dto.categoriaId());
         });
     }
 
@@ -109,18 +109,18 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
                 log.info("Produto já cadastrado com o nome {}", dto.nome());
                 throw new ProdutoAlreadyExistsException(dto.nome());
             }
-            return categoriaRepository.findById(dto.idCategoria()).map(c -> {
+            return categoriaRepository.findById(dto.categoriaId()).map(c -> {
                 p.setNome(dto.nome());
                 p.setDescricao(dto.descricao());
                 p.setValorUnitario(dto.valorUnitario());
                 p.setEstoque(dto.estoque());
                 p.setCategoria(c);
-                if (dto.idSubcategoria() != null)
-                    subcategoriaRepository.findById(dto.idSubcategoria()).ifPresent(p::setSubcategoria);
+                if (dto.subcategoriaId() != null)
+                    subcategoriaRepository.findById(dto.subcategoriaId()).ifPresent(p::setSubcategoria);
                 return mapper.toProdutoDetalhesDto(produtoRepository.save(p));
             }).orElseThrow(() -> {
-                log.info("Categoria não encontrada com id {}", dto.idCategoria());
-                return new CategoriaNotFoundException(dto.idCategoria());
+                log.info("Categoria não encontrada com id {}", dto.categoriaId());
+                return new CategoriaNotFoundException(dto.categoriaId());
             });
         }).orElseThrow(() -> {
             log.info("Produto não encontrado com id {}", id);
