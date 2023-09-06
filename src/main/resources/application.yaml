@@ -8,6 +8,8 @@ spring:
     name: resilientshop-products-api
   #PostgreSQL
   datasource:
+    hikari:
+      initialization-fail-timeout: 30000
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
@@ -24,6 +26,9 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    metadata-map:
+      "prometheus.scrape": "true"
+      "prometheus.path": "/actuator/prometheus"
   client:
     fetchRegistry: false
     registerWithEureka: true
