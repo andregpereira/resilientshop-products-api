@@ -114,6 +114,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
                 p.setDescricao(dto.descricao());
                 p.setValorUnitario(dto.valorUnitario());
                 p.setEstoque(dto.estoque());
+                p.setImageUrl(dto.imageUrl());
                 p.setAtivo(dto.ativo());
                 p.setCategoria(c);
                 if (dto.subcategoriaId() != null)
