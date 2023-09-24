@@ -42,6 +42,11 @@ public class ProdutoEntity {
     @Column(nullable = false)
     private int estoque;
 
+    @Column(precision = 2, scale = 1)
+    private BigDecimal rating = BigDecimal.valueOf(3.6);
+
+    private String imageUrl;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataCriacao;

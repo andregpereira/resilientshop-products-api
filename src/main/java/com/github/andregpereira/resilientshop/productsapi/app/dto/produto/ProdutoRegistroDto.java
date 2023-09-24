@@ -18,6 +18,7 @@ public record ProdutoRegistroDto(@NotNull(message = "O SKU é obrigatório") Lon
                 message = "Poxa! O valor não pode ser igual ou inferior a R$0,00") BigDecimal valorUnitario,
         @NotNull(message = "A quantidade em estoque é obrigatória") @Positive(
                 message = "Ops! Quantidade inválida, digite um número que não seja negativo ou zero") int estoque,
+        String imageUrl,
         @NotNull(message = "A categoria é obrigatória") @Positive(
                 message = "O valor mínimo para esse campo é 1") Long categoriaId,
         @Positive(message = "O valor mínimo para esse campo é 1") Long subcategoriaId) {
