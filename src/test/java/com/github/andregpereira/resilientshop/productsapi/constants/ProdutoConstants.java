@@ -1,6 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.constants;
 
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -17,18 +17,18 @@ public class ProdutoConstants {
     public static final LocalDateTime LOCAL_DATE_TIME_FIXADO = LocalDateTime.now(
             Clock.fixed(Instant.parse("2014-12-22T10:15:30.00Z"), ZoneId.systemDefault()));
 
-    public static final Produto PRODUTO = new Produto(null, 123456789L, "nome", "Teste da classe Produto",
+    public static final ProdutoEntity PRODUTO = new ProdutoEntity(null, 123456789L, "nome", "Teste da classe Produto",
             LOCAL_DATE_TIME, BigDecimal.valueOf(10.59), 10, SUBCATEGORIA);
 
-    public static final Produto PRODUTO_LOCAL_DATE_TIME_FIXADO = new Produto(null, 123456789L, "nome",
+    public static final ProdutoEntity PRODUTO_LOCAL_DATE_TIME_FIXADO = new ProdutoEntity(null, 123456789L, "nome",
             "Teste da classe Produto", LOCAL_DATE_TIME_FIXADO, BigDecimal.valueOf(10.59), 10, SUBCATEGORIA);
 
-    public static final Produto PRODUTO_ATUALIZADO = new Produto(null, 123456789L, "nome2", "Teste da classe Produto2",
+    public static final ProdutoEntity PRODUTO_ATUALIZADO = new ProdutoEntity(null, 123456789L, "nome2", "Teste da classe Produto2",
             LOCAL_DATE_TIME, BigDecimal.valueOf(29.99), 87, SUBCATEGORIA_ATUALIZADA);
 
-    public static final Produto PRODUTO_INVALIDO = new Produto(null, null, "", "", null, null, 0,
+    public static final ProdutoEntity PRODUTO_INVALIDO = new ProdutoEntity(null, null, "", "", null, null, 0,
             SUBCATEGORIA_INVALIDA);
 
-    public static final Produto PRODUTO_VAZIO = new Produto();
+    public static final ProdutoEntity PRODUTO_VAZIO = new ProdutoEntity();
 
 }

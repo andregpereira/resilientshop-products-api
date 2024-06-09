@@ -1,6 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.cross.mappers;
 
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +21,7 @@ class CategoriaMapperTest {
 
     @Test
     void categoriaRegistroDtoRetornaCategoria() {
-        assertThat(mapper.toCategoria(CATEGORIA_REGISTRO_DTO)).isNotNull().isExactlyInstanceOf(Categoria.class);
+        assertThat(mapper.toCategoria(CATEGORIA_REGISTRO_DTO)).isNotNull().isExactlyInstanceOf(CategoriaEntity.class);
     }
 
     @Test

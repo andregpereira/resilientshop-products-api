@@ -1,6 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.cross.mappers;
 
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.SubcategoriaEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,7 +28,7 @@ class SubcategoriaMapperTest {
     @Test
     void subcategoriaRegistroDtoRetornaSubcategoria() {
         assertThat(subcategoriaMapper.toSubcategoria(SUBCATEGORIA_REGISTRO_DTO)).isNotNull().isExactlyInstanceOf(
-                Subcategoria.class);
+                SubcategoriaEntity.class);
     }
 
     @Test

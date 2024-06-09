@@ -3,14 +3,14 @@ package com.github.andregpereira.resilientshop.productsapi.cross.mappers;
 import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaRegistroDto;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.SubcategoriaEntity;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants.ComponentModel;
 import org.mapstruct.ReportingPolicy;
 
 /**
- * Interface mapper de {@link Subcategoria}, {@link SubcategoriaDto} e {@link SubcategoriaDetalhesDto}.
+ * Interface mapper de {@link SubcategoriaEntity}, {@link SubcategoriaDto} e {@link SubcategoriaDetalhesDto}.
  *
  * @author André Garcia
  * @see CategoriaMapper
@@ -19,10 +19,10 @@ import org.mapstruct.ReportingPolicy;
         injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SubcategoriaMapper {
 
-    Subcategoria toSubcategoria(SubcategoriaRegistroDto dto);
+    SubcategoriaEntity toSubcategoria(SubcategoriaRegistroDto dto);
 
-    SubcategoriaDto toSubcategoriaDto(Subcategoria subcategoria);
+    SubcategoriaDto toSubcategoriaDto(SubcategoriaEntity subcategoria);
 
-    SubcategoriaDetalhesDto toSubcategoriaDetalhesDto(Subcategoria subcategoria);
+    SubcategoriaDetalhesDto toSubcategoriaDetalhesDto(SubcategoriaEntity subcategoria);
 
 }

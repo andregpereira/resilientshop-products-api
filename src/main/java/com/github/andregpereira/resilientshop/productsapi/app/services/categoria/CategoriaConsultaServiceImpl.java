@@ -3,7 +3,7 @@ package com.github.andregpereira.resilientshop.productsapi.app.services.categori
 import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapper;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import java.util.Optional;
 import static java.util.function.Predicate.not;
 
 /**
- * Classe de serviço de consulta de {@link Categoria}.
+ * Classe de serviço de consulta de {@link CategoriaEntity}.
  *
  * @author André Garcia
  * @see CategoriaConsultaService
@@ -39,7 +39,7 @@ public class CategoriaConsultaServiceImpl implements CategoriaConsultaService {
     private final CategoriaMapper mapper;
 
     /**
-     * Lista todas as {@linkplain Categoria categorias} cadastradas.
+     * Lista todas as {@linkplain CategoriaEntity categorias} cadastradas.
      * Retorna uma {@linkplain Page sublista} de {@linkplain CategoriaDto categorias}.
      *
      * @param pageable o pageable padrão.
@@ -60,7 +60,7 @@ public class CategoriaConsultaServiceImpl implements CategoriaConsultaService {
     }
 
     /**
-     * Pesquisa uma {@linkplain Categoria categoria} por {@code id}.
+     * Pesquisa uma {@linkplain CategoriaEntity categoria} por {@code id}.
      * Retorna uma {@linkplain  CategoriaDto categoria}.
      *
      * @param id o id da categoria.

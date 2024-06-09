@@ -2,7 +2,7 @@ package com.github.andregpereira.resilientshop.productsapi.cross.mappers;
 
 import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoAtualizacaoDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoRegistroDto;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,12 +29,12 @@ class ProdutoMapperTest {
 
     @Test
     void produtoRegistroDtoRetornaProduto() {
-        assertThat(produtoMapper.toProduto(PRODUTO_REGISTRO_DTO)).isNotNull().isExactlyInstanceOf(Produto.class);
+        assertThat(produtoMapper.toProduto(PRODUTO_REGISTRO_DTO)).isNotNull().isExactlyInstanceOf(ProdutoEntity.class);
     }
 
     @Test
     void produtoAtualizacaoDtoRetornaProduto() {
-        assertThat(produtoMapper.toProduto(PRODUTO_ATUALIZACAO_DTO)).isNotNull().isExactlyInstanceOf(Produto.class);
+        assertThat(produtoMapper.toProduto(PRODUTO_ATUALIZACAO_DTO)).isNotNull().isExactlyInstanceOf(ProdutoEntity.class);
     }
 
     @Test

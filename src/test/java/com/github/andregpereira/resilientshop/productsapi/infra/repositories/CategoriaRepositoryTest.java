@@ -1,6 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.infra.repositories;
 
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +30,8 @@ class CategoriaRepositoryTest {
 
     @Test
     void criarCategoriaComDadosValidosRetornaCategoria() {
-        Categoria categoria = categoriaRepository.save(CATEGORIA);
-        Categoria sut = em.find(Categoria.class, categoria.getId());
+        CategoriaEntity categoria = categoriaRepository.save(CATEGORIA);
+        CategoriaEntity sut = em.find(CategoriaEntity.class, categoria.getId());
         assertThat(sut).isNotNull();
         assertThat(sut.getNome()).isEqualTo(CATEGORIA.getNome());
     }
@@ -46,18 +46,18 @@ class CategoriaRepositoryTest {
 
     @Test
     void criarCategoriaComSkuExistenteThrowsRuntimeException() {
-        Categoria sut = em.persistFlushFind(CATEGORIA);
+        CategoriaEntity sut = em.persistFlushFind(CATEGORIA);
         sut.setId(null);
         assertThatThrownBy(() -> categoriaRepository.saveAndFlush(sut)).isInstanceOf(RuntimeException.class);
     }
 
     @Test
     void atualizarCategoriaComDadosValidosRetornaCategoria() {
-        Categoria categoriaAntigo = em.persistFlushFind(CATEGORIA);
-        Categoria categoriaAtualizado = CATEGORIA_ATUALIZADA;
+        CategoriaEntity categoriaAntigo = em.persistFlushFind(CATEGORIA);
+        CategoriaEntity categoriaAtualizado = CATEGORIA_ATUALIZADA;
         categoriaAtualizado.setId(categoriaAntigo.getId());
         categoriaAtualizado.setNome(CATEGORIA_ATUALIZADA.getNome());
-        Categoria sut = categoriaRepository.save(categoriaAtualizado);
+        CategoriaEntity sut = categoriaRepository.save(categoriaAtualizado);
         assertThat(sut).isNotNull();
         assertThat(sut.getId()).isEqualTo(categoriaAntigo.getId());
         assertThat(sut.getNome()).isEqualTo(CATEGORIA_ATUALIZADA.getNome());
@@ -65,9 +65,9 @@ class CategoriaRepositoryTest {
 
     @Test
     void atualizarCategoriaComDadosInvalidosThrowsRuntimeException() {
-        Categoria categoriaAntigo = em.persistFlushFind(CATEGORIA);
-        Categoria sutVazio = CATEGORIA_VAZIA;
-        Categoria sutInvalido = CATEGORIA_INVALIDA;
+        CategoriaEntity categoriaAntigo = em.persistFlushFind(CATEGORIA);
+        CategoriaEntity sutVazio = CATEGORIA_VAZIA;
+        CategoriaEntity sutInvalido = CATEGORIA_INVALIDA;
         sutVazio.setId(categoriaAntigo.getId());
         sutInvalido.setId(categoriaAntigo.getId());
         assertThatThrownBy(() -> categoriaRepository.saveAndFlush(sutVazio)).isInstanceOf(RuntimeException.class);
@@ -76,24 +76,24 @@ class CategoriaRepositoryTest {
 
     @Test
     void consultarCategoriaPorIdExistenteRetornaTrueECategoria() {
-        Categoria categoria = em.persistFlushFind(CATEGORIA);
-        Optional<Categoria> optionalCategoria = categoriaRepository.findById(categoria.getId());
+        CategoriaEntity categoria = em.persistFlushFind(CATEGORIA);
+        Optional<CategoriaEntity> optionalCategoria = categoriaRepository.findById(categoria.getId());
         assertThat(categoriaRepository.existsById(categoria.getId())).isTrue();
         assertThat(optionalCategoria).isNotEmpty().get().isEqualTo(categoria);
     }
 
     @Test
     void consultarCategoriaPorIdInexistenteRetornaFalseEEmpty() {
-        Optional<Categoria> optionalCategoria = categoriaRepository.findById(10L);
+        Optional<CategoriaEntity> optionalCategoria = categoriaRepository.findById(10L);
         assertThat(categoriaRepository.existsById(10L)).isFalse();
         assertThat(optionalCategoria).isEmpty();
     }
 
     @Test
     void removerCategoriaPorIdExistenteRetornaNulo() {
-        Categoria sut = em.persistFlushFind(CATEGORIA);
+        CategoriaEntity sut = em.persistFlushFind(CATEGORIA);
         categoriaRepository.deleteById(sut.getId());
-        Categoria categoriaRemovido = em.find(Categoria.class, sut.getId());
+        CategoriaEntity categoriaRemovido = em.find(CategoriaEntity.class, sut.getId());
         assertThat(categoriaRemovido).isNull();
     }
 
