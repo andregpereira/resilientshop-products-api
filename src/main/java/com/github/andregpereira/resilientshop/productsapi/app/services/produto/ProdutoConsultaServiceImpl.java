@@ -6,7 +6,7 @@ import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.Categ
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
@@ -21,7 +21,7 @@ import java.util.Optional;
 import static java.util.function.Predicate.not;
 
 /**
- * Classe de serviço de consulta de {@link Produto}.
+ * Classe de serviço de consulta de {@link ProdutoEntity}.
  *
  * @author André Garcia
  * @see ProdutoConsultaService
@@ -56,7 +56,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     private final CategoriaRepository categoriaRepository;
 
     /**
-     * Lista todos os {@linkplain Produto produtos} cadastrados.
+     * Lista todos os {@linkplain ProdutoEntity produtos} cadastrados.
      * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
      *
      * @param pageable o pageable padrão.
@@ -77,7 +77,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     }
 
     /**
-     * Pesquisa um {@linkplain Produto produto} por {@code id}.
+     * Pesquisa um {@linkplain ProdutoEntity produto} por {@code id}.
      * Retorna um {@linkplain  ProdutoDetalhesDto produto detalhado}.
      *
      * @param id o id do produto.
@@ -98,7 +98,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     }
 
     /**
-     * Pesquisa {@linkplain Produto produtos} por {@code nome}.
+     * Pesquisa {@linkplain ProdutoEntity produtos} por {@code nome}.
      * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
      *
      * @param nome     o nome do produto.
@@ -110,7 +110,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
-        return Optional.of(produtoRepository.findByNome(nome, pageable)).filter(not(Page::isEmpty)).map(p -> {
+        return Optional.of(produtoRepository.findByName(nome, pageable)).filter(not(Page::isEmpty)).map(p -> {
             log.info("Retornando produto com nome {}", nome);
             return p.map(mapper::toProdutoDto);
         }).orElseThrow(() -> {
@@ -120,7 +120,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     }
 
     /**
-     * Pesquisa {@linkplain Produto produtos} pelo {@code id} da subcategoria.
+     * Pesquisa {@linkplain ProdutoEntity produtos} pelo {@code id} da subcategoria.
      * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
      *
      * @param id       o id da subcategoria.
@@ -147,7 +147,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     }
 
     /**
-     * Pesquisa {@linkplain Produto produtos} pelo {@code id} da categoria.
+     * Pesquisa {@linkplain ProdutoEntity produtos} pelo {@code id} da categoria.
      * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
      *
      * @param id       o id da categoria.
@@ -161,7 +161,7 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     @Override
     public Page<ProdutoDto> consultarPorCategoria(Long id, Pageable pageable) {
         return categoriaRepository.findById(id).map(c -> Optional.of(
-                produtoRepository.findAllBySubcategoriaCategoriaId(id, pageable)).filter(not(Page::isEmpty)).map(p -> {
+                produtoRepository.findAllByCategoriaId(id, pageable)).filter(not(Page::isEmpty)).map(p -> {
             log.info("Retornando produtos com categoria id {}", id);
             return p.map(mapper::toProdutoDto);
         }).orElseThrow(() -> {

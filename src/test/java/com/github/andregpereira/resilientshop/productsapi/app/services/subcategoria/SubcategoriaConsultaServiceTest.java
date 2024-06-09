@@ -4,7 +4,7 @@ import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.S
 import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.SubcategoriaMapper;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.SubcategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,9 +42,9 @@ class SubcategoriaConsultaServiceTest {
     @Test
     void listarSubcategoriasExistentesRetornaPageSubcategoriaDto() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        List<Subcategoria> listaSubcategorias = new ArrayList<>();
+        List<SubcategoriaEntity> listaSubcategorias = new ArrayList<>();
         listaSubcategorias.add(SUBCATEGORIA);
-        Page<Subcategoria> pageSubcategorias = new PageImpl<>(listaSubcategorias, pageable, 10);
+        Page<SubcategoriaEntity> pageSubcategorias = new PageImpl<>(listaSubcategorias, pageable, 10);
         given(repository.findAll(pageable)).willReturn(pageSubcategorias);
         given(mapper.toSubcategoriaDto(SUBCATEGORIA)).willReturn(SUBCATEGORIA_DTO);
         Page<SubcategoriaDto> sut = consultaService.listar(pageable);

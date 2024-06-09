@@ -4,7 +4,7 @@ import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.S
 import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.SubcategoriaMapper;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.SubcategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import java.util.Optional;
 import static java.util.function.Predicate.not;
 
 /**
- * Classe de serviço de consulta de {@link Subcategoria}.
+ * Classe de serviço de consulta de {@link SubcategoriaEntity}.
  *
  * @author André Garcia
  * @see SubcategoriaConsultaService
@@ -40,7 +40,7 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
     private final SubcategoriaMapper mapper;
 
     /**
-     * Lista todas as {@linkplain Subcategoria subcategorias} cadastradas.
+     * Lista todas as {@linkplain SubcategoriaEntity subcategorias} cadastradas.
      * Retorna uma {@linkplain Page sublista} de {@linkplain SubcategoriaDto subcategorias}.
      *
      * @param pageable o pageable padrão.
@@ -61,7 +61,7 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
     }
 
     /**
-     * Pesquisa uma {@linkplain Subcategoria subcategoria} por {@code id}.
+     * Pesquisa uma {@linkplain SubcategoriaEntity subcategoria} por {@code id}.
      * Retorna uma {@linkplain  SubcategoriaDetalhesDto subcategoria detalhada}.
      *
      * @param id o id da subcategoria.

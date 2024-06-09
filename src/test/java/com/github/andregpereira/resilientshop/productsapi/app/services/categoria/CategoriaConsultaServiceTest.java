@@ -3,7 +3,7 @@ package com.github.andregpereira.resilientshop.productsapi.app.services.categori
 import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapper;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,9 +57,9 @@ class CategoriaConsultaServiceTest {
     @Test
     void listarCategoriasExistentesRetornaPageCategoriaDto() {
         PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        List<Categoria> listaCategorias = new ArrayList<>();
+        List<CategoriaEntity> listaCategorias = new ArrayList<>();
         listaCategorias.add(CATEGORIA);
-        Page<Categoria> pageCategorias = new PageImpl<>(listaCategorias, pageable, 10);
+        Page<CategoriaEntity> pageCategorias = new PageImpl<>(listaCategorias, pageable, 10);
         given(repository.findAll(pageable)).willReturn(pageCategorias);
         given(mapper.toCategoriaDto(CATEGORIA)).willReturn(CATEGORIA_DTO);
         Page<CategoriaDto> sut = consultaService.listar(pageable);

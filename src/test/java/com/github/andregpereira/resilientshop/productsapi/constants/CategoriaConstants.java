@@ -1,15 +1,15 @@
 package com.github.andregpereira.resilientshop.productsapi.constants;
 
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Categoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 
 public class CategoriaConstants {
 
-    public static final Categoria CATEGORIA = new Categoria(null, "nome");
+    public static final CategoriaEntity CATEGORIA = new CategoriaEntity(null, "nome");
 
-    public static final Categoria CATEGORIA_ATUALIZADA = new Categoria(null, "nome2");
+    public static final CategoriaEntity CATEGORIA_ATUALIZADA = new CategoriaEntity(null, "nome2");
 
-    public static final Categoria CATEGORIA_INVALIDA = new Categoria(null, "");
+    public static final CategoriaEntity CATEGORIA_INVALIDA = new CategoriaEntity(null, "");
 
-    public static final Categoria CATEGORIA_VAZIA = new Categoria();
+    public static final CategoriaEntity CATEGORIA_VAZIA = new CategoriaEntity();
 
 }

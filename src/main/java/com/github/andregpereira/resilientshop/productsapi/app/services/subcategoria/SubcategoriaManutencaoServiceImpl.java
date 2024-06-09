@@ -6,7 +6,7 @@ import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.Categ
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.SubcategoriaMapper;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Subcategoria;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.SubcategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.MessageFormat;
 
 /**
- * Classe de serviço de manutenção de {@link Subcategoria}.
+ * Classe de serviço de manutenção de {@link SubcategoriaEntity}.
  *
  * @author André Garcia
  * @see SubcategoriaManutencaoService
@@ -63,15 +63,15 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
             log.info("Subcategoria já cadastrada com o nome {}", dto.nome());
             throw new SubcategoriaAlreadyExistsException(dto.nome());
         }
-        return categoriaRepository.findById(dto.idCategoria()).map(c -> {
-            Subcategoria subcategoria = mapper.toSubcategoria(dto);
+        return categoriaRepository.findById(dto.categoriaId()).map(c -> {
+            SubcategoriaEntity subcategoria = mapper.toSubcategoria(dto);
             subcategoria.setCategoria(c);
             subcategoriaRepository.save(subcategoria);
             log.info("Subcategoria criada");
             return mapper.toSubcategoriaDetalhesDto(subcategoria);
         }).orElseThrow(() -> {
-            log.info("Categoria não encontrada com id {}", dto.idCategoria());
-            return new CategoriaNotFoundException(dto.idCategoria());
+            log.info("Categoria não encontrada com id {}", dto.categoriaId());
+            return new CategoriaNotFoundException(dto.categoriaId());
         });
     }
 
@@ -95,16 +95,16 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
                 log.info("Subcategoria já cadastrada com o nome {}", dto.nome());
                 throw new SubcategoriaAlreadyExistsException(dto.nome());
             }
-            return categoriaRepository.findById(dto.idCategoria()).map(c -> {
-                Subcategoria subcategoriaAtualizada = mapper.toSubcategoria(dto);
+            return categoriaRepository.findById(dto.categoriaId()).map(c -> {
+                SubcategoriaEntity subcategoriaAtualizada = mapper.toSubcategoria(dto);
                 subcategoriaAtualizada.setId(id);
                 subcategoriaAtualizada.setCategoria(c);
                 subcategoriaRepository.save(subcategoriaAtualizada);
                 log.info("Subcategoria com id {} atualizada", id);
                 return mapper.toSubcategoriaDetalhesDto(subcategoriaAtualizada);
             }).orElseThrow(() -> {
-                log.info("Categoria não encontrada com id {}", dto.idCategoria());
-                return new CategoriaNotFoundException(dto.idCategoria());
+                log.info("Categoria não encontrada com id {}", dto.categoriaId());
+                return new CategoriaNotFoundException(dto.categoriaId());
             });
         }).orElseThrow(() -> {
             log.info("Subcategoria não encontrada com id {}", id);
@@ -113,7 +113,7 @@ public class SubcategoriaManutencaoServiceImpl implements SubcategoriaManutencao
     }
 
     /**
-     * Remove uma {@linkplain Subcategoria subcategoria} por {@code id}.
+     * Remove uma {@linkplain SubcategoriaEntity subcategoria} por {@code id}.
      * Retorna uma mensagem de confirmação de remoção.
      *
      * @param id o id da subcategoria a ser removida.

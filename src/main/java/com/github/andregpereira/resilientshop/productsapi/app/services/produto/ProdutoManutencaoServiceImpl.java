@@ -4,11 +4,13 @@ import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.Produt
 import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoAtualizarEstoqueDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoDetalhesDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
-import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import jakarta.transaction.Transactional;
@@ -20,7 +22,7 @@ import java.text.MessageFormat;
 import java.util.Set;
 
 /**
- * Classe de serviço de manutenção de {@link Produto}.
+ * Classe de serviço de manutenção de {@link ProdutoEntity}.
  *
  * @author André Garcia
  * @see ProdutoManutencaoService
@@ -42,6 +44,12 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      * conversões de DTO e entidade de produtos.
      */
     private final ProdutoMapper mapper;
+
+    /**
+     * Injeção da dependência {@link CategoriaRepository} para realizar operações de
+     * consulta na tabela de subcategorias no banco de dados.
+     */
+    private final CategoriaRepository categoriaRepository;
 
     /**
      * Injeção da dependência {@link SubcategoriaRepository} para realizar operações de
@@ -68,15 +76,17 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
         } else if (produtoRepository.existsByNome(dto.nome())) {
             log.info("Produto já cadastrado com o nome {}", dto.nome());
             throw new ProdutoAlreadyExistsException(dto.nome());
-        } else
-            return subcategoriaRepository.findById(dto.idSubcategoria()).map(sc -> {
-                Produto produto = mapper.toProduto(dto);
-                produto.setSubcategoria(sc);
-                return mapper.toProdutoDetalhesDto(produtoRepository.save(produto));
-            }).orElseThrow(() -> {
-                log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
-                return new SubcategoriaNotFoundException(dto.idSubcategoria());
-            });
+        }
+        return categoriaRepository.findById(dto.categoriaId()).map(c -> {
+            ProdutoEntity produto = mapper.toProduto(dto);
+            produto.setCategoria(c);
+            if (dto.subcategoriaId() != null)
+                subcategoriaRepository.findById(dto.subcategoriaId()).ifPresent(produto::setSubcategoria);
+            return mapper.toProdutoDetalhesDto(produtoRepository.save(produto));
+        }).orElseThrow(() -> {
+            log.info("Categoria não encontrada com id {}", dto.categoriaId());
+            return new CategoriaNotFoundException(dto.categoriaId());
+        });
     }
 
     /**
@@ -98,18 +108,22 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
             if (produtoRepository.existsByNome(dto.nome())) {
                 log.info("Produto já cadastrado com o nome {}", dto.nome());
                 throw new ProdutoAlreadyExistsException(dto.nome());
-            } else
-                return subcategoriaRepository.findById(dto.idSubcategoria()).map(sc -> {
-                    p.setNome(dto.nome());
-                    p.setDescricao(dto.descricao());
-                    p.setValorUnitario(dto.valorUnitario());
-                    p.setEstoque(dto.estoque());
-                    p.setSubcategoria(sc);
-                    return p;
-                }).map(produtoRepository::save).map(mapper::toProdutoDetalhesDto).orElseThrow(() -> {
-                    log.info("Subcategoria não encontrada com id {}", dto.idSubcategoria());
-                    return new SubcategoriaNotFoundException(dto.idSubcategoria());
-                });
+            }
+            return categoriaRepository.findById(dto.categoriaId()).map(c -> {
+                p.setNome(dto.nome());
+                p.setDescricao(dto.descricao());
+                p.setValorUnitario(dto.valorUnitario());
+                p.setEstoque(dto.estoque());
+                p.setImageUrl(dto.imageUrl());
+                p.setAtivo(dto.ativo());
+                p.setCategoria(c);
+                if (dto.subcategoriaId() != null)
+                    subcategoriaRepository.findById(dto.subcategoriaId()).ifPresent(p::setSubcategoria);
+                return mapper.toProdutoDetalhesDto(produtoRepository.save(p));
+            }).orElseThrow(() -> {
+                log.info("Categoria não encontrada com id {}", dto.categoriaId());
+                return new CategoriaNotFoundException(dto.categoriaId());
+            });
         }).orElseThrow(() -> {
             log.info("Produto não encontrado com id {}", id);
             return new ProdutoNotFoundException(id);
@@ -117,7 +131,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
     }
 
     /**
-     * Remove um {@linkplain Produto produto} por {@code id}.
+     * Remove um {@linkplain ProdutoEntity produto} por {@code id}.
      * Retorna uma mensagem de confirmação de remoção.
      *
      * @param id o id do produto a ser removido.
@@ -153,7 +167,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
     }
 
     /**
-     * Subtrai {@linkplain Produto produtos} do estoque, dado a lista de {@linkplain ProdutoAtualizarEstoqueDto produtos}.
+     * Subtrai {@linkplain ProdutoEntity produtos} do estoque, dado a lista de {@linkplain ProdutoAtualizarEstoqueDto produtos}.
      *
      * @param dtos a lista de produtos a terem seus estoques subtraídos.
      *
@@ -176,7 +190,7 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
     }
 
     /**
-     * Retorna {@linkplain Produto produtos} ao estoque, dado a lista de {@linkplain ProdutoAtualizarEstoqueDto produtos}.
+     * Retorna {@linkplain ProdutoEntity produtos} ao estoque, dado a lista de {@linkplain ProdutoAtualizarEstoqueDto produtos}.
      *
      * @param dtos a lista de produtos a serem retornados ao estoque.
      *
