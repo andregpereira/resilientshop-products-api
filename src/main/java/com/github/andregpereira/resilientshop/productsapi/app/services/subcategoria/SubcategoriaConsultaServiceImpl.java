@@ -12,10 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
-import static java.util.function.Predicate.not;
-
 /**
  * Classe de serviço de consulta de {@link SubcategoriaEntity}.
  *
@@ -51,13 +47,8 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
      */
     @Override
     public Page<SubcategoriaDto> listar(Pageable pageable) {
-        return Optional.of(repository.findAll(pageable)).filter(not(Page::isEmpty)).map(p -> {
-            log.info("Retornando subcategorias");
-            return p.map(mapper::toSubcategoriaDto);
-        }).orElseThrow(() -> {
-            log.info("Não há subcategorias cadastradas");
-            return new SubcategoriaNotFoundException();
-        });
+        log.info("Retornando subcategorias");
+        return repository.findAll(pageable).map(mapper::toSubcategoriaDto);
     }
 
     /**
@@ -72,10 +63,8 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
      */
     @Override
     public SubcategoriaDetalhesDto consultarPorId(Long id) {
-        return repository.findById(id).map(c -> {
-            log.info("Retornando subcategoria com id {}", id);
-            return mapper.toSubcategoriaDetalhesDto(c);
-        }).orElseThrow(() -> {
+        log.info("Retornando subcategoria com id {}", id);
+        return repository.findById(id).map(mapper::toSubcategoriaDetalhesDto).orElseThrow(() -> {
             log.info("Subcategoria não encontrada com id {}", id);
             return new SubcategoriaNotFoundException(id);
         });

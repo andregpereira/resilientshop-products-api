@@ -7,18 +7,12 @@ import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.Produ
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
-import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
-import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-
-import static java.util.function.Predicate.not;
 
 /**
  * Classe de serviço de consulta de {@link ProdutoEntity}.
@@ -35,25 +29,13 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      * Injeção da dependência {@link ProdutoRepository} para realizar operações de
      * consulta na tabela de produtos no banco de dados.
      */
-    private final ProdutoRepository produtoRepository;
+    private final ProdutoRepository repository;
 
     /**
      * Injeção da dependência {@link ProdutoMapper} para realizar
      * conversões de entidade para DTO de produtos.
      */
     private final ProdutoMapper mapper;
-
-    /**
-     * Injeção da dependência {@link SubcategoriaRepository} para realizar operações de
-     * consulta na tabela de subcategorias no banco de dados.
-     */
-    private final SubcategoriaRepository subcategoriaRepository;
-
-    /**
-     * Injeção da dependência {@link CategoriaRepository} para realizar operações de
-     * consulta na tabela de categorias no banco de dados.
-     */
-    private final CategoriaRepository categoriaRepository;
 
     /**
      * Lista todos os {@linkplain ProdutoEntity produtos} cadastrados.
@@ -67,13 +49,8 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public Page<ProdutoDto> listar(Pageable pageable) {
-        return Optional.of(produtoRepository.findAll(pageable)).filter(not(Page::isEmpty)).map(p -> {
-            log.info("Retornando produtos");
-            return p.map(mapper::toProdutoDto);
-        }).orElseThrow(() -> {
-            log.info("Não há produtos cadastrados");
-            return new ProdutoNotFoundException();
-        });
+        log.info("Retornando produtos");
+        return repository.findAll(pageable).map(mapper::toProdutoDto);
     }
 
     /**
@@ -88,10 +65,8 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public ProdutoDetalhesDto consultarPorId(Long id) {
-        return produtoRepository.findById(id).map(p -> {
-            log.info("Retornando produto com id {}", id);
-            return mapper.toProdutoDetalhesDto(p);
-        }).orElseThrow(() -> {
+        log.info("Retornando produto com id {}", id);
+        return repository.findById(id).map(mapper::toProdutoDetalhesDto).orElseThrow(() -> {
             log.info("Produto não encontrado com id {}", id);
             return new ProdutoNotFoundException(id);
         });
@@ -110,13 +85,8 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
-        return Optional.of(produtoRepository.findByName(nome, pageable)).filter(not(Page::isEmpty)).map(p -> {
-            log.info("Retornando produto com nome {}", nome);
-            return p.map(mapper::toProdutoDto);
-        }).orElseThrow(() -> {
-            log.info("Nenhum produto foi encontrado com o nome {}", nome);
-            return new ProdutoNotFoundException("nome", nome);
-        });
+        log.info("Retornando produtos com nome {}", nome);
+        return repository.findByName(nome, pageable).map(mapper::toProdutoDto);
     }
 
     /**
@@ -133,17 +103,8 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public Page<ProdutoDto> consultarPorSubcategoria(Long id, Pageable pageable) {
-        return subcategoriaRepository.findById(id).map(sc -> Optional.of(
-                produtoRepository.findAllBySubcategoriaId(id, pageable)).filter(not(Page::isEmpty)).map(p -> {
-            log.info("Retornando produtos com subcategoria id {}", id);
-            return p.map(mapper::toProdutoDto);
-        }).orElseThrow(() -> {
-            log.info("Nenhum produto foi encontrado com a subcategoria id {}", id);
-            return new ProdutoNotFoundException("subcategoria", sc.getNome());
-        })).orElseThrow(() -> {
-            log.info("Nenhuma subcategoria foi encontrada com id {}", id);
-            return new SubcategoriaNotFoundException(id);
-        });
+        log.info("Retornando produtos com subcategoria id {}", id);
+        return repository.findAllBySubcategoriaId(id, pageable).map(mapper::toProdutoDto);
     }
 
     /**
@@ -160,17 +121,8 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
      */
     @Override
     public Page<ProdutoDto> consultarPorCategoria(Long id, Pageable pageable) {
-        return categoriaRepository.findById(id).map(c -> Optional.of(
-                produtoRepository.findAllByCategoriaId(id, pageable)).filter(not(Page::isEmpty)).map(p -> {
-            log.info("Retornando produtos com categoria id {}", id);
-            return p.map(mapper::toProdutoDto);
-        }).orElseThrow(() -> {
-            log.info("Nenhum produto foi encontrado com a categoria id {}", id);
-            return new ProdutoNotFoundException("categoria", c.getNome());
-        })).orElseThrow(() -> {
-            log.info("Nenhuma categoria foi encontrada com id {}", id);
-            return new CategoriaNotFoundException(id);
-        });
+        log.info("Retornando produtos com categoria id {}", id);
+        return repository.findAllByCategoriaId(id, pageable).map(mapper::toProdutoDto);
     }
 
 }
