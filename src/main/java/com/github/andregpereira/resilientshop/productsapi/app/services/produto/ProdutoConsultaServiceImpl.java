@@ -50,7 +50,9 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     @Override
     public Page<ProdutoDto> listar(Pageable pageable) {
         log.info("Retornando produtos");
-        return repository.findAll(pageable).map(mapper::toProdutoDto);
+        return repository
+            .findAll(pageable)
+            .map(mapper::toProdutoDto);
     }
 
     /**
@@ -66,10 +68,13 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     @Override
     public ProdutoDetalhesDto consultarPorId(Long id) {
         log.info("Retornando produto com id {}", id);
-        return repository.findById(id).map(mapper::toProdutoDetalhesDto).orElseThrow(() -> {
-            log.info("Produto não encontrado com id {}", id);
-            return new ProdutoNotFoundException(id);
-        });
+        return repository
+            .findById(id)
+            .map(mapper::toProdutoDetalhesDto)
+            .orElseThrow(() -> {
+                log.info("Produto não encontrado com id {}", id);
+                return new ProdutoNotFoundException(id);
+            });
     }
 
     /**
@@ -86,7 +91,9 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     @Override
     public Page<ProdutoDto> consultarPorNome(String nome, Pageable pageable) {
         log.info("Retornando produtos com nome {}", nome);
-        return repository.findByName(nome, pageable).map(mapper::toProdutoDto);
+        return repository
+            .findByName(nome, pageable)
+            .map(mapper::toProdutoDto);
     }
 
     /**
@@ -104,7 +111,9 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     @Override
     public Page<ProdutoDto> consultarPorSubcategoria(Long id, Pageable pageable) {
         log.info("Retornando produtos com subcategoria id {}", id);
-        return repository.findAllBySubcategoriaId(id, pageable).map(mapper::toProdutoDto);
+        return repository
+            .findAllBySubcategoriaId(id, pageable)
+            .map(mapper::toProdutoDto);
     }
 
     /**
@@ -122,7 +131,9 @@ public class ProdutoConsultaServiceImpl implements ProdutoConsultaService {
     @Override
     public Page<ProdutoDto> consultarPorCategoria(Long id, Pageable pageable) {
         log.info("Retornando produtos com categoria id {}", id);
-        return repository.findAllByCategoriaId(id, pageable).map(mapper::toProdutoDto);
+        return repository
+            .findAllByCategoriaId(id, pageable)
+            .map(mapper::toProdutoDto);
     }
 
 }
