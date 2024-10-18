@@ -1,38 +1,35 @@
 package com.github.andregpereira.resilientshop.productsapi.app.services.produto;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoDto;
-import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
-import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
-import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
+import org.assertj.core.api.BDDAssertions;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA;
-import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.PRODUTO;
-import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.PRODUTO_ATUALIZADO;
-import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoDtoConstants.*;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaConstants.SUBCATEGORIA;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.github.andregpereira.resilientshop.productsapi.util.constant.CommonConstants.PAGEABLE_ID;
+import static com.github.andregpereira.resilientshop.productsapi.util.constant.CommonConstants.PAGEABLE_NOME;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.getProdutoDetalhesDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.getProdutoDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.getProdutoEntity;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class ProdutoConsultaServiceTest {
@@ -44,148 +41,185 @@ class ProdutoConsultaServiceTest {
     private ProdutoMapper mapper;
 
     @Mock
-    private ProdutoRepository produtoRepository;
-
-    @Mock
-    private SubcategoriaRepository subcategoriaRepository;
-
-    @Mock
-    private CategoriaRepository categoriaRepository;
+    private ProdutoRepository repository;
 
     @Test
     void listarProdutosExistentesRetornaPageProdutoDto() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        List<ProdutoEntity> listaProdutos = new ArrayList<>();
-        listaProdutos.add(PRODUTO);
-        listaProdutos.add(PRODUTO_ATUALIZADO);
-        Page<ProdutoEntity> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
-        given(produtoRepository.findAll(pageable)).willReturn(pageProdutos);
-        given(mapper.toProdutoDto(PRODUTO)).willReturn(PRODUTO_DTO);
-        given(mapper.toProdutoDto(PRODUTO_ATUALIZADO)).willReturn(PRODUTO_DTO_ATUALIZADO);
-        Page<ProdutoDto> sut = produtoConsultaService.listar(pageable);
-        assertThat(sut).isNotEmpty().hasSize(2);
-        assertThat(sut.getContent().get(0)).isEqualTo(PRODUTO_DTO);
-        assertThat(sut.getContent().get(1)).isEqualTo(PRODUTO_DTO_ATUALIZADO);
+        final var listaProdutos = new ArrayList<ProdutoEntity>();
+        listaProdutos.add(getProdutoEntity());
+        listaProdutos.add(getProdutoEntity());
+        final var pageProdutos = new PageImpl<>(listaProdutos, PAGEABLE_ID, 10);
+        given(repository.findAll(any(Pageable.class))).willReturn(pageProdutos);
+        given(mapper.toProdutoDto(any(ProdutoEntity.class))).willReturn(getProdutoDto());
+//        given(mapper.toProdutoDto(any(ProdutoEntity.class))).willReturn(PRODUTO_DTO_ATUALIZADO);
+
+        final var sut = produtoConsultaService.listar(PAGEABLE_ID);
+
+        BDDAssertions
+            .then(sut)
+            .isNotEmpty()
+            .containsExactlyInAnyOrder(getProdutoDto(), getProdutoDto());
+        then(repository)
+            .should()
+            .findAll(any(Pageable.class));
+        then(mapper)
+            .should(times(2))
+            .toProdutoDto(any(ProdutoEntity.class));
     }
 
     @Test
-    void listarProdutosInexistentesThrowsException() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(produtoRepository.findAll(pageable)).willReturn(Page.empty());
-        assertThatThrownBy(() -> produtoConsultaService.listar(pageable)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Poxa! Ainda não há produtos cadastrados");
+    void listarProdutosInexistentesRetornaEmpty() {
+        given(repository.findAll(any(Pageable.class))).willReturn(Page.empty());
+
+        final var sut = produtoConsultaService.listar(PAGEABLE_ID);
+
+        BDDAssertions
+            .then(sut)
+            .isEmpty();
+        then(repository)
+            .should()
+            .findAll(any(Pageable.class));
+        then(mapper).shouldHaveNoInteractions();
     }
 
     @Test
     void consultarProdutoPorIdExistenteRetornaProdutoDetalhesDto() {
-        given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
-        given(mapper.toProdutoDetalhesDto(PRODUTO)).willReturn(PRODUTO_DETALHES_DTO);
-        ProdutoDetalhesDto sut = produtoConsultaService.consultarPorId(1L);
-        assertThat(sut).isNotNull().isEqualTo(PRODUTO_DETALHES_DTO);
+        final var dto = getProdutoDetalhesDto();
+        given(repository.findById(anyLong())).willReturn(Optional.of(getProdutoEntity()));
+        given(mapper.toProdutoDetalhesDto(any(ProdutoEntity.class))).willReturn(dto);
+
+        final var sut = produtoConsultaService.consultarPorId(1L);
+
+        BDDAssertions
+            .then(sut)
+            .isEqualTo(dto);
+        then(repository)
+            .should()
+            .findById(anyLong());
+        then(mapper)
+            .should()
+            .toProdutoDetalhesDto(any(ProdutoEntity.class));
     }
 
     @Test
     void consultarProdutoPorIdInexistenteThrowsException() {
-        given(produtoRepository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> produtoConsultaService.consultarPorId(10L)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Ops! Nenhum produto foi encontrado com o id 10");
+        given(repository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> produtoConsultaService.consultarPorId(10L);
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(ProdutoNotFoundException.class)
+            .hasMessage("Ops! Nenhum produto foi encontrado com o id 10");
+        then(repository)
+            .should()
+            .findById(anyLong());
+        then(mapper).shouldHaveNoInteractions();
     }
 
     @Test
     void consultarProdutoPorNomeExistenteRetornaProdutoDto() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
-        List<ProdutoEntity> listaProdutos = new ArrayList<>();
-        listaProdutos.add(PRODUTO);
-        listaProdutos.add(PRODUTO_ATUALIZADO);
-        Page<ProdutoEntity> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
-        given(produtoRepository.findByName("nome", pageable)).willReturn(pageProdutos);
-        given(mapper.toProdutoDto(PRODUTO)).willReturn(PRODUTO_DTO);
-        given(mapper.toProdutoDto(PRODUTO_ATUALIZADO)).willReturn(PRODUTO_DTO_ATUALIZADO);
-        Page<ProdutoDto> sut = produtoConsultaService.consultarPorNome("nome", pageable);
-        assertThat(sut).isNotEmpty().hasSize(2);
-        assertThat(sut.getContent().get(0)).isEqualTo(PRODUTO_DTO);
-        assertThat(sut.getContent().get(1)).isEqualTo(PRODUTO_DTO_ATUALIZADO);
+        final var listaProdutos = new ArrayList<ProdutoEntity>();
+        listaProdutos.add(getProdutoEntity());
+        listaProdutos.add(getProdutoEntity());
+        final var pageProdutos = new PageImpl<>(listaProdutos, PAGEABLE_NOME, 10);
+        given(repository.findByName(anyString(), any(Pageable.class))).willReturn(pageProdutos);
+        given(mapper.toProdutoDto(any(ProdutoEntity.class))).willReturn(getProdutoDto());
+//        given(mapper.toProdutoDto(any(ProdutoEntity.class))).willReturn(PRODUTO_DTO_ATUALIZADO);
+
+        final var sut = produtoConsultaService.consultarPorNome("nome", PAGEABLE_NOME);
+
+        BDDAssertions
+            .then(sut)
+            .isNotEmpty()
+            .containsExactlyInAnyOrder(getProdutoDto(), getProdutoDto());
+        then(repository)
+            .should()
+            .findByName(anyString(), any(Pageable.class));
+        then(mapper)
+            .should(times(2))
+            .toProdutoDto(any(ProdutoEntity.class));
     }
 
     @Test
-    void consultarProdutoPorNomeInexistenteThrowsException() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
-        given(produtoRepository.findByName(anyString(), any(Pageable.class))).willReturn(Page.empty());
-        assertThatThrownBy(() -> produtoConsultaService.consultarPorNome("produto", pageable)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Opa! Nenhum produto foi encontrado com o/a nome produto");
+    void consultarProdutoPorNomeInexistenteRetornaEmpty() {
+        given(repository.findByName(anyString(), any(Pageable.class))).willReturn(Page.empty());
+
+        final var sut = produtoConsultaService.consultarPorNome("produto", PAGEABLE_NOME);
+
+        BDDAssertions
+            .then(sut)
+            .isEmpty();
+        then(repository)
+            .should()
+            .findByName(anyString(), any(Pageable.class));
+        then(mapper).shouldHaveNoInteractions();
     }
 
     @Test
     void consultarProdutoPorNomeNuloThrowsException() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "nome");
-        assertThatThrownBy(() -> produtoConsultaService.consultarPorNome(null, pageable)).isInstanceOf(
-                RuntimeException.class);
+        assertThatThrownBy(() -> produtoConsultaService.consultarPorNome(
+            null,
+            PAGEABLE_NOME
+        )).isInstanceOf(RuntimeException.class);
     }
 
     @Test
     void consultarProdutoPorSubcategoriaExistenteRetornaProdutoDto() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        List<ProdutoEntity> listaProdutos = new ArrayList<>();
-        listaProdutos.add(PRODUTO);
-        Page<ProdutoEntity> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
-        given(subcategoriaRepository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA));
-        when(produtoRepository.findAllBySubcategoriaId(1L, pageable)).thenReturn(pageProdutos);
-        given(mapper.toProdutoDto(PRODUTO)).willReturn(PRODUTO_DTO);
-        Page<ProdutoDto> sut = produtoConsultaService.consultarPorSubcategoria(1L, pageable);
-        assertThat(sut).isNotEmpty().hasSize(1);
-        assertThat(sut.getContent().get(0)).isEqualTo(PRODUTO_DTO);
+        final var listaProdutos = new ArrayList<ProdutoEntity>();
+        listaProdutos.add(getProdutoEntity());
+        final var pageProdutos = new PageImpl<>(listaProdutos, PAGEABLE_ID, 10);
+        given(repository.findAllBySubcategoriaId(anyLong(), any(Pageable.class))).willReturn(pageProdutos);
+        given(mapper.toProdutoDto(any(ProdutoEntity.class))).willReturn(getProdutoDto());
+
+        final var sut = produtoConsultaService.consultarPorSubcategoria(1L, PAGEABLE_ID);
+
+        BDDAssertions
+            .then(sut)
+            .isNotEmpty()
+            .containsExactlyInAnyOrder(getProdutoDto());
+        then(repository)
+            .should()
+            .findAllBySubcategoriaId(anyLong(), any(Pageable.class));
+        then(mapper)
+            .should()
+            .toProdutoDto(any(ProdutoEntity.class));
     }
 
     @Test
-    void consultarProdutoPorSubcategoriaInexistenteThrowsException() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(subcategoriaRepository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> produtoConsultaService.consultarPorSubcategoria(10L, pageable)).isInstanceOf(
-                SubcategoriaNotFoundException.class).hasMessage("Ops! Nenhuma subcategoria foi encontrada com o id 10");
-    }
+    void consultarProdutoPorSubcategoriaInexistenteRetornaEmpty() {
+        given(repository.findAllBySubcategoriaId(anyLong(), any(Pageable.class))).willReturn(Page.empty());
 
-    @Test
-    void consultarProdutoInexistentePorSubcategoriaExistenteThrowsException() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(subcategoriaRepository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA));
-        given(produtoRepository.findAllBySubcategoriaId(1L, pageable)).willReturn(Page.empty());
-        assertThatThrownBy(() -> produtoConsultaService.consultarPorSubcategoria(1L, pageable)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage(
-                MessageFormat.format("Opa! Nenhum produto foi encontrado com o/a subcategoria {0}",
-                        SUBCATEGORIA.getNome()));
+        final var sut = produtoConsultaService.consultarPorSubcategoria(1L, PAGEABLE_ID);
+
+        BDDAssertions
+            .then(sut)
+            .isEmpty();
+        then(repository)
+            .should()
+            .findAllBySubcategoriaId(anyLong(), any(Pageable.class));
+        then(mapper).shouldHaveNoInteractions();
     }
 
     @Test
     void consultarProdutoPorCategoriaExistenteRetornaProdutoDto() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        List<ProdutoEntity> listaProdutos = new ArrayList<>();
-        listaProdutos.add(PRODUTO);
-        Page<ProdutoEntity> pageProdutos = new PageImpl<>(listaProdutos, pageable, 10);
-        given(categoriaRepository.findById(1L)).willReturn(Optional.of(CATEGORIA));
-        when(produtoRepository.findAllByCategoriaId(1L, pageable)).thenReturn(pageProdutos);
-        given(mapper.toProdutoDto(PRODUTO)).willReturn(PRODUTO_DTO);
-        Page<ProdutoDto> sut = produtoConsultaService.consultarPorCategoria(1L, pageable);
-        assertThat(sut).isNotEmpty().hasSize(1);
-        assertThat(sut.getContent().get(0)).isEqualTo(PRODUTO_DTO);
-    }
+        final var listaProdutos = new ArrayList<ProdutoEntity>();
+        listaProdutos.add(getProdutoEntity());
+        final var pageProdutos = new PageImpl<>(listaProdutos, PAGEABLE_ID, 10);
+        given(repository.findAllByCategoriaId(anyLong(), any(Pageable.class))).willReturn(pageProdutos);
+        given(mapper.toProdutoDto(any(ProdutoEntity.class))).willReturn(getProdutoDto());
 
-    @Test
-    void consultarProdutoPorCategoriaInexistenteThrowsException() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(categoriaRepository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> produtoConsultaService.consultarPorCategoria(10L, pageable)).isInstanceOf(
-                CategoriaNotFoundException.class).hasMessage("Ops! Nenhuma categoria foi encontrada com o id 10");
-    }
+        final var sut = produtoConsultaService.consultarPorCategoria(1L, PAGEABLE_ID);
 
-    @Test
-    void consultarProdutoInexistentePorCategoriaExistenteThrowsException() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(categoriaRepository.findById(1L)).willReturn(Optional.of(CATEGORIA));
-        given(produtoRepository.findAllByCategoriaId(1L, pageable)).willReturn(Page.empty());
-        assertThatThrownBy(() -> produtoConsultaService.consultarPorCategoria(1L, pageable)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage(
-                MessageFormat.format("Opa! Nenhum produto foi encontrado com o/a categoria {0}", CATEGORIA.getNome()));
+        BDDAssertions
+            .then(sut)
+            .isNotEmpty()
+            .containsExactlyInAnyOrder(getProdutoDto());
+        then(repository)
+            .should()
+            .findAllByCategoriaId(anyLong(), any(Pageable.class));
+        then(mapper)
+            .should()
+            .toProdutoDto(any(ProdutoEntity.class));
     }
 
 }
-

@@ -5,10 +5,11 @@ import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.Produt
 import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
-import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants.ComponentModel;
-import org.mapstruct.ReportingPolicy;
+
+import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
+import static org.mapstruct.ReportingPolicy.IGNORE;
 
 /**
  * Interface mapper de {@link ProdutoEntity}, {@link ProdutoDto} e {@link ProdutoDetalhesDto}.
@@ -16,8 +17,12 @@ import org.mapstruct.ReportingPolicy;
  * @author André Garcia
  * @see SubcategoriaMapper
  */
-@Mapper(componentModel = ComponentModel.SPRING, uses = SubcategoriaMapper.class,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+    componentModel = SPRING,
+    uses = {CategoriaMapper.class, SubcategoriaMapper.class},
+    injectionStrategy = CONSTRUCTOR,
+    unmappedTargetPolicy = IGNORE
+)
 public interface ProdutoMapper {
 
     ProdutoEntity toProduto(ProdutoRegistroDto dto);

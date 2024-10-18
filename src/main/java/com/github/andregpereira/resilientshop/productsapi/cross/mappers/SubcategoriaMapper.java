@@ -4,10 +4,11 @@ import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.S
 import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.SubcategoriaEntity;
-import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants.ComponentModel;
-import org.mapstruct.ReportingPolicy;
+
+import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
+import static org.mapstruct.ReportingPolicy.IGNORE;
 
 /**
  * Interface mapper de {@link SubcategoriaEntity}, {@link SubcategoriaDto} e {@link SubcategoriaDetalhesDto}.
@@ -15,8 +16,12 @@ import org.mapstruct.ReportingPolicy;
  * @author André Garcia
  * @see CategoriaMapper
  */
-@Mapper(componentModel = ComponentModel.SPRING, uses = CategoriaMapper.class,
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+    componentModel = SPRING,
+    uses = CategoriaMapper.class,
+    injectionStrategy = CONSTRUCTOR,
+    unmappedTargetPolicy = IGNORE
+)
 public interface SubcategoriaMapper {
 
     SubcategoriaEntity toSubcategoria(SubcategoriaRegistroDto dto);

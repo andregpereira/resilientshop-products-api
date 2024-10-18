@@ -1,12 +1,17 @@
 package com.github.andregpereira.resilientshop.productsapi.app.services.produto;
 
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoAtualizacaoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoRegistroDto;
+import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.ProdutoNotFoundException;
-import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.ProdutoMapper;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
+import org.assertj.core.api.BDDAssertions;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,14 +20,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.text.MessageFormat;
 import java.util.Optional;
+import java.util.Set;
 
-import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.*;
-import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoDtoConstants.*;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaConstants.SUBCATEGORIA;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaConstants.SUBCATEGORIA_ATUALIZADA;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.CategoriaMockFactory.getCategoriaEntity;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.getProdutoAtualizacaoDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.getProdutoAtualizarEstoqueDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.getProdutoDetalhesDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.getProdutoEntity;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.getProdutoRegistroDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.jsonInvalido;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.SubcategoriaMockFactory.getSubcategoriaEntity;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.anyLong;
+import static org.mockito.BDDMockito.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.never;
+import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 class ProdutoManutencaoServiceTest {
@@ -39,121 +53,391 @@ class ProdutoManutencaoServiceTest {
     @Mock
     private SubcategoriaRepository subcategoriaRepository;
 
+    @Mock
+    private CategoriaRepository categoriaRepository;
+
     @Test
     void criarProdutoComDadosValidosRetornaProdutoDetalhesDto() {
-        given(produtoRepository.existsBySku(PRODUTO_REGISTRO_DTO.sku())).willReturn(false);
-        given(produtoRepository.existsByNome(PRODUTO_REGISTRO_DTO.nome())).willReturn(false);
-        given(mapper.toProduto(PRODUTO_REGISTRO_DTO)).willReturn(PRODUTO_LOCAL_DATE_TIME_FIXADO);
-        given(subcategoriaRepository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA));
-        given(produtoRepository.save(PRODUTO_LOCAL_DATE_TIME_FIXADO)).willReturn(PRODUTO_LOCAL_DATE_TIME_FIXADO);
-        given(mapper.toProdutoDetalhesDto(PRODUTO_LOCAL_DATE_TIME_FIXADO)).willReturn(
-                PRODUTO_DETALHES_DTO_LOCAL_DATE_TIME_FIXADO);
-        assertThat(manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isEqualTo(
-                PRODUTO_DETALHES_DTO_LOCAL_DATE_TIME_FIXADO);
-        then(produtoRepository).should().save(PRODUTO_LOCAL_DATE_TIME_FIXADO);
+        given(produtoRepository.existsBySku(anyLong())).willReturn(false);
+        given(produtoRepository.existsByNome(anyString())).willReturn(false);
+        given(mapper.toProduto(any(ProdutoRegistroDto.class))).willReturn(getProdutoEntity());
+        given(categoriaRepository.findById(anyLong())).willReturn(Optional.of(getCategoriaEntity()));
+        given(subcategoriaRepository.findById(anyLong())).willReturn(Optional.of(getSubcategoriaEntity()));
+        given(produtoRepository.save(any(ProdutoEntity.class))).willReturn(getProdutoEntity());
+        given(mapper.toProdutoDetalhesDto(any(ProdutoEntity.class))).willReturn(getProdutoDetalhesDto());
+
+        final var sut = manutencaoService.criar(getProdutoRegistroDto());
+
+        BDDAssertions
+            .then(sut)
+            .isEqualTo(getProdutoDetalhesDto());
+        then(produtoRepository)
+            .should()
+            .save(any(ProdutoEntity.class));
+    }
+
+    @Test
+    void criarProdutoComDadosValidosSemSubcategoriaRetornaProdutoDetalhesDto() {
+        final var mock = getProdutoRegistroDto();
+        final var dto = new ProdutoRegistroDto(
+            mock.sku(),
+            mock.nome(),
+            mock.descricao(),
+            mock.valorUnitario(),
+            mock.estoque(),
+            mock.imageUrl(),
+            mock.categoriaId(),
+            null
+        );
+        given(produtoRepository.existsBySku(anyLong())).willReturn(false);
+        given(produtoRepository.existsByNome(anyString())).willReturn(false);
+        given(mapper.toProduto(any(ProdutoRegistroDto.class))).willReturn(getProdutoEntity());
+        given(categoriaRepository.findById(anyLong())).willReturn(Optional.of(getCategoriaEntity()));
+        given(produtoRepository.save(any(ProdutoEntity.class))).willReturn(getProdutoEntity());
+        given(mapper.toProdutoDetalhesDto(any(ProdutoEntity.class))).willReturn(getProdutoDetalhesDto());
+
+        final var sut = manutencaoService.criar(dto);
+
+        BDDAssertions
+            .then(sut)
+            .isEqualTo(getProdutoDetalhesDto());
+        then(produtoRepository)
+            .should()
+            .existsBySku(anyLong());
+        then(produtoRepository)
+            .should()
+            .existsByNome(anyString());
+        then(mapper)
+            .should()
+            .toProduto(any(ProdutoRegistroDto.class));
+        then(categoriaRepository)
+            .should()
+            .findById(anyLong());
+        then(produtoRepository)
+            .should()
+            .save(any(ProdutoEntity.class));
+        then(mapper)
+            .should()
+            .toProdutoDetalhesDto(any(ProdutoEntity.class));
+        then(subcategoriaRepository).shouldHaveNoInteractions();
     }
 
     @Test
     void criarProdutoComDadosInvalidosThrowsException() {
-        assertThatThrownBy(() -> manutencaoService.criar(PRODUTO_REGISTRO_DTO_INVALIDO)).isInstanceOf(
-                RuntimeException.class);
-        then(produtoRepository).should(never()).save(PRODUTO);
+        final ThrowingCallable sut = () -> manutencaoService.criar((ProdutoRegistroDto) jsonInvalido());
+
+        assertThatThrownBy(sut).isInstanceOf(RuntimeException.class);
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
     }
 
     @Test
     void criarProdutoComSkuExistenteThrowsException() {
-        given(produtoRepository.existsBySku(PRODUTO_REGISTRO_DTO.sku())).willReturn(true);
-        assertThatThrownBy(() -> manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
-                ProdutoAlreadyExistsException.class).hasMessage(
-                MessageFormat.format("Opa! Já existe um produto cadastrado com o SKU {0}",
-                        PRODUTO_REGISTRO_DTO.sku().toString().replace(".", "")));
-        then(produtoRepository).should(never()).save(PRODUTO);
+        final var dto = getProdutoRegistroDto();
+        given(produtoRepository.existsBySku(anyLong())).willReturn(true);
+
+        final ThrowingCallable sut = () -> manutencaoService.criar(dto);
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(ProdutoAlreadyExistsException.class)
+            .hasMessage(MessageFormat.format(
+                "Opa! Já existe um produto cadastrado com o SKU {0}",
+                dto
+                    .sku()
+                    .toString()
+                    .replace(".", "")
+            ));
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
     }
 
     @Test
     void criarProdutoComNomeExistenteThrowsException() {
-        given(produtoRepository.existsBySku(PRODUTO_REGISTRO_DTO.sku())).willReturn(false);
-        given(produtoRepository.existsByNome(PRODUTO_REGISTRO_DTO.nome())).willReturn(true);
-        assertThatThrownBy(() -> manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
-                ProdutoAlreadyExistsException.class).hasMessage(
-                MessageFormat.format("Opa! Já existe um produto cadastrado com o nome {0}",
-                        PRODUTO_REGISTRO_DTO.nome()));
-        then(produtoRepository).should(never()).save(PRODUTO);
+        final var dto = getProdutoRegistroDto();
+        given(produtoRepository.existsBySku(anyLong())).willReturn(false);
+        given(produtoRepository.existsByNome(anyString())).willReturn(true);
+
+        final ThrowingCallable sut = () -> manutencaoService.criar(dto);
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(ProdutoAlreadyExistsException.class)
+            .hasMessage(MessageFormat.format("Opa! Já existe um produto cadastrado com o nome {0}", dto.nome()));
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
     }
 
     @Test
-    void criarProdutoComIdSubcategoriaInexistenteThrowsException() {
-        given(produtoRepository.existsBySku(PRODUTO_REGISTRO_DTO.sku())).willReturn(false);
-        given(produtoRepository.existsByNome(PRODUTO_REGISTRO_DTO.nome())).willReturn(false);
-        given(subcategoriaRepository.findById(1L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> manutencaoService.criar(PRODUTO_REGISTRO_DTO)).isInstanceOf(
-                SubcategoriaNotFoundException.class).hasMessage(
-                MessageFormat.format("Ops! Nenhuma subcategoria foi encontrada com o id {0}",
-                        PRODUTO_REGISTRO_DTO.subcategoriaId()));
-        then(produtoRepository).should(never()).save(PRODUTO);
+    void criarProdutoComIdCategoriaInexistenteThrowsException() {
+        final var dto = getProdutoRegistroDto();
+        given(produtoRepository.existsBySku(anyLong())).willReturn(false);
+        given(produtoRepository.existsByNome(anyString())).willReturn(false);
+        given(categoriaRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> manutencaoService.criar(dto);
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(CategoriaNotFoundException.class)
+            .hasMessage(MessageFormat.format(
+                "Ops! Nenhuma categoria foi encontrada com o id {0}",
+                dto.subcategoriaId()
+            ));
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
     }
 
     @Test
     void atualizarProdutoComDadosValidosRetornaProdutoDetalhesDto() {
-        given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
-        given(produtoRepository.existsByNome(PRODUTO_ATUALIZACAO_DTO.nome())).willReturn(false);
-        given(subcategoriaRepository.findById(2L)).willReturn(Optional.of(SUBCATEGORIA_ATUALIZADA));
-        given(produtoRepository.save(PRODUTO_ATUALIZADO)).willReturn(PRODUTO_ATUALIZADO);
-        given(mapper.toProdutoDetalhesDto(PRODUTO_ATUALIZADO)).willReturn(PRODUTO_DETALHES_DTO_ATUALIZADO);
-        assertThat(manutencaoService.atualizar(1L, PRODUTO_ATUALIZACAO_DTO)).isEqualTo(PRODUTO_DETALHES_DTO_ATUALIZADO);
-        then(produtoRepository).should().save(PRODUTO_ATUALIZADO);
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.of(getProdutoEntity()));
+        given(produtoRepository.existsByNome(anyString())).willReturn(false);
+        given(categoriaRepository.findById(anyLong())).willReturn(Optional.of(getCategoriaEntity()));
+        given(subcategoriaRepository.findById(anyLong())).willReturn(Optional.of(getSubcategoriaEntity()));
+        given(produtoRepository.save(any(ProdutoEntity.class))).willReturn(getProdutoEntity());
+        given(mapper.toProdutoDetalhesDto(any(ProdutoEntity.class))).willReturn(getProdutoDetalhesDto());
+
+        final var sut = manutencaoService.atualizar(1L, getProdutoAtualizacaoDto());
+
+        BDDAssertions
+            .then(sut)
+            .isEqualTo(getProdutoDetalhesDto());
+        then(produtoRepository)
+            .should()
+            .save(any(ProdutoEntity.class));
+    }
+
+    @Test
+    void atualizarProdutoComDadosValidosSemSubcategoriaRetornaProdutoDetalhesDto() {
+        final var mock = getProdutoAtualizacaoDto();
+        final var dto = new ProdutoAtualizacaoDto(
+            mock.nome(),
+            mock.descricao(),
+            mock.valorUnitario(),
+            mock.estoque(),
+            mock.imageUrl(),
+            mock.ativo(),
+            mock.categoriaId(),
+            null
+        );
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.of(getProdutoEntity()));
+        given(produtoRepository.existsByNome(anyString())).willReturn(false);
+        given(categoriaRepository.findById(anyLong())).willReturn(Optional.of(getCategoriaEntity()));
+        given(produtoRepository.save(any(ProdutoEntity.class))).willReturn(getProdutoEntity());
+        given(mapper.toProdutoDetalhesDto(any(ProdutoEntity.class))).willReturn(getProdutoDetalhesDto());
+
+        final var sut = manutencaoService.atualizar(1L, dto);
+
+        BDDAssertions
+            .then(sut)
+            .isEqualTo(getProdutoDetalhesDto());
+        then(produtoRepository)
+            .should()
+            .findById(anyLong());
+        then(produtoRepository)
+            .should()
+            .existsByNome(anyString());
+        then(categoriaRepository)
+            .should()
+            .findById(anyLong());
+        then(produtoRepository)
+            .should()
+            .save(any(ProdutoEntity.class));
+        then(mapper)
+            .should()
+            .toProdutoDetalhesDto(any(ProdutoEntity.class));
+        then(subcategoriaRepository).shouldHaveNoInteractions();
     }
 
     @Test
     void atualizarProdutoComDadosInvalidosThrowsException() {
-        assertThatThrownBy(() -> manutencaoService.atualizar(10L, PRODUTO_ATUALIZACAO_DTO_INVALIDO)).isInstanceOf(
-                RuntimeException.class);
-        then(produtoRepository).should(never()).save(PRODUTO_ATUALIZADO);
+        final ThrowingCallable sut = () -> manutencaoService.atualizar(10L, (ProdutoAtualizacaoDto) jsonInvalido());
+
+        assertThatThrownBy(sut).isInstanceOf(RuntimeException.class);
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
     }
 
     @Test
     void atualizarProdutoComIdInexistenteThrowsException() {
-        given(produtoRepository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> manutencaoService.atualizar(10L, PRODUTO_ATUALIZACAO_DTO)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Ops! Nenhum produto foi encontrado com o id 10");
-        then(produtoRepository).should(never()).save(PRODUTO_ATUALIZADO);
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> manutencaoService.atualizar(10L, getProdutoAtualizacaoDto());
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(ProdutoNotFoundException.class)
+            .hasMessage("Ops! Nenhum produto foi encontrado com o id 10");
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
     }
 
     @Test
     void atualizarProdutoComNomeExistenteThrowsException() {
-        given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
-        given(produtoRepository.existsByNome(PRODUTO_ATUALIZACAO_DTO.nome())).willReturn(true);
-        assertThatThrownBy(() -> manutencaoService.atualizar(1L, PRODUTO_ATUALIZACAO_DTO)).isInstanceOf(
-                ProdutoAlreadyExistsException.class).hasMessage(
-                MessageFormat.format("Opa! Já existe um produto cadastrado com o nome {0}",
-                        PRODUTO_ATUALIZACAO_DTO.nome()));
-        then(produtoRepository).should(never()).save(PRODUTO_ATUALIZADO);
+        final var produto = getProdutoEntity();
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.of(produto));
+        given(produtoRepository.existsByNome(anyString())).willReturn(true);
+
+        final ThrowingCallable sut = () -> manutencaoService.atualizar(1L, getProdutoAtualizacaoDto());
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(ProdutoAlreadyExistsException.class)
+            .hasMessage(MessageFormat.format("Opa! Já existe um produto cadastrado com o nome {0}", produto.getNome()));
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
     }
 
     @Test
-    void atualizarProdutoComIdSubcategoriaInexistenteThrowsException() {
-        given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
-        given(produtoRepository.existsByNome(PRODUTO_ATUALIZACAO_DTO.nome())).willReturn(false);
-        given(subcategoriaRepository.findById(2L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> manutencaoService.atualizar(1L, PRODUTO_ATUALIZACAO_DTO)).isInstanceOf(
-                SubcategoriaNotFoundException.class).hasMessage("Ops! Nenhuma subcategoria foi encontrada com o id 2");
-        then(produtoRepository).should(never()).save(PRODUTO_ATUALIZADO);
+    void atualizarProdutoComIdCategoriaInexistenteThrowsException() {
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.of(getProdutoEntity()));
+        given(produtoRepository.existsByNome(anyString())).willReturn(false);
+        given(categoriaRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> manutencaoService.atualizar(1L, getProdutoAtualizacaoDto());
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(CategoriaNotFoundException.class)
+            .hasMessage("Ops! Nenhuma categoria foi encontrada com o id 1");
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
     }
 
     @Test
-    void removerProdutoComIdExistenteRetornaString() {
-        given(produtoRepository.findById(1L)).willReturn(Optional.of(PRODUTO));
-        assertThat(manutencaoService.desativar(1L)).isEqualTo("Produto com id 1 desativado com sucesso");
-        then(produtoRepository).should().findById(1L);
-        then(produtoRepository).should().save(PRODUTO);
+    void desativarProdutoComIdExistenteRetornaString() {
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.of(getProdutoEntity()));
+
+        final var sut = manutencaoService.desativar(1L);
+
+        BDDAssertions
+            .then(sut)
+            .isEqualTo("Produto com id 1 desativado com sucesso");
+        then(produtoRepository)
+            .should()
+            .findById(anyLong());
+        then(produtoRepository)
+            .should()
+            .save(any(ProdutoEntity.class));
     }
 
     @Test
-    void removerProdutoComIdInexistenteThrowsException() {
-        given(produtoRepository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> manutencaoService.desativar(10L)).isInstanceOf(
-                ProdutoNotFoundException.class).hasMessage("Ops! Não foi encontrado um produto ativo com o id 10");
-        then(produtoRepository).should(never()).save(any(ProdutoEntity.class));
+    void desativarProdutoComIdInexistenteThrowsException() {
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> manutencaoService.desativar(10L);
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(ProdutoNotFoundException.class)
+            .hasMessage("Ops! Não foi encontrado um produto ativo com o id 10");
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
+    }
+
+    @Test
+    void reativarProdutoComIdExistenteRetornaString() {
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.of(getProdutoEntity()));
+
+        final var sut = manutencaoService.reativar(1L);
+
+        BDDAssertions
+            .then(sut)
+            .isEqualTo("Produto com id 1 reativado com sucesso");
+        then(produtoRepository)
+            .should()
+            .findById(anyLong());
+        then(produtoRepository)
+            .should()
+            .save(any(ProdutoEntity.class));
+    }
+
+    @Test
+    void reativarProdutoComIdInexistenteThrowsException() {
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> manutencaoService.reativar(10L);
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(ProdutoNotFoundException.class)
+            .hasMessage("Ops! Não foi encontrado um produto inativo com o id 10");
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
+    }
+
+    @Test
+    void subtrairProdutosComIdsExistentes() {
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.of(getProdutoEntity()));
+
+        manutencaoService.subtrairEstoque(Set.of(getProdutoAtualizarEstoqueDto()));
+
+        then(produtoRepository)
+            .should()
+            .findById(anyLong());
+        then(produtoRepository)
+            .should()
+            .save(any(ProdutoEntity.class));
+    }
+
+    @Test
+    void subtrairProdutosComIdsInexistentesThrowsException() {
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> manutencaoService.subtrairEstoque(Set.of(getProdutoAtualizarEstoqueDto()));
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(ProdutoNotFoundException.class)
+            .hasMessage("Ops! Nenhum produto foi encontrado com o id 1");
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
+    }
+
+    @Test
+    void subtrairProdutosComEstoqueInsuficienteThrowsException() {
+        final var produto = getProdutoEntity();
+        produto.setEstoque(0);
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.of(produto));
+
+        final ThrowingCallable sut = () -> manutencaoService.subtrairEstoque(Set.of(getProdutoAtualizarEstoqueDto()));
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(ProdutoNotFoundException.class)
+            .hasMessage(MessageFormat.format("Ops! O produto {0} não possui estoque suficiente", produto.getNome()));
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
+    }
+
+    @Test
+    void retornarProdutosComIdsExistentes() {
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.of(getProdutoEntity()));
+
+        manutencaoService.retornarEstoque(Set.of(getProdutoAtualizarEstoqueDto()));
+
+        then(produtoRepository)
+            .should()
+            .findById(anyLong());
+        then(produtoRepository)
+            .should()
+            .save(any(ProdutoEntity.class));
+    }
+
+    @Test
+    void retornarProdutosComIdsInexistentesThrowsException() {
+        given(produtoRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> manutencaoService.retornarEstoque(Set.of(getProdutoAtualizarEstoqueDto()));
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(ProdutoNotFoundException.class)
+            .hasMessage("Ops! Nenhum produto foi encontrado com o id 1");
+        then(produtoRepository)
+            .should(never())
+            .save(any(ProdutoEntity.class));
     }
 
 }
