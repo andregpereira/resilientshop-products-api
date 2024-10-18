@@ -1,5 +1,6 @@
 package com.github.andregpereira.resilientshop.productsapi.cross.mappers;
 
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.SubcategoriaEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,11 +9,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ContextConfiguration;
 
-import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA;
-import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaDtoConstants.CATEGORIA_DTO;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaConstants.SUBCATEGORIA;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaDtoConstants.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.CategoriaMockFactory.getCategoriaDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.SubcategoriaMockFactory.getSubcategoriaDetalhesDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.SubcategoriaMockFactory.getSubcategoriaDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.SubcategoriaMockFactory.getSubcategoriaEntity;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.SubcategoriaMockFactory.getSubcategoriaRegistroDto;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,34 +30,35 @@ class SubcategoriaMapperTest {
 
     @Test
     void subcategoriaRegistroDtoRetornaSubcategoria() {
-        assertThat(subcategoriaMapper.toSubcategoria(SUBCATEGORIA_REGISTRO_DTO)).isNotNull().isExactlyInstanceOf(
-                SubcategoriaEntity.class);
+        then(subcategoriaMapper.toSubcategoria(getSubcategoriaRegistroDto()))
+            .isNotNull()
+            .isExactlyInstanceOf(SubcategoriaEntity.class);
     }
 
     @Test
     void subcategoriaRegistroDtoNuloRetornaNull() {
-        assertThat(subcategoriaMapper.toSubcategoria(null)).isNotEqualTo(SUBCATEGORIA);
+        then(subcategoriaMapper.toSubcategoria(null)).isNull();
     }
 
     @Test
     void subcategoriaRetornaSubcategoriaDto() {
-        assertThat(subcategoriaMapper.toSubcategoriaDto(SUBCATEGORIA)).isEqualTo(SUBCATEGORIA_DTO);
+        then(subcategoriaMapper.toSubcategoriaDto(getSubcategoriaEntity())).isEqualTo(getSubcategoriaDto());
     }
 
     @Test
     void subcategoriaRetornaSubcategoriaDetalhesDto() {
-        given(categoriaMapper.toCategoriaDto(CATEGORIA)).willReturn(CATEGORIA_DTO);
-        assertThat(subcategoriaMapper.toSubcategoriaDetalhesDto(SUBCATEGORIA)).isEqualTo(SUBCATEGORIA_DETALHES_DTO);
+        given(categoriaMapper.toCategoriaDto(any(CategoriaEntity.class))).willReturn(getCategoriaDto());
+        then(subcategoriaMapper.toSubcategoriaDetalhesDto(getSubcategoriaEntity())).isEqualTo(getSubcategoriaDetalhesDto());
     }
 
     @Test
     void subcategoriaNuloRetornaSubcategoriaDtoNull() {
-        assertThat(subcategoriaMapper.toSubcategoriaDto(null)).isNotEqualTo(SUBCATEGORIA_DTO);
+        then(subcategoriaMapper.toSubcategoriaDto(null)).isNull();
     }
 
     @Test
     void subcategoriaNuloRetornaSubcategoriaDetalhesDtoNull() {
-        assertThat(subcategoriaMapper.toSubcategoriaDetalhesDto(null)).isNotEqualTo(SUBCATEGORIA_DETALHES_DTO);
+        then(subcategoriaMapper.toSubcategoriaDetalhesDto(null)).isNull();
     }
 
 }

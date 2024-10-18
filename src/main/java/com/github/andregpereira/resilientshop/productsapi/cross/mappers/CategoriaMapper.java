@@ -4,8 +4,9 @@ import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.Cate
 import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants.ComponentModel;
-import org.mapstruct.ReportingPolicy;
+
+import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
+import static org.mapstruct.ReportingPolicy.IGNORE;
 
 /**
  * Interface mapper de {@link CategoriaEntity} e {@link CategoriaDto}.
@@ -13,7 +14,7 @@ import org.mapstruct.ReportingPolicy;
  * @author André Garcia
  * @see CategoriaMapper
  */
-@Mapper(componentModel = ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = SPRING, unmappedTargetPolicy = IGNORE)
 public interface CategoriaMapper {
 
     CategoriaEntity toCategoria(CategoriaRegistroDto dto);

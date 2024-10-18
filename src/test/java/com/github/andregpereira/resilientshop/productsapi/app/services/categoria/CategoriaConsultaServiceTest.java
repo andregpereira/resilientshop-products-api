@@ -1,10 +1,12 @@
 package com.github.andregpereira.resilientshop.productsapi.app.services.categoria;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapper;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
+import com.github.andregpereira.resilientshop.productsapi.util.mock.factory.CategoriaMockFactory;
+import org.assertj.core.api.BDDAssertions;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,17 +14,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA;
-import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaDtoConstants.CATEGORIA_DTO;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.github.andregpereira.resilientshop.productsapi.util.constant.CommonConstants.PAGEABLE_ID;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.CategoriaMockFactory.getCategoriaDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.CategoriaMockFactory.getCategoriaEntity;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.CategoriaMockFactory.getPageIdCategorias;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -30,7 +33,7 @@ import static org.mockito.BDDMockito.then;
 class CategoriaConsultaServiceTest {
 
     @InjectMocks
-    private CategoriaConsultaServiceImpl consultaService;
+    private CategoriaConsultaServiceImpl service;
 
     @Mock
     private CategoriaMapper mapper;
@@ -40,40 +43,73 @@ class CategoriaConsultaServiceTest {
 
     @Test
     void consultarCategoriaPorIdExistenteRetornaCategoriaDto() {
-        given(repository.findById(1L)).willReturn(Optional.of(CATEGORIA));
-        given(mapper.toCategoriaDto(CATEGORIA)).willReturn(CATEGORIA_DTO);
-        CategoriaDto sut = consultaService.consultarPorId(1L);
-        assertThat(sut).isNotNull().isEqualTo(CATEGORIA_DTO);
-        then(repository).should().findById(1L);
+        given(repository.findById(anyLong())).willReturn(Optional.of(getCategoriaEntity()));
+        given(mapper.toCategoriaDto(any(CategoriaEntity.class))).willReturn(getCategoriaDto());
+
+        final var sut = service.consultarPorId(1L);
+
+        BDDAssertions
+            .then(sut)
+            .isNotNull()
+            .isEqualTo(getCategoriaDto());
+        then(repository)
+            .should()
+            .findById(anyLong());
+        then(mapper)
+            .should()
+            .toCategoriaDto(any(CategoriaEntity.class));
     }
 
     @Test
     void consultarCategoriaPorIdInexistenteThrowsException() {
-        given(repository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> consultaService.consultarPorId(10L)).isInstanceOf(
-                CategoriaNotFoundException.class).hasMessage("Ops! Nenhuma categoria foi encontrada com o id 10");
+        given(repository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> service.consultarPorId(10L);
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(CategoriaNotFoundException.class)
+            .hasMessage("Ops! Nenhuma categoria foi encontrada com o id 10");
+        then(repository)
+            .should()
+            .findById(anyLong());
+        then(mapper).shouldHaveNoInteractions();
     }
 
     @Test
     void listarCategoriasExistentesRetornaPageCategoriaDto() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        List<CategoriaEntity> listaCategorias = new ArrayList<>();
-        listaCategorias.add(CATEGORIA);
-        Page<CategoriaEntity> pageCategorias = new PageImpl<>(listaCategorias, pageable, 10);
-        given(repository.findAll(pageable)).willReturn(pageCategorias);
-        given(mapper.toCategoriaDto(CATEGORIA)).willReturn(CATEGORIA_DTO);
-        Page<CategoriaDto> sut = consultaService.listar(pageable);
-        assertThat(sut).isNotEmpty().hasSize(1);
-        assertThat(sut.getContent().get(0)).isEqualTo(CATEGORIA_DTO);
-        then(repository).should().findAll(pageable);
+        final var listaCategorias = new ArrayList<CategoriaEntity>();
+        listaCategorias.add(getCategoriaEntity());
+        final var pageCategorias = new PageImpl<>(listaCategorias, PAGEABLE_ID, 10);
+        given(repository.findAll(any(Pageable.class))).willReturn(pageCategorias);
+        given(mapper.toCategoriaDto(any(CategoriaEntity.class))).willReturn(getCategoriaDto());
+
+        final var sut = service.listar(PAGEABLE_ID);
+
+        BDDAssertions
+            .then(sut)
+            .isNotEmpty()
+            .containsExactlyInAnyOrder(getCategoriaDto());
+        then(repository)
+            .should()
+            .findAll(any(Pageable.class));
+        then(mapper)
+            .should()
+            .toCategoriaDto(any(CategoriaEntity.class));
     }
 
     @Test
-    void listarCategoriasInexistentesThrowsException() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(repository.findAll(pageable)).willReturn(Page.empty());
-        assertThatThrownBy(() -> consultaService.listar(pageable)).isInstanceOf(
-                CategoriaNotFoundException.class).hasMessage("Poxa! Ainda não há categorias cadastradas");
+    void listar_CategoriasInexistentes_RetornaPageVazia() {
+        given(repository.findAll(any(Pageable.class))).willReturn(Page.empty());
+
+        final var sut = service.listar(PAGEABLE_ID);
+
+        BDDAssertions
+            .then(sut)
+            .isEmpty();
+        then(repository)
+            .should()
+            .findAll(any(Pageable.class));
+        then(mapper).shouldHaveNoInteractions();
     }
 
 }

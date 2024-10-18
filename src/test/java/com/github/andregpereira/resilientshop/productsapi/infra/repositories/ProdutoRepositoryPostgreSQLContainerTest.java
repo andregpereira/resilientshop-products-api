@@ -1,32 +1,41 @@
 package com.github.andregpereira.resilientshop.productsapi.infra.repositories;
 
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.ProdutoEntity;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.SubcategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.config.PostgreSQLContainerConfig;
+import com.github.andregpereira.resilientshop.productsapi.infra.repositories.config.PostgreSQLContainerConfig.PostgreSQLContainerInitializer;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.math.BigDecimal;
-import java.util.Optional;
-
-import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA;
-import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.CATEGORIA_ATUALIZADA;
-import static com.github.andregpereira.resilientshop.productsapi.constants.ProdutoConstants.*;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaConstants.SUBCATEGORIA;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaConstants.SUBCATEGORIA_ATUALIZADA;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.github.andregpereira.resilientshop.productsapi.util.constant.CommonConstants.PAGEABLE_ID;
+import static com.github.andregpereira.resilientshop.productsapi.util.constant.CommonConstants.PAGEABLE_NOME;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.getProdutoEntity;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.ProdutoMockFactory.getProdutoEntityInvalido;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.BDDAssertions.then;
 
 @DataJpaTest
-@ContextConfiguration(initializers = PostgreSQLContainerConfig.PostgreSQLContainerInitializer.class)
+@ContextConfiguration(initializers = PostgreSQLContainerInitializer.class)
 class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig {
+
+    private static final ProdutoEntity PRODUTO = getProdutoEntity();
+
+    private static final CategoriaEntity CATEGORIA = PRODUTO.getCategoria();
+
+    private static final SubcategoriaEntity SUBCATEGORIA = PRODUTO.getSubcategoria();
+
+    static {
+        SUBCATEGORIA.setCategoria(CATEGORIA);
+    }
 
     @Autowired
     private ProdutoRepository repository;
@@ -34,198 +43,157 @@ class ProdutoRepositoryPostgreSQLContainerTest extends PostgreSQLContainerConfig
     @Autowired
     private TestEntityManager em;
 
+    @BeforeEach
+    void beforeEach() {
+        em.persist(CATEGORIA);
+        em.persist(SUBCATEGORIA);
+        em.persist(PRODUTO);
+    }
+
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         PRODUTO.setId(null);
-        PRODUTO_ATUALIZADO.setId(null);
-        SUBCATEGORIA.setId(null);
-        SUBCATEGORIA_ATUALIZADA.setId(null);
         CATEGORIA.setId(null);
-        CATEGORIA_ATUALIZADA.setId(null);
+        SUBCATEGORIA.setId(null);
     }
 
     @Test
-    void criarProdutoComDadosValidosRetornaProduto() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity produto = repository.save(PRODUTO);
-        ProdutoEntity sut = em.find(ProdutoEntity.class, produto.getId());
-        assertThat(sut).isNotNull();
-        assertThat(sut.getSku()).isEqualTo(PRODUTO.getSku());
-        assertThat(sut.getNome()).isEqualTo(PRODUTO.getNome());
-        assertThat(sut.getDescricao()).isEqualTo(PRODUTO.getDescricao());
-        assertThat(sut.getDataCriacao()).isEqualTo(PRODUTO.getDataCriacao());
-        assertThat(sut.getValorUnitario()).isEqualTo(PRODUTO.getValorUnitario());
-        assertThat(sut.getSubcategoria()).isEqualTo(PRODUTO.getSubcategoria());
-        assertThat(sut.getSubcategoria().getCategoria()).isEqualTo(PRODUTO.getSubcategoria().getCategoria());
+    void salvarProdutoComDadosValidosRetornaProduto() {
+        final var id = repository
+            .save(PRODUTO)
+            .getId();
+
+        final var sut = em.find(ProdutoEntity.class, id);
+
+        then(sut)
+            .isNotNull()
+            .isEqualTo(PRODUTO);
     }
 
     @Test
-    void criarProdutoComDadosInvalidosThrowsRuntimeException() {
-        assertThatThrownBy(() -> repository.saveAndFlush(PRODUTO_VAZIO)).isInstanceOf(RuntimeException.class);
-        assertThatThrownBy(() -> repository.save(PRODUTO_INVALIDO)).isInstanceOf(RuntimeException.class);
+    void salvarProdutoComDadosInvalidosThrowsException() {
+        final ThrowingCallable sut = () -> repository.saveAndFlush(getProdutoEntityInvalido());
+
+        assertThatThrownBy(sut).isExactlyInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
-    void criarProdutoComSkuExistenteThrowsRuntimeException() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity sut = em.persistFlushFind(PRODUTO);
-        sut.setId(null);
-        assertThatThrownBy(() -> repository.saveAndFlush(sut)).isInstanceOf(RuntimeException.class);
+    void salvarProdutoComSkuExistenteThrowsException() {
+        final var produto = em.find(ProdutoEntity.class, PRODUTO.getId());
+        produto.setId(null);
+
+        final ThrowingCallable sut = () -> repository.saveAndFlush(produto);
+
+        assertThatThrownBy(sut).isExactlyInstanceOf(JpaSystemException.class);
     }
 
     @Test
-    void atualizarProdutoComDadosValidosRetornaProduto() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity produtoAntigo = em.persistFlushFind(PRODUTO);
-        ProdutoEntity produtoAtualizado = PRODUTO_ATUALIZADO;
-        produtoAtualizado.setId(produtoAntigo.getId());
-        produtoAtualizado.setSku(PRODUTO_ATUALIZADO.getSku());
-        produtoAtualizado.setNome(PRODUTO_ATUALIZADO.getNome());
-        produtoAtualizado.setDescricao(PRODUTO_ATUALIZADO.getDescricao());
-        produtoAtualizado.setDataCriacao(PRODUTO_ATUALIZADO.getDataCriacao());
-        produtoAtualizado.setValorUnitario(PRODUTO_ATUALIZADO.getValorUnitario());
-        produtoAtualizado.getSubcategoria().setId(PRODUTO_ATUALIZADO.getSubcategoria().getId());
-        produtoAtualizado.getSubcategoria().getCategoria().setId(
-                PRODUTO_ATUALIZADO.getSubcategoria().getCategoria().getId());
-        em.persist(CATEGORIA_ATUALIZADA);
-        em.persist(SUBCATEGORIA_ATUALIZADA);
-        ProdutoEntity sut = repository.save(produtoAtualizado);
-        assertThat(sut).isNotNull();
-        assertThat(sut.getId()).isEqualTo(produtoAntigo.getId());
-        assertThat(sut.getSku()).isEqualTo(PRODUTO_ATUALIZADO.getSku());
-        assertThat(sut.getNome()).isEqualTo(PRODUTO_ATUALIZADO.getNome());
-        assertThat(sut.getDescricao()).isEqualTo(PRODUTO_ATUALIZADO.getDescricao());
-        assertThat(sut.getDataCriacao()).isEqualTo(PRODUTO_ATUALIZADO.getDataCriacao());
-        assertThat(sut.getValorUnitario()).isEqualTo(PRODUTO_ATUALIZADO.getValorUnitario());
-        assertThat(sut.getSubcategoria()).isEqualTo(PRODUTO_ATUALIZADO.getSubcategoria());
-        assertThat(sut.getSubcategoria().getCategoria()).isEqualTo(PRODUTO_ATUALIZADO.getSubcategoria().getCategoria());
+    void listarProdutosExistentesRetornaPageProdutos() {
+        final var sut = repository.findAll(PAGEABLE_ID);
+
+        then(sut)
+            .isNotEmpty()
+            .hasSize(1);
     }
 
     @Test
-    void atualizarProdutoComDadosInvalidosThrowsRuntimeException() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity produtoAntigo = em.persistFlushFind(PRODUTO);
-        ProdutoEntity sutVazio = PRODUTO_VAZIO;
-        ProdutoEntity sutInvalido = PRODUTO_INVALIDO;
-        sutVazio.setId(produtoAntigo.getId());
-        sutInvalido.setId(produtoAntigo.getId());
-        assertThatThrownBy(() -> repository.saveAndFlush(sutVazio)).isInstanceOf(RuntimeException.class);
-        assertThatThrownBy(() -> repository.saveAndFlush(sutInvalido)).isInstanceOf(RuntimeException.class);
-    }
+    void listarProdutosInexistentesRetornaPageEmpty() {
+        em.clear();
 
-    @Test
-    void listarProdutosExistentesRetornaProdutos() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        em.persistFlushFind(PRODUTO);
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity sut2 = new ProdutoEntity(null, 1234567890L, "nome2", "Teste da classe Produto", LOCAL_DATE_TIME,
-                BigDecimal.valueOf(10.99), 10, SUBCATEGORIA);
-        em.persist(sut2);
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        Page<ProdutoEntity> pageProdutos = repository.findAll(pageable);
-        assertThat(pageProdutos).isNotEmpty().hasSize(2);
-    }
+        final var sut = repository.findAll(PAGEABLE_ID);
 
-    @Test
-    void listarProdutosInexistentesRetornaEmpty() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        Page<ProdutoEntity> pageProdutos = repository.findAll(pageable);
-        assertThat(pageProdutos).isEmpty();
+        then(sut).isEmpty();
     }
 
     @Test
     void consultarProdutoPorIdExistenteRetornaTrueEProduto() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
-        Optional<ProdutoEntity> optionalProduto = repository.findById(produto.getId());
-        assertThat(repository.existsById(produto.getId())).isTrue();
-        assertThat(optionalProduto).isNotEmpty().get().isEqualTo(produto);
+        final var sut = repository.findById(PRODUTO.getId());
+
+        then(repository.existsById(PRODUTO.getId())).isTrue();
+        then(sut)
+            .isNotEmpty()
+            .get()
+            .isEqualTo(PRODUTO);
     }
 
     @Test
     void consultarProdutoPorIdInexistenteRetornaFalseEEmpty() {
-        Optional<ProdutoEntity> optionalProduto = repository.findById(10L);
-        assertThat(repository.existsById(10L)).isFalse();
-        assertThat(optionalProduto).isEmpty();
+        em.clear();
+
+        final var sut = repository.findById(10L);
+
+        then(repository.existsById(10L)).isFalse();
+        then(sut).isEmpty();
     }
 
     @Test
     void consultarProdutoPorNomeExistenteRetornaProduto() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
-        PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<ProdutoEntity> pageProdutos = repository.findByName(produto.getNome(), pageable);
-        assertThat(pageProdutos).isNotEmpty().hasSize(1);
-        assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
+        final var sut = repository.findByName(PRODUTO.getNome(), PAGEABLE_NOME);
+
+        then(sut)
+            .isNotEmpty()
+            .hasSize(1);
+        then(sut
+            .getContent()
+            .getFirst()).isEqualTo(PRODUTO);
     }
 
     @Test
-    void consultarProdutoPorNomeInexistenteRetornaEmpty() {
-        PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<ProdutoEntity> pageProdutos = repository.findByName("", pageable);
-        assertThat(pageProdutos).isEmpty();
-    }
+    void consultarProdutoPorNomeInexistenteRetornaPageEmpty() {
+        em.clear();
 
-    @Test
-    void consultarProdutosPorSubcategoriaExistenteRetornaPageProduto() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
-        PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<ProdutoEntity> pageProdutos = repository.findAllBySubcategoriaId(produto.getSubcategoria().getId(), pageable);
-        assertThat(pageProdutos).isNotEmpty().hasSize(1);
-        assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
-    }
+        final var sut = repository.findByName("", PAGEABLE_NOME);
 
-    @Test
-    void consultarProdutosPorSubcategoriaInexistenteRetornaEmpty() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
-        PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<ProdutoEntity> pageProdutos = repository.findAllBySubcategoriaId(10L, pageable);
-        assertThat(pageProdutos).isEmpty();
+        then(sut).isEmpty();
     }
 
     @Test
     void consultarProdutosPorCategoriaExistenteRetornaPageProduto() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
-        PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<ProdutoEntity> pageProdutos = repository.findAllByCategoriaId(
-                produto.getSubcategoria().getCategoria().getId(), pageable);
-        assertThat(pageProdutos).isNotEmpty().hasSize(1);
-        assertThat(pageProdutos.getContent().get(0)).isEqualTo(produto);
+        final var sut = repository.findAllByCategoriaId(CATEGORIA.getId(), PAGEABLE_NOME);
+
+        then(sut)
+            .isNotEmpty()
+            .hasSize(1);
+        then(sut
+            .getContent()
+            .getFirst()).isEqualTo(PRODUTO);
     }
 
     @Test
-    void consultarProdutosPorCategoriaInexistenteRetornaEmpty() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity produto = em.persistFlushFind(PRODUTO);
-        PageRequest pageable = PageRequest.of(0, 10, Direction.ASC, "nome");
-        Page<ProdutoEntity> pageProdutos = repository.findAllByCategoriaId(10L, pageable);
-        assertThat(pageProdutos).isEmpty();
+    void consultarProdutosPorCategoriaInexistenteRetornaPageEmpty() {
+        final var sut = repository.findAllByCategoriaId(10L, PAGEABLE_NOME);
+
+        then(sut).isEmpty();
+    }
+
+    @Test
+    void consultarProdutosPorSubcategoriaExistenteRetornaPageProduto() {
+        final var sut = repository.findAllBySubcategoriaId(SUBCATEGORIA.getId(), PAGEABLE_NOME);
+
+        then(sut)
+            .isNotEmpty()
+            .hasSize(1);
+        then(sut
+            .getContent()
+            .getFirst()).isEqualTo(PRODUTO);
+    }
+
+    @Test
+    void consultarProdutosPorSubcategoriaInexistenteRetornaPageEmpty() {
+        em.clear();
+
+        final var sut = repository.findAllBySubcategoriaId(10L, PAGEABLE_NOME);
+
+        then(sut).isEmpty();
     }
 
     @Test
     void removerProdutoPorIdExistenteRetornaNulo() {
-        em.persist(CATEGORIA);
-        em.persist(SUBCATEGORIA);
-        ProdutoEntity sut = em.persistFlushFind(PRODUTO);
-        repository.deleteById(sut.getId());
-        ProdutoEntity produtoRemovido = em.find(ProdutoEntity.class, sut.getId());
-        assertThat(produtoRemovido).isNull();
+        repository.deleteById(PRODUTO.getId());
+
+        final var sut = em.find(ProdutoEntity.class, PRODUTO.getId());
+
+        then(sut).isNull();
     }
 
 }
-

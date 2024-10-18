@@ -47,7 +47,9 @@ public class CategoriaConsultaServiceImpl implements CategoriaConsultaService {
     @Override
     public Page<CategoriaDto> listar(Pageable pageable) {
         log.info("Retornando categorias");
-        return repository.findAll(pageable).map(mapper::toCategoriaDto);
+        return repository
+            .findAll(pageable)
+            .map(mapper::toCategoriaDto);
     }
 
     /**
@@ -63,10 +65,13 @@ public class CategoriaConsultaServiceImpl implements CategoriaConsultaService {
     @Override
     public CategoriaDto consultarPorId(Long id) {
         log.info("Retornando categoria com id {}", id);
-        return repository.findById(id).map(mapper::toCategoriaDto).orElseThrow(() -> {
-            log.info("Categoria não encontrada com id {}", id);
-            return new CategoriaNotFoundException(id);
-        });
+        return repository
+            .findById(id)
+            .map(mapper::toCategoriaDto)
+            .orElseThrow(() -> {
+                log.info("Categoria não encontrada com id {}", id);
+                return new CategoriaNotFoundException(id);
+            });
     }
 
 }

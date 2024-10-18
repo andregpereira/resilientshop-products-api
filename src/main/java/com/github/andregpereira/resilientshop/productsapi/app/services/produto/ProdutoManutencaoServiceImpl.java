@@ -13,10 +13,10 @@ import com.github.andregpereira.resilientshop.productsapi.infra.entities.Produto
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.ProdutoRepository;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 import java.util.Set;
@@ -77,16 +77,22 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
             log.info("Produto já cadastrado com o nome {}", dto.nome());
             throw new ProdutoAlreadyExistsException(dto.nome());
         }
-        return categoriaRepository.findById(dto.categoriaId()).map(c -> {
-            ProdutoEntity produto = mapper.toProduto(dto);
-            produto.setCategoria(c);
-            if (dto.subcategoriaId() != null)
-                subcategoriaRepository.findById(dto.subcategoriaId()).ifPresent(produto::setSubcategoria);
-            return mapper.toProdutoDetalhesDto(produtoRepository.save(produto));
-        }).orElseThrow(() -> {
-            log.info("Categoria não encontrada com id {}", dto.categoriaId());
-            return new CategoriaNotFoundException(dto.categoriaId());
-        });
+        return categoriaRepository
+            .findById(dto.categoriaId())
+            .map(c -> {
+                ProdutoEntity produto = mapper.toProduto(dto);
+                produto.setCategoria(c);
+                if (dto.subcategoriaId() != null) {
+                    subcategoriaRepository
+                        .findById(dto.subcategoriaId())
+                        .ifPresent(produto::setSubcategoria);
+                }
+                return mapper.toProdutoDetalhesDto(produtoRepository.save(produto));
+            })
+            .orElseThrow(() -> {
+                log.info("Categoria não encontrada com id {}", dto.categoriaId());
+                return new CategoriaNotFoundException(dto.categoriaId());
+            });
     }
 
     /**
@@ -104,30 +110,39 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      */
     @Override
     public ProdutoDetalhesDto atualizar(Long id, ProdutoAtualizacaoDto dto) {
-        return produtoRepository.findById(id).map(p -> {
-            if (produtoRepository.existsByNome(dto.nome())) {
-                log.info("Produto já cadastrado com o nome {}", dto.nome());
-                throw new ProdutoAlreadyExistsException(dto.nome());
-            }
-            return categoriaRepository.findById(dto.categoriaId()).map(c -> {
-                p.setNome(dto.nome());
-                p.setDescricao(dto.descricao());
-                p.setValorUnitario(dto.valorUnitario());
-                p.setEstoque(dto.estoque());
-                p.setImageUrl(dto.imageUrl());
-                p.setAtivo(dto.ativo());
-                p.setCategoria(c);
-                if (dto.subcategoriaId() != null)
-                    subcategoriaRepository.findById(dto.subcategoriaId()).ifPresent(p::setSubcategoria);
-                return mapper.toProdutoDetalhesDto(produtoRepository.save(p));
-            }).orElseThrow(() -> {
-                log.info("Categoria não encontrada com id {}", dto.categoriaId());
-                return new CategoriaNotFoundException(dto.categoriaId());
+        return produtoRepository
+            .findById(id)
+            .map(p -> {
+                if (produtoRepository.existsByNome(dto.nome())) {
+                    log.info("Produto já cadastrado com o nome {}", dto.nome());
+                    throw new ProdutoAlreadyExistsException(dto.nome());
+                }
+                return categoriaRepository
+                    .findById(dto.categoriaId())
+                    .map(c -> {
+                        p.setNome(dto.nome());
+                        p.setDescricao(dto.descricao());
+                        p.setValorUnitario(dto.valorUnitario());
+                        p.setEstoque(dto.estoque());
+                        p.setImageUrl(dto.imageUrl());
+                        p.setAtivo(dto.ativo());
+                        p.setCategoria(c);
+                        if (dto.subcategoriaId() != null) {
+                            subcategoriaRepository
+                                .findById(dto.subcategoriaId())
+                                .ifPresent(p::setSubcategoria);
+                        }
+                        return mapper.toProdutoDetalhesDto(produtoRepository.save(p));
+                    })
+                    .orElseThrow(() -> {
+                        log.info("Categoria não encontrada com id {}", dto.categoriaId());
+                        return new CategoriaNotFoundException(dto.categoriaId());
+                    });
+            })
+            .orElseThrow(() -> {
+                log.info("Produto não encontrado com id {}", id);
+                return new ProdutoNotFoundException(id);
             });
-        }).orElseThrow(() -> {
-            log.info("Produto não encontrado com id {}", id);
-            return new ProdutoNotFoundException(id);
-        });
     }
 
     /**
@@ -142,28 +157,34 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      */
     @Override
     public String desativar(Long id) {
-        return produtoRepository.findById(id).map(p -> {
-            p.setAtivo(false);
-            produtoRepository.save(p);
-            log.info("Produto com id {} desativado", id);
-            return MessageFormat.format("Produto com id {0} desativado com sucesso", id);
-        }).orElseThrow(() -> {
-            log.info("Produto ativo não encontrado com id {}", id);
-            return new ProdutoNotFoundException(id, true);
-        });
+        return produtoRepository
+            .findById(id)
+            .map(p -> {
+                p.setAtivo(false);
+                produtoRepository.save(p);
+                log.info("Produto com id {} desativado", id);
+                return MessageFormat.format("Produto com id {0} desativado com sucesso", id);
+            })
+            .orElseThrow(() -> {
+                log.info("Produto ativo não encontrado com id {}", id);
+                return new ProdutoNotFoundException(id, true);
+            });
     }
 
     @Override
     public String reativar(Long id) {
-        return produtoRepository.findById(id).map(p -> {
-            p.setAtivo(true);
-            produtoRepository.save(p);
-            log.info("Produto com id {} reativado", id);
-            return MessageFormat.format("Produto com id {0} reativado com sucesso", id);
-        }).orElseThrow(() -> {
-            log.info("Produto inativo não encontrado com id {}", id);
-            return new ProdutoNotFoundException(id, false);
-        });
+        return produtoRepository
+            .findById(id)
+            .map(p -> {
+                p.setAtivo(true);
+                produtoRepository.save(p);
+                log.info("Produto com id {} reativado", id);
+                return MessageFormat.format("Produto com id {0} reativado com sucesso", id);
+            })
+            .orElseThrow(() -> {
+                log.info("Produto inativo não encontrado com id {}", id);
+                return new ProdutoNotFoundException(id, false);
+            });
     }
 
     /**
@@ -175,18 +196,29 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      */
     @Override
     public void subtrairEstoque(Set<ProdutoAtualizarEstoqueDto> dtos) {
-        dtos.stream().forEach(pDto -> produtoRepository.findById(pDto.id()).ifPresentOrElse(p -> {
-            if (p.getEstoque() < pDto.quantidade())
-                throw new ProdutoNotFoundException(
-                        MessageFormat.format("Ops! O produto {0} não possui estoque suficiente", p.getNome()));
-            p.setEstoque(p.getEstoque() - pDto.quantidade());
-            produtoRepository.save(p);
-            log.info("Produto {} com {} itens subtraídos do estoque. Estoque atual: {}", p.getNome(), pDto.quantidade(),
-                    p.getEstoque());
-        }, () -> {
-            log.info("Produto não encontrado com id {}", pDto.id());
-            throw new ProdutoNotFoundException(pDto.id());
-        }));
+        dtos
+            .stream()
+            .forEach(dto -> produtoRepository
+                .findById(dto.id())
+                .ifPresentOrElse(p -> {
+                    if (p.getEstoque() < dto.quantidade()) {
+                        throw new ProdutoNotFoundException(MessageFormat.format(
+                            "Ops! O produto {0} não possui estoque suficiente",
+                            p.getNome()
+                        ));
+                    }
+                    p.setEstoque(p.getEstoque() - dto.quantidade());
+                    produtoRepository.save(p);
+                    log.info(
+                        "Produto {} com {} itens subtraídos do estoque. Estoque atual: {}",
+                        p.getNome(),
+                        dto.quantidade(),
+                        p.getEstoque()
+                    );
+                }, () -> {
+                    log.info("Produto não encontrado com id {}", dto.id());
+                    throw new ProdutoNotFoundException(dto.id());
+                }));
     }
 
     /**
@@ -198,15 +230,23 @@ public class ProdutoManutencaoServiceImpl implements ProdutoManutencaoService {
      */
     @Override
     public void retornarEstoque(Set<ProdutoAtualizarEstoqueDto> dtos) {
-        dtos.stream().forEach(pDto -> produtoRepository.findById(pDto.id()).ifPresentOrElse(p -> {
-            p.setEstoque(p.getEstoque() + pDto.quantidade());
-            produtoRepository.save(p);
-            log.info("Produto {} com {} itens retornados ao estoque. Estoque atual: {}", p.getNome(), pDto.quantidade(),
-                    p.getEstoque());
-        }, () -> {
-            log.info("Produto não encontrado com id {}", pDto.id());
-            throw new ProdutoNotFoundException(pDto.id());
-        }));
+        dtos
+            .stream()
+            .forEach(dto -> produtoRepository
+                .findById(dto.id())
+                .ifPresentOrElse(p -> {
+                    p.setEstoque(p.getEstoque() + dto.quantidade());
+                    produtoRepository.save(p);
+                    log.info(
+                        "Produto {} com {} itens retornados ao estoque. Estoque atual: {}",
+                        p.getNome(),
+                        dto.quantidade(),
+                        p.getEstoque()
+                    );
+                }, () -> {
+                    log.info("Produto não encontrado com id {}", dto.id());
+                    throw new ProdutoNotFoundException(dto.id());
+                }));
     }
 
 }

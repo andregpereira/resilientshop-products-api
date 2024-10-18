@@ -1,0 +1,14 @@
+{
+    "sku": 123456789,
+    "nome": "nome",
+    "descricao": "teste da classe Produto",
+    "valor_unitario": 10.59,
+    "estoque": 10,
+    "rating": 3.6,
+    "image_url": "http://",
+    "data_criacao": "24/09/2021 16:31",
+    "data_modificacao": "12/07/2023 11:54",
+    "ativo": true,
+    "categoria_id": 1,
+    "subcategoria_id": 1
+}
