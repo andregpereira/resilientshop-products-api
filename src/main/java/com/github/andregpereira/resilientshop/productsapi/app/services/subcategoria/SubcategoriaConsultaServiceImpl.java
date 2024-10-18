@@ -48,7 +48,9 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
     @Override
     public Page<SubcategoriaDto> listar(Pageable pageable) {
         log.info("Retornando subcategorias");
-        return repository.findAll(pageable).map(mapper::toSubcategoriaDto);
+        return repository
+            .findAll(pageable)
+            .map(mapper::toSubcategoriaDto);
     }
 
     /**
@@ -64,10 +66,13 @@ public class SubcategoriaConsultaServiceImpl implements SubcategoriaConsultaServ
     @Override
     public SubcategoriaDetalhesDto consultarPorId(Long id) {
         log.info("Retornando subcategoria com id {}", id);
-        return repository.findById(id).map(mapper::toSubcategoriaDetalhesDto).orElseThrow(() -> {
-            log.info("Subcategoria não encontrada com id {}", id);
-            return new SubcategoriaNotFoundException(id);
-        });
+        return repository
+            .findById(id)
+            .map(mapper::toSubcategoriaDetalhesDto)
+            .orElseThrow(() -> {
+                log.info("Subcategoria não encontrada com id {}", id);
+                return new SubcategoriaNotFoundException(id);
+            });
     }
 
 }

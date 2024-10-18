@@ -1,0 +1,8 @@
+{
+    "nome": "nome",
+    "descricao": "descricao",
+    "categoria": {
+        "nome": "nome"
+    },
+    "produtos": []
+}

@@ -1,9 +1,13 @@
 package com.github.andregpereira.resilientshop.productsapi.app.services.categoria;
 
+import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaAlreadyExistsException;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.CategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.CategoriaMapper;
+import com.github.andregpereira.resilientshop.productsapi.infra.entities.CategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.CategoriaRepository;
+import org.assertj.core.api.BDDAssertions;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,10 +16,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaConstants.*;
-import static com.github.andregpereira.resilientshop.productsapi.constants.CategoriaDtoConstants.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.CategoriaMockFactory.getCategoriaDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.CategoriaMockFactory.getCategoriaEntity;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.CategoriaMockFactory.getCategoriaRegistroDto;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
@@ -24,7 +31,7 @@ import static org.mockito.Mockito.never;
 class CategoriaManutencaoServiceTest {
 
     @InjectMocks
-    private CategoriaManutencaoServiceImpl manutencaoService;
+    private CategoriaManutencaoServiceImpl service;
 
     @Mock
     private CategoriaMapper mapper;
@@ -34,82 +41,183 @@ class CategoriaManutencaoServiceTest {
 
     @Test
     void criarCategoriaComDadosValidosRetornaCategoriaDto() {
-        given(repository.existsByNome(CATEGORIA_REGISTRO_DTO.nome())).willReturn(false);
-        given(mapper.toCategoria(CATEGORIA_REGISTRO_DTO)).willReturn(CATEGORIA);
-        given(repository.save(CATEGORIA)).willReturn(CATEGORIA);
-        given(mapper.toCategoriaDto(CATEGORIA)).willReturn(CATEGORIA_DTO);
-        assertThat(manutencaoService.criar(CATEGORIA_REGISTRO_DTO)).isEqualTo(CATEGORIA_DTO);
-        then(repository).should().save(CATEGORIA);
+        given(repository.existsByNome(anyString())).willReturn(false);
+        given(mapper.toCategoria(any(CategoriaRegistroDto.class))).willReturn(getCategoriaEntity());
+        given(repository.save(any(CategoriaEntity.class))).willReturn(getCategoriaEntity());
+        given(mapper.toCategoriaDto(any(CategoriaEntity.class))).willReturn(getCategoriaDto());
+
+        final var sut = service.criar(getCategoriaRegistroDto());
+
+        BDDAssertions
+            .then(sut)
+            .isNotNull()
+            .isEqualTo(getCategoriaDto());
+        then(repository)
+            .should()
+            .existsByNome(anyString());
+        then(mapper)
+            .should()
+            .toCategoria(any(CategoriaRegistroDto.class));
+        then(repository)
+            .should()
+            .save(any(CategoriaEntity.class));
+        then(mapper)
+            .should()
+            .toCategoriaDto(any(CategoriaEntity.class));
     }
 
     @Test
     void criarCategoriaComDadosInvalidosThrowsException() {
-        given(repository.existsByNome(CATEGORIA_INVALIDA.getNome())).willReturn(false);
-        given(repository.save(CATEGORIA_INVALIDA)).willThrow(RuntimeException.class);
-        assertThatThrownBy(() -> manutencaoService.criar(CATEGORIA_REGISTRO_DTO_INVALIDA)).isInstanceOf(
-                RuntimeException.class);
-        then(repository).should(never()).save(CATEGORIA);
+        given(repository.existsByNome(anyString())).willReturn(false);
+        given(mapper.toCategoria(any(CategoriaRegistroDto.class))).willReturn(getCategoriaEntity());
+        given(repository.save(any(CategoriaEntity.class))).willThrow(RuntimeException.class);
+
+        final ThrowingCallable sut = () -> service.criar(getCategoriaRegistroDto());
+
+        assertThatThrownBy(sut).isInstanceOf(RuntimeException.class);
+        then(repository)
+            .should()
+            .existsByNome(anyString());
+        then(mapper)
+            .should()
+            .toCategoria(any(CategoriaRegistroDto.class));
+        then(repository)
+            .should()
+            .save(any(CategoriaEntity.class));
+        then(mapper).shouldHaveNoMoreInteractions();
     }
 
     @Test
     void criarCategoriaComNomeExistenteThrowsException() {
-        given(repository.existsByNome(CATEGORIA.getNome())).willReturn(true);
-        assertThatThrownBy(() -> manutencaoService.criar(CATEGORIA_REGISTRO_DTO)).isInstanceOf(
-                CategoriaAlreadyExistsException.class);
-        then(repository).should(never()).save(CATEGORIA);
+        given(repository.existsByNome(anyString())).willReturn(true);
+
+        final ThrowingCallable sut = () -> service.criar(getCategoriaRegistroDto());
+
+        assertThatThrownBy(sut).isInstanceOf(CategoriaAlreadyExistsException.class);
+        then(repository)
+            .should()
+            .existsByNome(anyString());
+        then(repository).shouldHaveNoMoreInteractions();
+        then(mapper).shouldHaveNoInteractions();
     }
 
     @Test
     void atualizarCategoriaComDadosValidosRetornaCategoriaDto() {
-        given(repository.findById(1L)).willReturn(Optional.of(CATEGORIA));
-        given(mapper.toCategoria(CATEGORIA_REGISTRO_DTO_ATUALIZADA)).willReturn(CATEGORIA_ATUALIZADA);
-        given(repository.existsByNome(CATEGORIA_REGISTRO_DTO_ATUALIZADA.nome())).willReturn(false);
-        given(repository.save(CATEGORIA_ATUALIZADA)).willReturn(CATEGORIA_ATUALIZADA);
-        given(mapper.toCategoriaDto(CATEGORIA_ATUALIZADA)).willReturn(CATEGORIA_DTO_ATUALIZADA);
-        assertThat(manutencaoService.atualizar(1L, CATEGORIA_REGISTRO_DTO_ATUALIZADA)).isEqualTo(
-                CATEGORIA_DTO_ATUALIZADA);
-        then(repository).should().save(CATEGORIA_ATUALIZADA);
+        given(repository.findById(anyLong())).willReturn(Optional.of(getCategoriaEntity()));
+        given(mapper.toCategoria(any(CategoriaRegistroDto.class))).willReturn(getCategoriaEntity());
+        given(repository.existsByNome(anyString())).willReturn(false);
+        given(repository.save(any(CategoriaEntity.class))).willReturn(getCategoriaEntity());
+        given(mapper.toCategoriaDto(any(CategoriaEntity.class))).willReturn(getCategoriaDto());
+
+        final var sut = service.atualizar(1L, getCategoriaRegistroDto());
+
+        BDDAssertions
+            .then(sut)
+            .isEqualTo(getCategoriaDto());
+        then(repository)
+            .should()
+            .findById(anyLong());
+        then(mapper)
+            .should()
+            .toCategoria(any(CategoriaRegistroDto.class));
+        then(repository)
+            .should()
+            .existsByNome(anyString());
+        then(repository)
+            .should()
+            .save(any(CategoriaEntity.class));
+        then(mapper)
+            .should()
+            .toCategoriaDto(any(CategoriaEntity.class));
     }
 
     @Test
     void atualizarCategoriaComDadosInvalidosThrowsException() {
-        assertThatThrownBy(() -> manutencaoService.atualizar(10L, CATEGORIA_REGISTRO_DTO_INVALIDA)).isInstanceOf(
-                RuntimeException.class);
-        then(repository).should(never()).save(CATEGORIA);
+        given(repository.findById(anyLong())).willReturn(Optional.of(getCategoriaEntity()));
+        given(mapper.toCategoria(any(CategoriaRegistroDto.class))).willReturn(getCategoriaEntity());
+        given(repository.existsByNome(anyString())).willReturn(false);
+        given(repository.save(any(CategoriaEntity.class))).willThrow(RuntimeException.class);
+
+        final ThrowingCallable sut = () -> service.atualizar(10L, getCategoriaRegistroDto());
+
+        assertThatThrownBy(sut).isExactlyInstanceOf(RuntimeException.class);
+        then(repository)
+            .should()
+            .findById(anyLong());
+        then(mapper)
+            .should()
+            .toCategoria(any(CategoriaRegistroDto.class));
+        then(repository)
+            .should()
+            .existsByNome(anyString());
+        then(repository)
+            .should()
+            .save(any(CategoriaEntity.class));
+        then(mapper).shouldHaveNoMoreInteractions();
     }
 
     @Test
     void atualizarCategoriaComIdInexistenteThrowsException() {
-        given(repository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> manutencaoService.atualizar(10L, CATEGORIA_REGISTRO_DTO)).isInstanceOf(
-                CategoriaNotFoundException.class).hasMessage("Ops! Nenhuma categoria foi encontrada com o id 10");
-        then(repository).should(never()).save(CATEGORIA);
+        given(repository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> service.atualizar(10L, getCategoriaRegistroDto());
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(CategoriaNotFoundException.class)
+            .hasMessage("Ops! Nenhuma categoria foi encontrada com o id 10");
+        then(repository)
+            .should()
+            .findById(anyLong());
+        then(repository).shouldHaveNoMoreInteractions();
+        then(mapper).shouldHaveNoInteractions();
     }
 
     @Test
     void atualizarCategoriaComNomeExistenteThrowsException() {
-        given(repository.findById(1L)).willReturn(Optional.of(CATEGORIA));
-        given(repository.existsByNome(CATEGORIA.getNome())).willReturn(true);
-        assertThatThrownBy(() -> manutencaoService.atualizar(1L, CATEGORIA_REGISTRO_DTO)).isInstanceOf(
-                CategoriaAlreadyExistsException.class).hasMessage(
-                "Opa! Já existe uma categoria cadastrada com o nome nome");
-        then(repository).should(never()).save(CATEGORIA);
+        given(repository.findById(anyLong())).willReturn(Optional.of(getCategoriaEntity()));
+        given(repository.existsByNome(anyString())).willReturn(true);
+
+        final ThrowingCallable sut = () -> service.atualizar(1L, getCategoriaRegistroDto());
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(CategoriaAlreadyExistsException.class)
+            .hasMessage("Opa! Já existe uma categoria cadastrada com o nome nome");
+        then(repository)
+            .should()
+            .findById(anyLong());
+        then(repository)
+            .should()
+            .existsByNome(anyString());
+        then(repository).shouldHaveNoMoreInteractions();
+        then(mapper).shouldHaveNoInteractions();
     }
 
     @Test
     void removerCategoriaComIdExistenteRetornaString() {
-        given(repository.findById(1L)).willReturn(Optional.of(CATEGORIA));
-        assertThat(manutencaoService.remover(1L)).isEqualTo("Categoria com id 1 removida com sucesso");
-        then(repository).should().deleteById(1L);
+        given(repository.findById(anyLong())).willReturn(Optional.of(getCategoriaEntity()));
+
+        final var sut = service.remover(1L);
+
+        BDDAssertions
+            .then(sut)
+            .isEqualTo("Categoria com id 1 removida com sucesso");
+        then(repository)
+            .should()
+            .deleteById(anyLong());
     }
 
     @Test
     void removerCategoriaComIdInexistenteRetornaString() {
-        given(repository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> manutencaoService.remover(10L)).isInstanceOf(
-                CategoriaNotFoundException.class).hasMessage("Ops! Nenhuma categoria foi encontrada com o id 10");
-        then(repository).should(never()).deleteById(10L);
+        given(repository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> service.remover(10L);
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(CategoriaNotFoundException.class)
+            .hasMessage("Ops! Nenhuma categoria foi encontrada com o id 10");
+        then(repository)
+            .should(never())
+            .deleteById(anyLong());
     }
 
 }
-

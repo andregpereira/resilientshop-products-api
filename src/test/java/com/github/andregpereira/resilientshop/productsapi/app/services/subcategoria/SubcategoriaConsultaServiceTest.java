@@ -1,11 +1,11 @@
 package com.github.andregpereira.resilientshop.productsapi.app.services.subcategoria;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaDetalhesDto;
-import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaDto;
 import com.github.andregpereira.resilientshop.productsapi.cross.exceptions.SubcategoriaNotFoundException;
 import com.github.andregpereira.resilientshop.productsapi.cross.mappers.SubcategoriaMapper;
 import com.github.andregpereira.resilientshop.productsapi.infra.entities.SubcategoriaEntity;
 import com.github.andregpereira.resilientshop.productsapi.infra.repositories.SubcategoriaRepository;
+import org.assertj.core.api.BDDAssertions;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,25 +13,26 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaConstants.SUBCATEGORIA;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaDtoConstants.SUBCATEGORIA_DETALHES_DTO;
-import static com.github.andregpereira.resilientshop.productsapi.constants.SubcategoriaDtoConstants.SUBCATEGORIA_DTO;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.github.andregpereira.resilientshop.productsapi.util.constant.CommonConstants.PAGEABLE_ID;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.SubcategoriaMockFactory.getSubcategoriaDetalhesDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.SubcategoriaMockFactory.getSubcategoriaDto;
+import static com.github.andregpereira.resilientshop.productsapi.util.mock.factory.SubcategoriaMockFactory.getSubcategoriaEntity;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 class SubcategoriaConsultaServiceTest {
 
     @InjectMocks
-    private SubcategoriaConsultaServiceImpl consultaService;
+    private SubcategoriaConsultaServiceImpl service;
 
     @Mock
     private SubcategoriaMapper mapper;
@@ -41,38 +42,73 @@ class SubcategoriaConsultaServiceTest {
 
     @Test
     void listarSubcategoriasExistentesRetornaPageSubcategoriaDto() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        List<SubcategoriaEntity> listaSubcategorias = new ArrayList<>();
-        listaSubcategorias.add(SUBCATEGORIA);
-        Page<SubcategoriaEntity> pageSubcategorias = new PageImpl<>(listaSubcategorias, pageable, 10);
-        given(repository.findAll(pageable)).willReturn(pageSubcategorias);
-        given(mapper.toSubcategoriaDto(SUBCATEGORIA)).willReturn(SUBCATEGORIA_DTO);
-        Page<SubcategoriaDto> sut = consultaService.listar(pageable);
-        assertThat(sut).isNotEmpty().hasSize(1);
-        assertThat(sut.getContent().get(0)).isEqualTo(SUBCATEGORIA_DTO);
+        final var listaSubcategorias = new ArrayList<SubcategoriaEntity>();
+        listaSubcategorias.add(getSubcategoriaEntity());
+        final var pageSubcategorias = new PageImpl<>(listaSubcategorias, PAGEABLE_ID, 10);
+        given(repository.findAll(any(Pageable.class))).willReturn(pageSubcategorias);
+        given(mapper.toSubcategoriaDto(any(SubcategoriaEntity.class))).willReturn(getSubcategoriaDto());
+
+        final var sut = service.listar(PAGEABLE_ID);
+
+        BDDAssertions
+            .then(sut)
+            .isNotEmpty()
+            .containsExactlyInAnyOrder(getSubcategoriaDto());
+        then(repository)
+            .should()
+            .findAll(any(Pageable.class));
+        then(mapper)
+            .should()
+            .toSubcategoriaDto(any(SubcategoriaEntity.class));
     }
 
     @Test
-    void listarSubcategoriasInexistentesThrowsException() {
-        PageRequest pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "id");
-        given(repository.findAll(pageable)).willReturn(Page.empty());
-        assertThatThrownBy(() -> consultaService.listar(pageable)).isInstanceOf(
-                SubcategoriaNotFoundException.class).hasMessage("Poxa! Ainda não há subcategorias cadastradas");
+    void listarSubcategoriasInexistentesRetornaPageEmpty() {
+        given(repository.findAll(any(Pageable.class))).willReturn(Page.empty());
+
+        final var sut = service.listar(PAGEABLE_ID);
+
+        BDDAssertions
+            .then(sut)
+            .isEmpty();
+        then(repository)
+            .should()
+            .findAll(any(Pageable.class));
+        then(mapper).shouldHaveNoInteractions();
     }
 
     @Test
     void consultarSubcategoriaPorIdExistenteRetornaSubcategoriaDetalhesDto() {
-        given(repository.findById(1L)).willReturn(Optional.of(SUBCATEGORIA));
-        given(mapper.toSubcategoriaDetalhesDto(SUBCATEGORIA)).willReturn(SUBCATEGORIA_DETALHES_DTO);
-        SubcategoriaDetalhesDto sut = consultaService.consultarPorId(1L);
-        assertThat(sut).isNotNull().isEqualTo(SUBCATEGORIA_DETALHES_DTO);
+        given(repository.findById(anyLong())).willReturn(Optional.of(getSubcategoriaEntity()));
+        given(mapper.toSubcategoriaDetalhesDto(any(SubcategoriaEntity.class))).willReturn(getSubcategoriaDetalhesDto());
+
+        final var sut = service.consultarPorId(1L);
+
+        BDDAssertions
+            .then(sut)
+            .isNotNull()
+            .isEqualTo(getSubcategoriaDetalhesDto());
+        then(repository)
+            .should()
+            .findById(anyLong());
+        then(mapper)
+            .should()
+            .toSubcategoriaDetalhesDto(any(SubcategoriaEntity.class));
     }
 
     @Test
     void consultarSubcategoriaPorIdInexistenteThrowsException() {
-        given(repository.findById(10L)).willReturn(Optional.empty());
-        assertThatThrownBy(() -> consultaService.consultarPorId(10L)).isInstanceOf(
-                SubcategoriaNotFoundException.class).hasMessage("Ops! Nenhuma subcategoria foi encontrada com o id 10");
+        given(repository.findById(anyLong())).willReturn(Optional.empty());
+
+        final ThrowingCallable sut = () -> service.consultarPorId(10L);
+
+        assertThatThrownBy(sut)
+            .isInstanceOf(SubcategoriaNotFoundException.class)
+            .hasMessage("Ops! Nenhuma subcategoria foi encontrada com o id 10");
+        then(repository)
+            .should()
+            .findById(anyLong());
+        then(mapper).shouldHaveNoInteractions();
     }
 
 }

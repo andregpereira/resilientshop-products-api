@@ -102,7 +102,7 @@ public class ProdutoController {
     @PatchMapping("/reativar/{id}")
     public ResponseEntity<String> reativar(@PathVariable Long id) {
         log.info("Reativando produto com id {}...", id);
-        return ResponseEntity.ok(manutencaoService.desativar(id));
+        return ResponseEntity.ok(manutencaoService.reativar(id));
     }
 
     /**

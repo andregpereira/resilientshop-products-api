@@ -9,21 +9,28 @@ import org.testcontainers.utility.DockerImageName;
 
 public abstract class PostgreSQLContainerConfig {
 
-    private static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER = new PostgreSQLContainer<>(
-            DockerImageName.parse("postgres:15.2"));
+    private static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
+        new PostgreSQLContainer<>(DockerImageName.parse("postgres:alpine"));
 
     static {
-        Startables.deepStart(POSTGRESQL_CONTAINER).join();
+        Startables
+            .deepStart(POSTGRESQL_CONTAINER)
+            .join();
     }
 
-    public static class PostgreSQLContainerInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+    public static class PostgreSQLContainerInitializer
+        implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
-            TestPropertyValues.of("spring.datasource.url=" + POSTGRESQL_CONTAINER.getJdbcUrl(),
-                    "spring.datasource.username=" + POSTGRESQL_CONTAINER.getUsername(),
-                    "spring.datasource.password=" + POSTGRESQL_CONTAINER.getPassword(),
-                    "spring.test.database.replace=none").applyTo(applicationContext.getEnvironment());
+            TestPropertyValues
+                .of(
+                    "spring.datasource.url=".concat(POSTGRESQL_CONTAINER.getJdbcUrl()),
+                    "spring.datasource.username=".concat(POSTGRESQL_CONTAINER.getUsername()),
+                    "spring.datasource.password=".concat(POSTGRESQL_CONTAINER.getPassword()),
+                    "spring.test.database.replace=none"
+                )
+                .applyTo(applicationContext.getEnvironment());
         }
 
     }
