@@ -4,15 +4,24 @@ import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.Cate
 import com.github.andregpereira.resilientshop.productsapi.app.dto.categoria.CategoriaRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.categoria.CategoriaManutencaoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -24,6 +33,7 @@ import java.net.URI;
  */
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Categorias", description = "Operações de criação, atualização, remoção e consulta de categorias.")
 @RestController
 @RequestMapping("/categorias")
 public class CategoriaController {
@@ -46,13 +56,19 @@ public class CategoriaController {
      *
      * @return a categoria criada.
      */
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<CategoriaDto> registrar(@RequestBody @Valid CategoriaRegistroDto dto) {
+    public ResponseEntity<CategoriaDto> criarCategoria(@Valid @RequestBody CategoriaRegistroDto dto) {
         log.info("Criando categoria...");
         CategoriaDto categoria = manutencaoService.criar(dto);
-        URI uri = UriComponentsBuilder.fromPath("/categorias/{id}").buildAndExpand(categoria.id()).toUri();
+        URI uri = UriComponentsBuilder
+            .fromPath("/categorias/{id}")
+            .buildAndExpand(categoria.id())
+            .toUri();
         log.info("Categoria criada com sucesso");
-        return ResponseEntity.created(uri).body(categoria);
+        return ResponseEntity
+            .created(uri)
+            .body(categoria);
     }
 
     /**
@@ -65,7 +81,9 @@ public class CategoriaController {
      * @return a categoria atualizada.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<CategoriaDto> atualizar(@PathVariable Long id, @RequestBody @Valid CategoriaRegistroDto dto) {
+    public ResponseEntity<CategoriaDto> atualizarCategoria(
+        @PathVariable Long id, @Valid @RequestBody CategoriaRegistroDto dto
+    ) {
         log.info("Atualizando categoria com id {}...", id);
         return ResponseEntity.ok(manutencaoService.atualizar(id, dto));
     }
@@ -78,7 +96,7 @@ public class CategoriaController {
      * @return uma mensagem de confirmação de remoção.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> remover(@PathVariable Long id) {
+    public ResponseEntity<String> removerCategoria(@PathVariable Long id) {
         log.info("Removendo categoria com id {}...", id);
         return ResponseEntity.ok(manutencaoService.remover(id));
     }
@@ -92,8 +110,9 @@ public class CategoriaController {
      * @return uma sublista de uma lista com todas as subcategorias cadastradas.
      */
     @GetMapping
-    public ResponseEntity<Page<CategoriaDto>> listar(
-            @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+    public ResponseEntity<Page<CategoriaDto>> listarCategorias(
+        @PageableDefault(sort = "id") Pageable pageable
+    ) {
         log.info("Listando categorias...");
         return ResponseEntity.ok(consultaService.listar(pageable));
     }
@@ -107,7 +126,7 @@ public class CategoriaController {
      * @return uma categoria encontrada pelo {@code id}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriaDto> consultarPorId(@PathVariable Long id) {
+    public ResponseEntity<CategoriaDto> consultarCategoriaPorId(@PathVariable Long id) {
         log.info("Procurando categoria com id {}...", id);
         return ResponseEntity.ok(consultaService.consultarPorId(id));
     }

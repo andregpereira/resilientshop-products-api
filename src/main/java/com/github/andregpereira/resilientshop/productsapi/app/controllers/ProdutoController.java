@@ -1,19 +1,34 @@
 package com.github.andregpereira.resilientshop.productsapi.app.controllers;
 
-import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.*;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoAtualizacaoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoAtualizarEstoqueDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoDetalhesDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoDto;
+import com.github.andregpereira.resilientshop.productsapi.app.dto.produto.ProdutoRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.produto.ProdutoManutencaoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -26,6 +41,10 @@ import java.util.Set;
  */
 @RequiredArgsConstructor
 @Slf4j
+@Tag(
+    name = "Produtos",
+    description = "Operações de criação, atualização, desativação, reativação, subtração de estoque, retorno de estoque e consulta de produtos."
+)
 @Validated
 @RestController
 @RequestMapping("/produtos")
@@ -49,13 +68,19 @@ public class ProdutoController {
      *
      * @return o produto criado.
      */
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<ProdutoDetalhesDto> criar(@RequestBody @Valid ProdutoRegistroDto dto) {
+    public ResponseEntity<ProdutoDetalhesDto> criarProduto(@Valid @RequestBody ProdutoRegistroDto dto) {
         log.info("Criando produto...");
         ProdutoDetalhesDto produto = manutencaoService.criar(dto);
         log.info("Produto criado com sucesso");
-        URI uri = UriComponentsBuilder.fromPath("/produtos/{id}").buildAndExpand(produto.id()).toUri();
-        return ResponseEntity.created(uri).body(produto);
+        URI uri = UriComponentsBuilder
+            .fromPath("/produtos/{id}")
+            .buildAndExpand(produto.id())
+            .toUri();
+        return ResponseEntity
+            .created(uri)
+            .body(produto);
     }
 
     /**
@@ -67,14 +92,21 @@ public class ProdutoController {
      *
      * @return o produto atualizado.
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<ProdutoDetalhesDto> atualizar(@PathVariable Long id,
-            @RequestBody @Valid ProdutoAtualizacaoDto dto) {
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<ProdutoDetalhesDto> atualizarProduto(
+        @PathVariable Long id, @Valid @RequestBody ProdutoAtualizacaoDto dto
+    ) {
         log.info("Atualizando produto com id {}...", id);
         ProdutoDetalhesDto produto = manutencaoService.atualizar(id, dto);
         log.info("Produto com id {} atualizado", id);
-        URI uri = UriComponentsBuilder.fromPath("/produtos/{id}").buildAndExpand(id).toUri();
-        return ResponseEntity.ok().location(uri).body(produto);
+        URI uri = UriComponentsBuilder
+            .fromPath("/produtos/{id}")
+            .buildAndExpand(id)
+            .toUri();
+        return ResponseEntity
+            .ok()
+            .location(uri)
+            .body(produto);
     }
 
     /**
@@ -86,7 +118,7 @@ public class ProdutoController {
      * @return uma mensagem de confirmação de desativação.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> desativar(@PathVariable Long id) {
+    public ResponseEntity<String> desativarProduto(@PathVariable Long id) {
         log.info("Desativando produto com id {}...", id);
         return ResponseEntity.ok(manutencaoService.desativar(id));
     }
@@ -100,7 +132,7 @@ public class ProdutoController {
      * @return uma mensagem de confirmação de reativação.
      */
     @PatchMapping("/reativar/{id}")
-    public ResponseEntity<String> reativar(@PathVariable Long id) {
+    public ResponseEntity<String> reativarProduto(@PathVariable Long id) {
         log.info("Reativando produto com id {}...", id);
         return ResponseEntity.ok(manutencaoService.reativar(id));
     }
@@ -111,10 +143,12 @@ public class ProdutoController {
      * @param dtos a lista de produtos a terem seus estoques subtraídos.
      */
     @PutMapping("/estoque/subtrair")
-    public ResponseEntity<Void> subtrairEstoque(@RequestBody Set<ProdutoAtualizarEstoqueDto> dtos) {
+    public ResponseEntity<Void> subtrairProdutosDoEstoque(@RequestBody Set<ProdutoAtualizarEstoqueDto> dtos) {
         log.info("Subtraindo produtos do estoque...");
         manutencaoService.subtrairEstoque(dtos);
-        return ResponseEntity.ok().build();
+        return ResponseEntity
+            .ok()
+            .build();
     }
 
     /**
@@ -123,10 +157,12 @@ public class ProdutoController {
      * @param dtos a lista de produtos a serem retornados ao estoque.
      */
     @PutMapping("/estoque/retornar")
-    public ResponseEntity<Void> retornarEstoque(@RequestBody Set<ProdutoAtualizarEstoqueDto> dtos) {
+    public ResponseEntity<Void> retornarProdutosAoEstoque(@RequestBody Set<ProdutoAtualizarEstoqueDto> dtos) {
         log.info("Retornando produtos ao estoque...");
         manutencaoService.retornarEstoque(dtos);
-        return ResponseEntity.ok().build();
+        return ResponseEntity
+            .ok()
+            .build();
     }
 
     /**
@@ -138,8 +174,9 @@ public class ProdutoController {
      * @return uma sublista de uma lista com todos os produtos cadastrados.
      */
     @GetMapping
-    public ResponseEntity<Page<ProdutoDto>> listar(
-            @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+    public ResponseEntity<Page<ProdutoDto>> listarProdutos(
+        @PageableDefault(sort = "id") Pageable pageable
+    ) {
         log.info("Listando produtos...");
         return ResponseEntity.ok(consultaService.listar(pageable));
     }
@@ -151,8 +188,8 @@ public class ProdutoController {
      *
      * @return um produto encontrado pelo {@code id}.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<ProdutoDetalhesDto> consultarPorId(@PathVariable Long id) {
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<ProdutoDetalhesDto> consultarProdutoPorId(@PathVariable Long id) {
         log.info("Procurando produto com id {}...", id);
         return ResponseEntity.ok(consultaService.consultarPorId(id));
     }
@@ -167,27 +204,12 @@ public class ProdutoController {
      * @return uma sublista de uma lista com todos os produtos encontrados pelo {@code nome}.
      */
     @GetMapping("/nome")
-    public ResponseEntity<Page<ProdutoDto>> consultarPorNome(
-            @RequestParam @Size(message = "O nome deve ter pelo menos 2 caracteres", min = 2) String nome,
-            @PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+    public ResponseEntity<Page<ProdutoDto>> consultarProdutosPorNome(
+        @RequestParam @Size(message = "O nome deve ter pelo menos 2 caracteres", min = 2) String nome,
+        @PageableDefault(sort = "nome") Pageable pageable
+    ) {
         log.info("Procurando produto com nome {}...", nome.trim());
         return ResponseEntity.ok(consultaService.consultarPorNome(nome.trim(), pageable));
-    }
-
-    /**
-     * Pesquisa produtos pelo {@code id} da subcategoria.
-     * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
-     *
-     * @param id       o id da subcategoria.
-     * @param pageable o pageable padrão.
-     *
-     * @return uma sublista de uma lista com todos os produtos encontrados pelo {@code id} da subcategoria.
-     */
-    @GetMapping("/subcategoria/{id}")
-    public ResponseEntity<Page<ProdutoDto>> consultarPorSubcategoria(@PathVariable Long id,
-            @PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
-        log.info("Procurando produto com subcategoria com id {}...", id);
-        return ResponseEntity.ok(consultaService.consultarPorSubcategoria(id, pageable));
     }
 
     /**
@@ -200,10 +222,28 @@ public class ProdutoController {
      * @return uma sublista de uma lista com todos os produtos encontrados pelo {@code id} da categoria.
      */
     @GetMapping("/categoria/{id}")
-    public ResponseEntity<Page<ProdutoDto>> consultarPorCategoria(@PathVariable Long id,
-            @PageableDefault(sort = "nome", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+    public ResponseEntity<Page<ProdutoDto>> consultarProdutosPorIdCategoria(
+        @PathVariable Long id, @PageableDefault(sort = "nome") Pageable pageable
+    ) {
         log.info("Procurando produto com categoria com id {}...", id);
         return ResponseEntity.ok(consultaService.consultarPorCategoria(id, pageable));
+    }
+
+    /**
+     * Pesquisa produtos pelo {@code id} da subcategoria.
+     * Retorna uma {@linkplain Page sublista} de {@linkplain ProdutoDto produtos}.
+     *
+     * @param id       o id da subcategoria.
+     * @param pageable o pageable padrão.
+     *
+     * @return uma sublista de uma lista com todos os produtos encontrados pelo {@code id} da subcategoria.
+     */
+    @GetMapping("/subcategoria/{id}")
+    public ResponseEntity<Page<ProdutoDto>> consultarProdutosPorIdSubcategoria(
+        @PathVariable Long id, @PageableDefault(sort = "nome") Pageable pageable
+    ) {
+        log.info("Procurando produto com subcategoria com id {}...", id);
+        return ResponseEntity.ok(consultaService.consultarPorSubcategoria(id, pageable));
     }
 
 }
