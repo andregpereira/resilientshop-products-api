@@ -5,15 +5,24 @@ import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.S
 import com.github.andregpereira.resilientshop.productsapi.app.dto.subcategoria.SubcategoriaRegistroDto;
 import com.github.andregpereira.resilientshop.productsapi.app.services.subcategoria.SubcategoriaConsultaService;
 import com.github.andregpereira.resilientshop.productsapi.app.services.subcategoria.SubcategoriaManutencaoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -25,6 +34,7 @@ import java.net.URI;
  */
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Subcategorias", description = "Operações de criação, atualização, remoção e consulta de subcategorias.")
 @RestController
 @RequestMapping("/subcategorias")
 public class SubcategoriaController {
@@ -47,13 +57,19 @@ public class SubcategoriaController {
      *
      * @return a subcategoria criada.
      */
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity<SubcategoriaDetalhesDto> registrar(@RequestBody @Valid SubcategoriaRegistroDto dto) {
+    public ResponseEntity<SubcategoriaDetalhesDto> criarSubcategoria(@RequestBody @Valid SubcategoriaRegistroDto dto) {
         log.info("Criando subcategoria...");
         SubcategoriaDetalhesDto subcategoria = manutencaoService.criar(dto);
-        URI uri = UriComponentsBuilder.fromPath("/categorias/{id}").buildAndExpand(subcategoria.id()).toUri();
+        URI uri = UriComponentsBuilder
+            .fromPath("/categorias/{id}")
+            .buildAndExpand(subcategoria.id())
+            .toUri();
         log.info("Subcategoria criada com sucesso");
-        return ResponseEntity.created(uri).body(subcategoria);
+        return ResponseEntity
+            .created(uri)
+            .body(subcategoria);
     }
 
     /**
@@ -66,8 +82,9 @@ public class SubcategoriaController {
      * @return a subcategoria atualizada.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<SubcategoriaDetalhesDto> atualizar(@PathVariable Long id,
-            @RequestBody @Valid SubcategoriaRegistroDto dto) {
+    public ResponseEntity<SubcategoriaDetalhesDto> atualizarSubcategoria(
+        @PathVariable Long id, @Valid @RequestBody SubcategoriaRegistroDto dto
+    ) {
         log.info("Atualizando subcategoria com id {}...", id);
         return ResponseEntity.ok(manutencaoService.atualizar(id, dto));
     }
@@ -80,7 +97,7 @@ public class SubcategoriaController {
      * @return uma mensagem de confirmação de remoção.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> remover(@PathVariable Long id) {
+    public ResponseEntity<String> removerSubcategoria(@PathVariable Long id) {
         log.info("Removendo subcategoria com id {}...", id);
         return ResponseEntity.ok(manutencaoService.remover(id));
     }
@@ -94,8 +111,9 @@ public class SubcategoriaController {
      * @return uma sublista de uma lista com todas as subcategorias cadastradas.
      */
     @GetMapping
-    public ResponseEntity<Page<SubcategoriaDto>> listar(
-            @PageableDefault(sort = "id", direction = Direction.ASC, page = 0, size = 10) Pageable pageable) {
+    public ResponseEntity<Page<SubcategoriaDto>> listarSubcategorias(
+        @PageableDefault(sort = "id") Pageable pageable
+    ) {
         log.info("Listando subcategorias...");
         return ResponseEntity.ok(consultaService.listar(pageable));
     }
@@ -109,7 +127,7 @@ public class SubcategoriaController {
      * @return uma subcategoria encontrada pelo {@code id}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<SubcategoriaDetalhesDto> consultarPorId(@PathVariable Long id) {
+    public ResponseEntity<SubcategoriaDetalhesDto> consultarSubcategoriaPorId(@PathVariable Long id) {
         log.info("Procurando subcategoria com id {}...", id);
         return ResponseEntity.ok(consultaService.consultarPorId(id));
     }
